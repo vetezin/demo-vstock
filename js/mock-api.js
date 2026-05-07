@@ -345,7 +345,7 @@
     const method = String(init?.method || 'GET').toUpperCase();
     const path = url.pathname;
 
-    if (path === '/api/funcionarios/licenca/status' && method === 'GET') return json({ chaveObrigatoria: false, motivo: 'Demo estática sem validação de licença.' });
+    if (path === '/api/funcionarios/licenca/status' && method === 'GET') return json({ licencaAtiva: true, chaveObrigatoria: false, motivo: 'Demo est?tica sem valida??o de licen?a.', expiraEm: '2027-12-31' });
 
     if (path === '/api/funcionarios/login' && method === 'POST') {
       const body = parseFormBody(init);
