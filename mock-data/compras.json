@@ -1,0 +1,142 @@
+[
+  {
+    "compra_cod": 1,
+    "data_compra": "2026-02-28",
+    "compra_valor_tt": 54.9,
+    "fornecedor_id": 1,
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "compra_cod": 2,
+    "data_compra": "2026-03-02",
+    "compra_valor_tt": 84.5,
+    "fornecedor_id": 2,
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "compra_cod": 3,
+    "data_compra": "2026-03-04",
+    "compra_valor_tt": 118.8,
+    "fornecedor_id": 3,
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "compra_cod": 4,
+    "data_compra": "2026-03-06",
+    "compra_valor_tt": 157.8,
+    "fornecedor_id": 4,
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "compra_cod": 5,
+    "data_compra": "2026-03-08",
+    "compra_valor_tt": 201.5,
+    "fornecedor_id": 5,
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "compra_cod": 6,
+    "data_compra": "2026-03-10",
+    "compra_valor_tt": 249.9,
+    "fornecedor_id": 6,
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "compra_cod": 7,
+    "data_compra": "2026-03-12",
+    "compra_valor_tt": 161.6,
+    "fornecedor_id": 7,
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "compra_cod": 8,
+    "data_compra": "2026-03-14",
+    "compra_valor_tt": 202.95,
+    "fornecedor_id": 8,
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "compra_cod": 9,
+    "data_compra": "2026-03-16",
+    "compra_valor_tt": 249.0,
+    "fornecedor_id": 9,
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "compra_cod": 10,
+    "data_compra": "2026-03-18",
+    "compra_valor_tt": 299.75,
+    "fornecedor_id": 10,
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "compra_cod": 11,
+    "data_compra": "2026-03-20",
+    "compra_valor_tt": 355.2,
+    "fornecedor_id": 11,
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "compra_cod": 12,
+    "data_compra": "2026-03-22",
+    "compra_valor_tt": 415.35,
+    "fornecedor_id": 12,
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "compra_cod": 13,
+    "data_compra": "2026-03-24",
+    "compra_valor_tt": 480.2,
+    "fornecedor_id": 13,
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "compra_cod": 14,
+    "data_compra": "2026-03-26",
+    "compra_valor_tt": 293.2,
+    "fornecedor_id": 14,
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "compra_cod": 15,
+    "data_compra": "2026-03-28",
+    "compra_valor_tt": 351.0,
+    "fornecedor_id": 15,
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "compra_cod": 16,
+    "data_compra": "2026-03-30",
+    "compra_valor_tt": 413.5,
+    "fornecedor_id": 16,
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "compra_cod": 17,
+    "data_compra": "2026-04-01",
+    "compra_valor_tt": 480.7,
+    "fornecedor_id": 17,
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "compra_cod": 18,
+    "data_compra": "2026-04-03",
+    "compra_valor_tt": 552.6,
+    "fornecedor_id": 18,
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "compra_cod": 19,
+    "data_compra": "2026-04-05",
+    "compra_valor_tt": 629.2,
+    "fornecedor_id": 19,
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "compra_cod": 20,
+    "data_compra": "2026-04-07",
+    "compra_valor_tt": 710.5,
+    "fornecedor_id": 20,
+    "funcionario_func_cpf": "10000000004"
+  }
+]

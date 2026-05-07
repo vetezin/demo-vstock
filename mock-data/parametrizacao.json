@@ -1,0 +1,21 @@
+{
+  "razaoSocial": "VStock Demo LTDA",
+  "nomeFantasia": "VStock Demo",
+  "telefone": "(11) 97777-8899",
+  "email": "contato@demovstock.com.br",
+  "site": "https://demo.vstock.com.br",
+  "rua": "Rua das Demonstrações, 123",
+  "bairro": "Centro",
+  "cidade": "São Paulo",
+  "uf": "SP",
+  "cep": "01010-000",
+  "logotipoSmall": null,
+  "logotipoBig": null,
+  "moduloEstoque": true,
+  "moduloAlertas": true,
+  "moduloVendas": false,
+  "moduloFinanceiro": false,
+  "moduloContasPagar": false,
+  "moduloContasReceber": false,
+  "moduloRelatorios": false
+}

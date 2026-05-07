@@ -1,0 +1,102 @@
+[
+  {
+    "catCod": 1,
+    "catDescr": "Categoria 01",
+    "ativo": true
+  },
+  {
+    "catCod": 2,
+    "catDescr": "Categoria 02",
+    "ativo": true
+  },
+  {
+    "catCod": 3,
+    "catDescr": "Categoria 03",
+    "ativo": true
+  },
+  {
+    "catCod": 4,
+    "catDescr": "Categoria 04",
+    "ativo": true
+  },
+  {
+    "catCod": 5,
+    "catDescr": "Categoria 05",
+    "ativo": true
+  },
+  {
+    "catCod": 6,
+    "catDescr": "Categoria 06",
+    "ativo": false
+  },
+  {
+    "catCod": 7,
+    "catDescr": "Categoria 07",
+    "ativo": true
+  },
+  {
+    "catCod": 8,
+    "catDescr": "Categoria 08",
+    "ativo": true
+  },
+  {
+    "catCod": 9,
+    "catDescr": "Categoria 09",
+    "ativo": true
+  },
+  {
+    "catCod": 10,
+    "catDescr": "Categoria 10",
+    "ativo": true
+  },
+  {
+    "catCod": 11,
+    "catDescr": "Categoria 11",
+    "ativo": true
+  },
+  {
+    "catCod": 12,
+    "catDescr": "Categoria 12",
+    "ativo": true
+  },
+  {
+    "catCod": 13,
+    "catDescr": "Categoria 13",
+    "ativo": false
+  },
+  {
+    "catCod": 14,
+    "catDescr": "Categoria 14",
+    "ativo": true
+  },
+  {
+    "catCod": 15,
+    "catDescr": "Categoria 15",
+    "ativo": true
+  },
+  {
+    "catCod": 16,
+    "catDescr": "Categoria 16",
+    "ativo": true
+  },
+  {
+    "catCod": 17,
+    "catDescr": "Categoria 17",
+    "ativo": true
+  },
+  {
+    "catCod": 18,
+    "catDescr": "Categoria 18",
+    "ativo": true
+  },
+  {
+    "catCod": 19,
+    "catDescr": "Categoria 19",
+    "ativo": false
+  },
+  {
+    "catCod": 20,
+    "catDescr": "Categoria 20",
+    "ativo": true
+  }
+]

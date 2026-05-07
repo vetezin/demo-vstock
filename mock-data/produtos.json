@@ -1,0 +1,262 @@
+[
+  {
+    "prodCod": 1,
+    "prodDescr": "Produto 01",
+    "qtdMin": 4,
+    "valorUnitario": 6.1,
+    "codigoBarras": "78910000000001",
+    "dataCadastro": "2025-11-11",
+    "ativo": true,
+    "categoria": {
+      "catCod": 1,
+      "catDescr": "Categoria 01"
+    }
+  },
+  {
+    "prodCod": 2,
+    "prodDescr": "Produto 02",
+    "qtdMin": 5,
+    "valorUnitario": 8.45,
+    "codigoBarras": "78910000000002",
+    "dataCadastro": "2025-11-14",
+    "ativo": true,
+    "categoria": {
+      "catCod": 2,
+      "catDescr": "Categoria 02"
+    }
+  },
+  {
+    "prodCod": 3,
+    "prodDescr": "Produto 03",
+    "qtdMin": 6,
+    "valorUnitario": 10.8,
+    "codigoBarras": "78910000000003",
+    "dataCadastro": "2025-11-17",
+    "ativo": true,
+    "categoria": {
+      "catCod": 3,
+      "catDescr": "Categoria 03"
+    }
+  },
+  {
+    "prodCod": 4,
+    "prodDescr": "Produto 04",
+    "qtdMin": 7,
+    "valorUnitario": 13.15,
+    "codigoBarras": "78910000000004",
+    "dataCadastro": "2025-11-20",
+    "ativo": false,
+    "categoria": {
+      "catCod": 4,
+      "catDescr": "Categoria 04"
+    }
+  },
+  {
+    "prodCod": 5,
+    "prodDescr": "Produto 05",
+    "qtdMin": 3,
+    "valorUnitario": 15.5,
+    "codigoBarras": "78910000000005",
+    "dataCadastro": "2025-11-23",
+    "ativo": true,
+    "categoria": {
+      "catCod": 5,
+      "catDescr": "Categoria 05"
+    }
+  },
+  {
+    "prodCod": 6,
+    "prodDescr": "Produto 06",
+    "qtdMin": 4,
+    "valorUnitario": 17.85,
+    "codigoBarras": "78910000000006",
+    "dataCadastro": "2025-11-26",
+    "ativo": true,
+    "categoria": {
+      "catCod": 6,
+      "catDescr": "Categoria 06"
+    }
+  },
+  {
+    "prodCod": 7,
+    "prodDescr": "Produto 07",
+    "qtdMin": 5,
+    "valorUnitario": 20.2,
+    "codigoBarras": "78910000000007",
+    "dataCadastro": "2025-11-29",
+    "ativo": true,
+    "categoria": {
+      "catCod": 7,
+      "catDescr": "Categoria 07"
+    }
+  },
+  {
+    "prodCod": 8,
+    "prodDescr": "Produto 08",
+    "qtdMin": 6,
+    "valorUnitario": 22.55,
+    "codigoBarras": "78910000000008",
+    "dataCadastro": "2025-12-02",
+    "ativo": true,
+    "categoria": {
+      "catCod": 8,
+      "catDescr": "Categoria 08"
+    }
+  },
+  {
+    "prodCod": 9,
+    "prodDescr": "Produto 09",
+    "qtdMin": 7,
+    "valorUnitario": 24.9,
+    "codigoBarras": "78910000000009",
+    "dataCadastro": "2025-12-05",
+    "ativo": false,
+    "categoria": {
+      "catCod": 9,
+      "catDescr": "Categoria 09"
+    }
+  },
+  {
+    "prodCod": 10,
+    "prodDescr": "Produto 10",
+    "qtdMin": 3,
+    "valorUnitario": 27.25,
+    "codigoBarras": "78910000000010",
+    "dataCadastro": "2025-12-08",
+    "ativo": true,
+    "categoria": {
+      "catCod": 10,
+      "catDescr": "Categoria 10"
+    }
+  },
+  {
+    "prodCod": 11,
+    "prodDescr": "Produto 11",
+    "qtdMin": 4,
+    "valorUnitario": 29.6,
+    "codigoBarras": "78910000000011",
+    "dataCadastro": "2025-12-11",
+    "ativo": true,
+    "categoria": {
+      "catCod": 11,
+      "catDescr": "Categoria 11"
+    }
+  },
+  {
+    "prodCod": 12,
+    "prodDescr": "Produto 12",
+    "qtdMin": 5,
+    "valorUnitario": 31.95,
+    "codigoBarras": "78910000000012",
+    "dataCadastro": "2025-12-14",
+    "ativo": true,
+    "categoria": {
+      "catCod": 12,
+      "catDescr": "Categoria 12"
+    }
+  },
+  {
+    "prodCod": 13,
+    "prodDescr": "Produto 13",
+    "qtdMin": 6,
+    "valorUnitario": 34.3,
+    "codigoBarras": "78910000000013",
+    "dataCadastro": "2025-12-17",
+    "ativo": true,
+    "categoria": {
+      "catCod": 13,
+      "catDescr": "Categoria 13"
+    }
+  },
+  {
+    "prodCod": 14,
+    "prodDescr": "Produto 14",
+    "qtdMin": 7,
+    "valorUnitario": 36.65,
+    "codigoBarras": "78910000000014",
+    "dataCadastro": "2025-12-20",
+    "ativo": true,
+    "categoria": {
+      "catCod": 14,
+      "catDescr": "Categoria 14"
+    }
+  },
+  {
+    "prodCod": 15,
+    "prodDescr": "Produto 15",
+    "qtdMin": 3,
+    "valorUnitario": 39.0,
+    "codigoBarras": "78910000000015",
+    "dataCadastro": "2025-12-23",
+    "ativo": true,
+    "categoria": {
+      "catCod": 15,
+      "catDescr": "Categoria 15"
+    }
+  },
+  {
+    "prodCod": 16,
+    "prodDescr": "Produto 16",
+    "qtdMin": 4,
+    "valorUnitario": 41.35,
+    "codigoBarras": "78910000000016",
+    "dataCadastro": "2025-12-26",
+    "ativo": false,
+    "categoria": {
+      "catCod": 16,
+      "catDescr": "Categoria 16"
+    }
+  },
+  {
+    "prodCod": 17,
+    "prodDescr": "Produto 17",
+    "qtdMin": 5,
+    "valorUnitario": 43.7,
+    "codigoBarras": "78910000000017",
+    "dataCadastro": "2025-12-29",
+    "ativo": true,
+    "categoria": {
+      "catCod": 17,
+      "catDescr": "Categoria 17"
+    }
+  },
+  {
+    "prodCod": 18,
+    "prodDescr": "Produto 18",
+    "qtdMin": 6,
+    "valorUnitario": 46.05,
+    "codigoBarras": "78910000000018",
+    "dataCadastro": "2026-01-01",
+    "ativo": true,
+    "categoria": {
+      "catCod": 18,
+      "catDescr": "Categoria 18"
+    }
+  },
+  {
+    "prodCod": 19,
+    "prodDescr": "Produto 19",
+    "qtdMin": 7,
+    "valorUnitario": 48.4,
+    "codigoBarras": "78910000000019",
+    "dataCadastro": "2026-01-04",
+    "ativo": true,
+    "categoria": {
+      "catCod": 19,
+      "catDescr": "Categoria 19"
+    }
+  },
+  {
+    "prodCod": 20,
+    "prodDescr": "Produto 20",
+    "qtdMin": 3,
+    "valorUnitario": 50.75,
+    "codigoBarras": "78910000000020",
+    "dataCadastro": "2026-01-07",
+    "ativo": true,
+    "categoria": {
+      "catCod": 20,
+      "catDescr": "Categoria 20"
+    }
+  }
+]

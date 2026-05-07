@@ -1,0 +1,78 @@
+.brand-subtitle-inline {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.nav-btn-disabled {
+  opacity: 0.6;
+}
+
+.brand-divider {
+  margin: 2rem 0;
+  border-color: var(--brand-primary);
+}
+
+.stats-card-meta {
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.campo-moeda {
+  position: relative;
+}
+
+.campo-moeda-prefixo {
+  position: absolute;
+  top: 50%;
+  left: 0.9rem;
+  transform: translateY(-50%);
+  color: #5f6662;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.campo-moeda .form-control {
+  padding-left: 2.7rem;
+  text-align: left;
+}
+
+.campo-moeda .form-control::placeholder {
+  text-align: left;
+}
+
+.icon-box-brand {
+  background: rgba(var(--brand-primary-rgb), 0.12);
+}
+
+.icon-box-primary {
+  background: rgba(13, 110, 253, 0.12);
+}
+
+.icon-box-warning {
+  background: rgba(255, 193, 7, 0.16);
+}
+
+.icon-box-success {
+  background: rgba(25, 135, 84, 0.12);
+}
+
+.preview-uf-field {
+  max-width: 140px;
+}
+
+.logo-preview-small {
+  max-width: 160px;
+  height: auto;
+}
+
+.logo-preview-big {
+  max-width: 220px;
+  height: auto;
+}
+
+.theme-preview-default {
+  --preview-primary: #0F6A73;
+  --preview-secondary: #094C55;
+  --preview-accent: #74AED6;
+}

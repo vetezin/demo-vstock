@@ -1,0 +1,142 @@
+[
+  {
+    "compraCompraCod": 1,
+    "produtoProdCod": 1,
+    "valor": 6.1,
+    "quantidade": 9,
+    "validade": "2026-06-12"
+  },
+  {
+    "compraCompraCod": 2,
+    "produtoProdCod": 2,
+    "valor": 8.45,
+    "quantidade": 10,
+    "validade": "2026-05-19"
+  },
+  {
+    "compraCompraCod": 3,
+    "produtoProdCod": 3,
+    "valor": 10.8,
+    "quantidade": 11,
+    "validade": "2026-05-05"
+  },
+  {
+    "compraCompraCod": 4,
+    "produtoProdCod": 4,
+    "valor": 13.15,
+    "quantidade": 12,
+    "validade": "2026-06-15"
+  },
+  {
+    "compraCompraCod": 5,
+    "produtoProdCod": 5,
+    "valor": 15.5,
+    "quantidade": 13,
+    "validade": "2026-05-11"
+  },
+  {
+    "compraCompraCod": 6,
+    "produtoProdCod": 6,
+    "valor": 17.85,
+    "quantidade": 14,
+    "validade": "2026-06-17"
+  },
+  {
+    "compraCompraCod": 7,
+    "produtoProdCod": 7,
+    "valor": 20.2,
+    "quantidade": 8,
+    "validade": "2026-05-19"
+  },
+  {
+    "compraCompraCod": 8,
+    "produtoProdCod": 8,
+    "valor": 22.55,
+    "quantidade": 9,
+    "validade": "2026-05-05"
+  },
+  {
+    "compraCompraCod": 9,
+    "produtoProdCod": 9,
+    "valor": 24.9,
+    "quantidade": 10,
+    "validade": "2026-06-20"
+  },
+  {
+    "compraCompraCod": 10,
+    "produtoProdCod": 10,
+    "valor": 27.25,
+    "quantidade": 11,
+    "validade": "2026-05-11"
+  },
+  {
+    "compraCompraCod": 11,
+    "produtoProdCod": 11,
+    "valor": 29.6,
+    "quantidade": 12,
+    "validade": "2026-06-22"
+  },
+  {
+    "compraCompraCod": 12,
+    "produtoProdCod": 12,
+    "valor": 31.95,
+    "quantidade": 13,
+    "validade": "2026-05-19"
+  },
+  {
+    "compraCompraCod": 13,
+    "produtoProdCod": 13,
+    "valor": 34.3,
+    "quantidade": 14,
+    "validade": "2026-05-05"
+  },
+  {
+    "compraCompraCod": 14,
+    "produtoProdCod": 14,
+    "valor": 36.65,
+    "quantidade": 8,
+    "validade": "2026-06-25"
+  },
+  {
+    "compraCompraCod": 15,
+    "produtoProdCod": 15,
+    "valor": 39.0,
+    "quantidade": 9,
+    "validade": "2026-05-11"
+  },
+  {
+    "compraCompraCod": 16,
+    "produtoProdCod": 16,
+    "valor": 41.35,
+    "quantidade": 10,
+    "validade": "2026-06-27"
+  },
+  {
+    "compraCompraCod": 17,
+    "produtoProdCod": 17,
+    "valor": 43.7,
+    "quantidade": 11,
+    "validade": "2026-05-19"
+  },
+  {
+    "compraCompraCod": 18,
+    "produtoProdCod": 18,
+    "valor": 46.05,
+    "quantidade": 12,
+    "validade": "2026-05-05"
+  },
+  {
+    "compraCompraCod": 19,
+    "produtoProdCod": 19,
+    "valor": 48.4,
+    "quantidade": 13,
+    "validade": "2026-06-30"
+  },
+  {
+    "compraCompraCod": 20,
+    "produtoProdCod": 20,
+    "valor": 50.75,
+    "quantidade": 14,
+    "validade": "2026-05-11"
+  }
+]

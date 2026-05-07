@@ -1,0 +1,419 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Saída de Estoque | Plataforma de Gestão</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/app.css" rel="stylesheet"/>
+  <link href="css/principal.css" rel="stylesheet"/>
+  <link href="css/entrada-compra.css" rel="stylesheet"/>
+  <link href="css/estoque-paginas.css" rel="stylesheet"/>
+</head>
+
+<body>
+  <nav class="navbar brand-navbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png"/>
+      </a>
+
+      <div class="text-white text-end">
+        <div class="navbar-date">
+          <i class="bi bi-calendar3"></i>
+          <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <div class="sidebar">
+      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
+
+      <a class="nav-btn" href="index.html">
+        <i class="bi bi-house-heart"></i> Dashboard
+      </a>
+
+      <a class="nav-btn" href="parametrizacao.html">
+        <i class="bi bi-sliders"></i> Parametrização
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-journal-text"></i> CADASTROS</small>
+      </div>
+
+      <a class="nav-btn" href="cadastro-fornecedor.html">
+        <i class="bi bi-truck"></i> Fornecedores
+      </a>
+
+      <a class="nav-btn" href="cadastro-categoria.html">
+        <i class="bi bi-tags"></i> Categorias
+      </a>
+
+      <a class="nav-btn" href="cadastro-produto.html">
+        <i class="bi bi-box-seam"></i> Produtos
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-box"></i> CONTROLE DE ESTOQUE</small>
+      </div>
+
+      <a class="nav-btn" href="entrada-compra.html">
+        <i class="bi bi-pencil-square"></i> Entrada de Estoque
+      </a>
+
+      <a class="nav-btn active" href="saida-estoque.html">
+        <i class="bi bi-box-arrow-up"></i> Saída de Estoque
+      </a>
+
+      <a class="nav-btn" href="estoque.html">
+        <i class="bi bi-archive"></i> Estoque
+      </a>
+
+      <a class="nav-btn" href="historico.html">
+        <i class="bi bi-clock-history"></i> Movimentações
+      </a>
+
+      <div class="module-development">
+        <small><i class="bi bi-stars"></i> EVOLUÇÕES</small>
+      </div>
+
+      <a class="nav-btn" href="alertas.html">
+        <i class="bi bi-bell"></i> Alertas
+      </a>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-speedometer2"></i> Dashboard Avançado
+      </button>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-shield-lock"></i> Perfis e Permissões
+      </button>
+
+      <hr class="brand-divider"/>
+
+      <div class="stats-card">
+        <h6><i class="bi bi-shield-check"></i> Plataforma</h6>
+        <small>Versão 1.0 Beta</small><br/>
+        <small><i class="bi bi-circle-fill text-success"></i> Operacional</small><br/>
+        <small class="stats-card-meta">
+          <i class="bi bi-clock"></i> Atualizado hoje
+        </small>
+      </div>
+    </div>
+
+    <div class="content">
+      <main class="page-wrapper">
+        <div id="mensagens" class="mb-3"></div>
+
+        <h2 class="h4 mb-1">
+          <i class="bi bi-box-arrow-up text-danger"></i>
+          Saída de Estoque
+        </h2>
+        <p class="text-muted mb-4">Registre as retiradas do estoque com motivo e quantidade de forma controlada.</p>
+
+        <div class="card mb-4 card-entrada-unificada">
+          <div class="card-header bg-light card-header-flex">
+            <i class="bi bi-arrow-up-right-square text-danger"></i>
+            <span>Nova Saída</span>
+          </div>
+
+          <div class="card-body">
+            <div class="entrada-section">
+              <div class="entrada-section-header">
+                <i class="bi bi-journal-text text-danger"></i>
+                <span>Dados da Saída</span>
+              </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label required">Data da Saída</label>
+                <input type="date" id="dataSaida" class="form-control"/>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label required">Funcionário Logado</label>
+                <input class="form-control" id="funcionarioNome" disabled placeholder="-"/>
+                <input type="hidden" id="funcionarioCpf"/>
+                <small class="text-muted">Responsável pela retirada</small>
+              </div>
+            </div>
+            </div>
+
+            <div class="entrada-section-divider"></div>
+
+            <div class="entrada-section">
+              <div class="entrada-section-header">
+                <i class="bi bi-box2-heart text-danger"></i>
+                <span>Itens da Saída</span>
+              </div>
+
+            <div class="row g-3 estoque-form-row">
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <label class="form-label">Código de Barras</label>
+                <input id="codigoBarrasSaida" class="form-control" placeholder="Leia o código com o scanner" autocomplete="off"/>
+              </div>
+
+              <div class="col-xl-4 col-lg-4 col-md-6">
+                <label class="form-label required">Produto</label>
+                <div class="produto-busca-grupo">
+                  <input id="buscaProdutoSaida" class="form-control" placeholder="Buscar produto..." autocomplete="off"/>
+                  <div id="dropdownProdutosSaida" class="produto-dropdown"></div>
+                </div>
+
+                <select id="listaProdutos" class="form-select d-none">
+                  <option disabled selected>Carregando...</option>
+                </select>
+              </div>
+
+              <div class="col-xl-2 col-lg-2 col-md-4">
+                <label class="form-label">Saldo Estoque</label>
+                <input type="text" id="saldoProduto" class="form-control text-end" disabled placeholder="0"/>
+              </div>
+
+              <div class="col-xl-2 col-lg-2 col-md-4">
+                <label class="form-label">Valor Unitário</label>
+                <div class="campo-moeda">
+                  <span class="campo-moeda-prefixo">R$</span>
+                  <input type="text" id="valorUnitarioProduto" class="form-control" disabled placeholder="0,00"/>
+                </div>
+              </div>
+
+              <div class="col-xl-2 col-lg-2 col-md-3">
+                <label class="form-label required">Quantidade</label>
+                <input type="number" id="quantidade" min="1" step="1" class="form-control text-end"/>
+              </div>
+
+              <div class="col-xl-2 col-lg-3 col-md-3">
+                <label class="form-label required">Motivo</label>
+                <select id="motivo" class="form-select">
+                  <option value="VENDA" selected>Venda</option>
+                  <option value="USO_INTERNO">Uso interno</option>
+                  <option value="PERDA">Perda</option>
+                  <option value="AVARIA">Avaria</option>
+                </select>
+              </div>
+
+              <div class="col-xl-3 col-lg-3 col-md-4" id="blocoRecebimentoDinheiro">
+                <label class="form-label required">Recebimento em dinheiro</label>
+                <div class="d-flex gap-3 flex-wrap align-items-center h-100 pt-md-4">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="recebimentoDinheiro" id="recebimentoDinheiroSim" value="SIM">
+                    <label class="form-check-label" for="recebimentoDinheiroSim">Sim</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="recebimentoDinheiro" id="recebimentoDinheiroNao" value="NAO">
+                    <label class="form-check-label" for="recebimentoDinheiroNao">Não</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-2 col-lg-2 col-md-3">
+                <label class="form-label">Subtotal</label>
+                <div class="campo-moeda">
+                  <span class="campo-moeda-prefixo">R$</span>
+                  <input type="text" id="subtotalItemSaida" class="form-control" disabled placeholder="0,00"/>
+                </div>
+              </div>
+
+              <div class="col-xl-2 col-lg-2 col-md-3">
+                <label class="form-label">Obs.</label>
+                <button id="btnAbrirObservacao" class="btn btn-outline-secondary w-100" type="button">
+                  <i class="bi bi-chat-left-text"></i>
+                </button>
+              </div>
+
+              <div class="col-xl-1 col-lg-2 col-md-2 estoque-form-action">
+                <label class="form-label form-label-placeholder">Adicionar</label>
+                <button id="btnAddItem" class="btn btn-danger" type="button">
+                  <i class="bi bi-plus-circle"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive mt-4">
+              <table class="table table-sm align-middle" id="tabelaItens">
+                <thead>
+                  <tr>
+                    <th>Produto</th>
+                    <th class="text-end">Saldo</th>
+                    <th class="text-end">Qtd</th>
+                    <th>Motivo</th>
+                    <th class="text-end">Valor</th>
+                    <th class="text-end">Subtotal</th>
+                    <th>Observação</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3 flex-column align-items-end">
+              <div class="totais-box">
+                Total de Itens: <span id="totalItensSaida">0</span>
+              </div>
+              <div class="totais-box mt-2" id="boxTotalVendaSaida">
+                Total da Venda: <span id="totalVendaSaida">R$ 0,00</span>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+          <div class="card-header bg-light card-header-flex">
+            <i class="bi bi-journal-minus text-danger"></i>
+            <span>Saídas Registradas</span>
+          </div>
+
+          <div class="card-body">
+            <div class="listagem-toolbar mb-3">
+              <div class="row g-3">
+                <div class="col-lg-4 col-md-6">
+                  <label class="form-label" for="filtroSaidaProduto">Produto</label>
+                  <input type="text" id="filtroSaidaProduto" class="form-control" placeholder="Buscar produto">
+                </div>
+                <div class="col-lg-4 col-md-6">
+                  <label class="form-label">Período</label>
+                  <div class="filtro-periodo">
+                    <input type="date" id="filtroSaidaDataInicio" class="form-control">
+                    <span class="filtro-periodo-separador">até</span>
+                    <input type="date" id="filtroSaidaDataFim" class="form-control">
+                  </div>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                  <label class="form-label" for="filtroSaidaFuncionario">Funcionário</label>
+                  <input type="text" id="filtroSaidaFuncionario" class="form-control" placeholder="Buscar funcionário">
+                </div>
+                <div class="col-12">
+                  <div class="d-flex justify-content-end gap-2 flex-wrap">
+                    <button id="btnLimparFiltroSaidas" class="btn btn-outline-warning" type="button">
+                      <i class="bi bi-eraser"></i> Limpar
+                    </button>
+                    <button id="btnFiltrarSaidas" class="btn btn-success" type="button">
+                      <i class="bi bi-search"></i> Filtrar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table id="tabelaSaidas" class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                      <th>Produto</th>
+                      <th class="text-end">Qtd</th>
+                      <th class="text-end">Total</th>
+                      <th>Data</th>
+                      <th>Funcionário</th>
+                      <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div id="paginacaoSaidas" class="paginacao-listagem"></div>
+          </div>
+        </div>
+
+        <div class="actions-bar d-flex flex-wrap justify-content-end gap-2 mb-4">
+          <a href="index.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+          </a>
+
+          <button id="btnLimparTudo" class="btn btn-outline-warning" type="button">
+            <i class="bi bi-eraser"></i> Limpar
+          </button>
+
+          <button id="btnSalvar" class="btn btn-success" type="button">
+            <i class="bi bi-check2-circle"></i> Confirmar Saída
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalObservacao" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-chat-left-text"></i> Observação do Item
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <label class="form-label">Observação</label>
+          <textarea id="observacaoItem" class="form-control" rows="4" placeholder="Detalhes opcionais sobre a saída"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Fechar</button>
+          <button class="btn btn-success" id="btnSalvarObservacao" type="button">Salvar observação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalRecebimentoDinheiro" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-cash-coin"></i> Recebimento da Venda
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Total da venda</label>
+            <input id="totalVendaRecebimento" class="form-control" type="text" disabled placeholder="R$ 0,00">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label required" for="valorRecebidoVenda">Valor recebido</label>
+            <div class="campo-moeda">
+              <span class="campo-moeda-prefixo">R$</span>
+              <input id="valorRecebidoVenda" class="form-control" type="text" placeholder="0,00" autocomplete="off">
+            </div>
+          </div>
+
+          <div>
+            <label class="form-label">Troco</label>
+            <input id="trocoVendaRecebimento" class="form-control" type="text" disabled placeholder="R$ 0,00">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+          <button class="btn btn-success" id="btnConfirmarRecebimentoDinheiro" type="button">Confirmar venda</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-info">
+    <i class="bi bi-box-seam"></i> Plataforma de Estoque v1.0 &copy; 2025
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/saida-estoque.js"></script>
+</body>
+</html>
+

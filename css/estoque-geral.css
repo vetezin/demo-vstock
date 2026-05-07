@@ -1,0 +1,235 @@
+.page-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-topo-title-center {
+  flex: 1;
+  text-align: center;
+}
+
+.page-topo-acoes {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.estoque-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.estoque-kpi-card {
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(229, 217, 207, 0.9);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 10px 26px rgba(82, 57, 43, 0.05);
+}
+
+.estoque-kpi-card small {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #727b76;
+}
+
+.estoque-kpi-card strong {
+  font-size: 1.65rem;
+  color: #24322d;
+}
+
+.estoque-kpi-card.alerta {
+  background: rgba(255, 193, 7, 0.10);
+}
+
+.estoque-kpi-card.vencimento {
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.estoque-filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.estoque-filtros-card {
+  padding: 1rem;
+  border: 1px solid rgba(229, 217, 207, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.status-badge-estoque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 122px;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.status-ok {
+  background: rgba(25, 135, 84, 0.12);
+  color: #1f6b46;
+}
+
+.status-baixo {
+  background: rgba(255, 193, 7, 0.16);
+  color: #9d6f00;
+}
+
+.status-vencendo {
+  background: rgba(255, 111, 0, 0.12);
+  color: #c06500;
+}
+
+.status-vencido {
+  background: rgba(220, 53, 69, 0.12);
+  color: #b42332;
+}
+
+.status-sem {
+  background: rgba(108, 117, 125, 0.14);
+  color: #5f666d;
+}
+
+.movimentacao-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+}
+
+.movimentacao-badge.entrada {
+  color: #198754;
+}
+
+.movimentacao-badge.saida {
+  color: #dc3545;
+}
+
+.movimentacao-badge.sem {
+  color: #6c757d;
+}
+
+.produto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.produto-info strong {
+  color: #23312a;
+}
+
+.produto-info small {
+  color: #7a817d;
+}
+
+#tabelaEstoque th:nth-child(3),
+#tabelaEstoque td:nth-child(3),
+#tabelaEstoque th:nth-child(4),
+#tabelaEstoque td:nth-child(4) {
+  white-space: nowrap;
+}
+
+#tabelaEstoque thead th {
+  text-align: center;
+}
+
+#tabelaEstoque td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#tabelaEstoque .produto-info {
+  align-items: center;
+}
+
+#tabelaEstoque th:first-child,
+#tabelaEstoque td:first-child {
+  width: 30%;
+}
+
+#tabelaEstoque th:nth-child(2),
+#tabelaEstoque td:nth-child(2) {
+  width: 19%;
+}
+
+#tabelaEstoque th:nth-child(3),
+#tabelaEstoque td:nth-child(3) {
+  width: 11%;
+}
+
+#tabelaEstoque th:nth-child(4),
+#tabelaEstoque td:nth-child(4) {
+  width: 11%;
+}
+
+#tabelaEstoque th:nth-child(5),
+#tabelaEstoque td:nth-child(5) {
+  width: 17%;
+}
+
+#tabelaEstoque th:nth-child(6),
+#tabelaEstoque td:nth-child(6) {
+  width: 12%;
+}
+
+#tabelaEstoque th:last-child,
+#tabelaEstoque td:last-child {
+  width: 10%;
+}
+
+#tabelaEstoque .movimentacao-badge {
+  justify-content: center;
+}
+
+.estado-vazio {
+  text-align: center;
+  padding: 1rem;
+  color: #6c757d;
+  border: 1px dashed rgba(229, 217, 207, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.paginacao-listagem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.paginacao-listagem-resumo {
+  color: #6c757d;
+  font-size: 0.95rem;
+}
+
+.paginacao-listagem-botoes {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1100px) {
+  .estoque-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .estoque-filtros,
+  .estoque-kpis {
+    grid-template-columns: 1fr;
+  }
+}

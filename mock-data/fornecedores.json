@@ -1,0 +1,222 @@
+[
+  {
+    "idFornecedor": 1,
+    "nome": "Fornecedor 01",
+    "contato": "Contato 01",
+    "email": "fornecedor01@demoestoque.com",
+    "telefone": "(11) 90001-2001",
+    "cpfCnpj": "12.345.678/0001-01",
+    "descricao": "Fornecedor demonstrativo 01 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-09",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 2,
+    "nome": "Fornecedor 02",
+    "contato": "Contato 02",
+    "email": "fornecedor02@demoestoque.com",
+    "telefone": "(11) 90002-2002",
+    "cpfCnpj": "12.345.678/0001-02",
+    "descricao": "Fornecedor demonstrativo 02 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-11",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 3,
+    "nome": "Fornecedor 03",
+    "contato": "Contato 03",
+    "email": "fornecedor03@demoestoque.com",
+    "telefone": "(11) 90003-2003",
+    "cpfCnpj": "12.345.678/0001-03",
+    "descricao": "Fornecedor demonstrativo 03 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-13",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 4,
+    "nome": "Fornecedor 04",
+    "contato": "Contato 04",
+    "email": "fornecedor04@demoestoque.com",
+    "telefone": "(11) 90004-2004",
+    "cpfCnpj": "12.345.678/0001-04",
+    "descricao": "Fornecedor demonstrativo 04 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-15",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 5,
+    "nome": "Fornecedor 05",
+    "contato": "Contato 05",
+    "email": "fornecedor05@demoestoque.com",
+    "telefone": "(11) 90005-2005",
+    "cpfCnpj": "12.345.678/0001-05",
+    "descricao": "Fornecedor demonstrativo 05 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-17",
+    "ativo": false
+  },
+  {
+    "idFornecedor": 6,
+    "nome": "Fornecedor 06",
+    "contato": "Contato 06",
+    "email": "fornecedor06@demoestoque.com",
+    "telefone": "(11) 90006-2006",
+    "cpfCnpj": "12.345.678/0001-06",
+    "descricao": "Fornecedor demonstrativo 06 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-19",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 7,
+    "nome": "Fornecedor 07",
+    "contato": "Contato 07",
+    "email": "fornecedor07@demoestoque.com",
+    "telefone": "(11) 90007-2007",
+    "cpfCnpj": "12.345.678/0001-07",
+    "descricao": "Fornecedor demonstrativo 07 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-21",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 8,
+    "nome": "Fornecedor 08",
+    "contato": "Contato 08",
+    "email": "fornecedor08@demoestoque.com",
+    "telefone": "(11) 90008-2008",
+    "cpfCnpj": "12.345.678/0001-08",
+    "descricao": "Fornecedor demonstrativo 08 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-23",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 9,
+    "nome": "Fornecedor 09",
+    "contato": "Contato 09",
+    "email": "fornecedor09@demoestoque.com",
+    "telefone": "(11) 90009-2009",
+    "cpfCnpj": "12.345.678/0001-09",
+    "descricao": "Fornecedor demonstrativo 09 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-25",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 10,
+    "nome": "Fornecedor 10",
+    "contato": "Contato 10",
+    "email": "fornecedor10@demoestoque.com",
+    "telefone": "(11) 90010-2010",
+    "cpfCnpj": "12.345.678/0001-10",
+    "descricao": "Fornecedor demonstrativo 10 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-27",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 11,
+    "nome": "Fornecedor 11",
+    "contato": "Contato 11",
+    "email": "fornecedor11@demoestoque.com",
+    "telefone": "(11) 90011-2011",
+    "cpfCnpj": "12.345.678/0001-11",
+    "descricao": "Fornecedor demonstrativo 11 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-29",
+    "ativo": false
+  },
+  {
+    "idFornecedor": 12,
+    "nome": "Fornecedor 12",
+    "contato": "Contato 12",
+    "email": "fornecedor12@demoestoque.com",
+    "telefone": "(11) 90012-2012",
+    "cpfCnpj": "12.345.678/0001-12",
+    "descricao": "Fornecedor demonstrativo 12 para a vitrine do sistema.",
+    "dataCadastro": "2026-01-31",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 13,
+    "nome": "Fornecedor 13",
+    "contato": "Contato 13",
+    "email": "fornecedor13@demoestoque.com",
+    "telefone": "(11) 90013-2013",
+    "cpfCnpj": "12.345.678/0001-13",
+    "descricao": "Fornecedor demonstrativo 13 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-02",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 14,
+    "nome": "Fornecedor 14",
+    "contato": "Contato 14",
+    "email": "fornecedor14@demoestoque.com",
+    "telefone": "(11) 90014-2014",
+    "cpfCnpj": "12.345.678/0001-14",
+    "descricao": "Fornecedor demonstrativo 14 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-04",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 15,
+    "nome": "Fornecedor 15",
+    "contato": "Contato 15",
+    "email": "fornecedor15@demoestoque.com",
+    "telefone": "(11) 90015-2015",
+    "cpfCnpj": "12.345.678/0001-15",
+    "descricao": "Fornecedor demonstrativo 15 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-06",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 16,
+    "nome": "Fornecedor 16",
+    "contato": "Contato 16",
+    "email": "fornecedor16@demoestoque.com",
+    "telefone": "(11) 90016-2016",
+    "cpfCnpj": "12.345.678/0001-16",
+    "descricao": "Fornecedor demonstrativo 16 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-08",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 17,
+    "nome": "Fornecedor 17",
+    "contato": "Contato 17",
+    "email": "fornecedor17@demoestoque.com",
+    "telefone": "(11) 90017-2017",
+    "cpfCnpj": "12.345.678/0001-17",
+    "descricao": "Fornecedor demonstrativo 17 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-10",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 18,
+    "nome": "Fornecedor 18",
+    "contato": "Contato 18",
+    "email": "fornecedor18@demoestoque.com",
+    "telefone": "(11) 90018-2018",
+    "cpfCnpj": "12.345.678/0001-18",
+    "descricao": "Fornecedor demonstrativo 18 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-12",
+    "ativo": false
+  },
+  {
+    "idFornecedor": 19,
+    "nome": "Fornecedor 19",
+    "contato": "Contato 19",
+    "email": "fornecedor19@demoestoque.com",
+    "telefone": "(11) 90019-2019",
+    "cpfCnpj": "12.345.678/0001-19",
+    "descricao": "Fornecedor demonstrativo 19 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-14",
+    "ativo": true
+  },
+  {
+    "idFornecedor": 20,
+    "nome": "Fornecedor 20",
+    "contato": "Contato 20",
+    "email": "fornecedor20@demoestoque.com",
+    "telefone": "(11) 90020-2020",
+    "cpfCnpj": "12.345.678/0001-20",
+    "descricao": "Fornecedor demonstrativo 20 para a vitrine do sistema.",
+    "dataCadastro": "2026-02-16",
+    "ativo": true
+  }
+]

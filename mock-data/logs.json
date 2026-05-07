@@ -1,0 +1,122 @@
+[
+  {
+    "createdAt": "2026-05-07T15:57:40",
+    "usuario": "admin@admin.login",
+    "operacao": "PRODUTO_INSERT",
+    "mensagem": "Registro demonstrativo 01 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-07T12:57:40",
+    "usuario": "funcionario02@demoestoque.com",
+    "operacao": "PRODUTO_UPDATE",
+    "mensagem": "Registro demonstrativo 02 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-07T09:57:40",
+    "usuario": "funcionario03@demoestoque.com",
+    "operacao": "FUNCIONARIO_INSERT",
+    "mensagem": "Registro demonstrativo 03 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-07T06:57:40",
+    "usuario": "funcionario04@demoestoque.com",
+    "operacao": "FORNECEDOR_UPDATE",
+    "mensagem": "Registro demonstrativo 04 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-07T03:57:40",
+    "usuario": "funcionario05@demoestoque.com",
+    "operacao": "COMPRA_INSERT",
+    "mensagem": "Registro demonstrativo 05 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-07T00:57:40",
+    "usuario": "funcionario06@demoestoque.com",
+    "operacao": "SAIDA_INSERT",
+    "mensagem": "Registro demonstrativo 06 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T21:57:40",
+    "usuario": "funcionario07@demoestoque.com",
+    "operacao": "CATEGORIA_INSERT",
+    "mensagem": "Registro demonstrativo 07 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T18:57:40",
+    "usuario": "funcionario08@demoestoque.com",
+    "operacao": "BACKUP_GERADO",
+    "mensagem": "Registro demonstrativo 08 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T15:57:40",
+    "usuario": "funcionario09@demoestoque.com",
+    "operacao": "LOGIN",
+    "mensagem": "Registro demonstrativo 09 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T12:57:40",
+    "usuario": "funcionario10@demoestoque.com",
+    "operacao": "PARAMETRIZACAO_UPDATE",
+    "mensagem": "Registro demonstrativo 10 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T09:57:40",
+    "usuario": "funcionario11@demoestoque.com",
+    "operacao": "PRODUTO_INSERT",
+    "mensagem": "Registro demonstrativo 11 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T06:57:40",
+    "usuario": "funcionario12@demoestoque.com",
+    "operacao": "PRODUTO_UPDATE",
+    "mensagem": "Registro demonstrativo 12 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T03:57:40",
+    "usuario": "funcionario13@demoestoque.com",
+    "operacao": "FUNCIONARIO_INSERT",
+    "mensagem": "Registro demonstrativo 13 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-06T00:57:40",
+    "usuario": "funcionario14@demoestoque.com",
+    "operacao": "FORNECEDOR_UPDATE",
+    "mensagem": "Registro demonstrativo 14 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T21:57:40",
+    "usuario": "funcionario15@demoestoque.com",
+    "operacao": "COMPRA_INSERT",
+    "mensagem": "Registro demonstrativo 15 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T18:57:40",
+    "usuario": "funcionario16@demoestoque.com",
+    "operacao": "SAIDA_INSERT",
+    "mensagem": "Registro demonstrativo 16 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T15:57:40",
+    "usuario": "funcionario17@demoestoque.com",
+    "operacao": "CATEGORIA_INSERT",
+    "mensagem": "Registro demonstrativo 17 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T12:57:40",
+    "usuario": "funcionario18@demoestoque.com",
+    "operacao": "BACKUP_GERADO",
+    "mensagem": "Registro demonstrativo 18 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T09:57:40",
+    "usuario": "funcionario19@demoestoque.com",
+    "operacao": "LOGIN",
+    "mensagem": "Registro demonstrativo 19 para auditoria visual da tela administrativa."
+  },
+  {
+    "createdAt": "2026-05-05T06:57:40",
+    "usuario": "funcionario20@demoestoque.com",
+    "operacao": "PARAMETRIZACAO_UPDATE",
+    "mensagem": "Registro demonstrativo 20 para auditoria visual da tela administrativa."
+  }
+]

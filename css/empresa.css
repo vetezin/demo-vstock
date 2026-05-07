@@ -1,0 +1,64 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top right, rgba(var(--brand-accent-rgb), 0.20), transparent 26%),
+    linear-gradient(180deg, #f7f2ec, #ede3d9);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.buscar-container {
+  background: rgba(255, 255, 255, 0.92);
+  padding: 2.2rem 2.6rem;
+  border-radius: 22px;
+  box-shadow: 0 18px 40px rgba(82, 57, 43, 0.12);
+  width: 100%;
+  max-width: 560px;
+  border: 1px solid rgba(229, 217, 207, 0.8);
+}
+
+.buscar-container h1 {
+  margin-bottom: 0.8rem;
+  color: var(--brand-primary-dark, #964638);
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.buscar-subtitle {
+  text-align: center;
+  color: #6d7772;
+  margin-bottom: 1.5rem;
+}
+
+.btn-buscar {
+  background: linear-gradient(45deg, var(--brand-primary, #b85c4b), var(--brand-primary-dark, #964638));
+  border: none;
+  color: white;
+  width: 100%;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  box-shadow: 0 12px 24px rgba(var(--brand-primary-dark-rgb), 0.20);
+}
+
+.btn-buscar:hover {
+  background: linear-gradient(45deg, var(--brand-primary-dark, #964638), #7d392d);
+}
+
+#empresaResultado {
+  margin-top: 2rem;
+  display: none;
+  background: rgba(255, 253, 249, 0.88);
+  border-radius: 16px;
+  border: 1px solid rgba(229, 217, 207, 0.8);
+}
+
+#logoEmpresa img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
+}

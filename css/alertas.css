@@ -1,0 +1,20 @@
+.alerta-resumo-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.alerta-resumo-card {
+  border-radius: 18px;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.12), rgba(255, 255, 255, 0.98));
+  box-shadow: 0 10px 24px rgba(82, 57, 43, 0.06);
+}
+
+.alerta-resumo-card strong {
+  color: #6b4d00;
+}
+
+.alerta-resumo-card small {
+  color: #7c6c40;
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "funcCpf": "11111111111",
+    "funcNome": "Administrador Mestre",
+    "funcTelefone": "(11) 99999-1001",
+    "funcEmail": "admin@admin.login",
+    "username": "adminmaster",
+    "cargo": "Administrador Geral",
+    "tipoAcesso": 99,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000002",
+    "funcNome": "Funcionário 02",
+    "funcTelefone": "(11) 98888-3002",
+    "funcEmail": "funcionario02@demoestoque.com",
+    "username": "usuario02",
+    "cargo": "Supervisor",
+    "tipoAcesso": 99,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000003",
+    "funcNome": "Funcionário 03",
+    "funcTelefone": "(11) 98888-3003",
+    "funcEmail": "funcionario03@demoestoque.com",
+    "username": "usuario03",
+    "cargo": "Supervisor",
+    "tipoAcesso": 99,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000004",
+    "funcNome": "Funcionário 04",
+    "funcTelefone": "(11) 98888-3004",
+    "funcEmail": "funcionario04@demoestoque.com",
+    "username": "usuario04",
+    "cargo": "Estoquista",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000005",
+    "funcNome": "Funcionário 05",
+    "funcTelefone": "(11) 98888-3005",
+    "funcEmail": "funcionario05@demoestoque.com",
+    "username": "usuario05",
+    "cargo": "Caixa",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000006",
+    "funcNome": "Funcionário 06",
+    "funcTelefone": "(11) 98888-3006",
+    "funcEmail": "funcionario06@demoestoque.com",
+    "username": "usuario06",
+    "cargo": "Comprador",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000007",
+    "funcNome": "Funcionário 07",
+    "funcTelefone": "(11) 98888-3007",
+    "funcEmail": "funcionario07@demoestoque.com",
+    "username": "usuario07",
+    "cargo": "Auxiliar",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": "2026-04-20"
+  },
+  {
+    "funcCpf": "10000000008",
+    "funcNome": "Funcionário 08",
+    "funcTelefone": "(11) 98888-3008",
+    "funcEmail": "funcionario08@demoestoque.com",
+    "username": "usuario08",
+    "cargo": "Estoquista",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000009",
+    "funcNome": "Funcionário 09",
+    "funcTelefone": "(11) 98888-3009",
+    "funcEmail": "funcionario09@demoestoque.com",
+    "username": "usuario09",
+    "cargo": "Caixa",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000010",
+    "funcNome": "Funcionário 10",
+    "funcTelefone": "(11) 98888-3010",
+    "funcEmail": "funcionario10@demoestoque.com",
+    "username": "usuario10",
+    "cargo": "Comprador",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000011",
+    "funcNome": "Funcionário 11",
+    "funcTelefone": "(11) 98888-3011",
+    "funcEmail": "funcionario11@demoestoque.com",
+    "username": "usuario11",
+    "cargo": "Auxiliar",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000012",
+    "funcNome": "Funcionário 12",
+    "funcTelefone": "(11) 98888-3012",
+    "funcEmail": "funcionario12@demoestoque.com",
+    "username": "usuario12",
+    "cargo": "Estoquista",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000013",
+    "funcNome": "Funcionário 13",
+    "funcTelefone": "(11) 98888-3013",
+    "funcEmail": "funcionario13@demoestoque.com",
+    "username": "usuario13",
+    "cargo": "Caixa",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000014",
+    "funcNome": "Funcionário 14",
+    "funcTelefone": "(11) 98888-3014",
+    "funcEmail": "funcionario14@demoestoque.com",
+    "username": "usuario14",
+    "cargo": "Comprador",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": "2026-04-13"
+  },
+  {
+    "funcCpf": "10000000015",
+    "funcNome": "Funcionário 15",
+    "funcTelefone": "(11) 98888-3015",
+    "funcEmail": "funcionario15@demoestoque.com",
+    "username": "usuario15",
+    "cargo": "Auxiliar",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000016",
+    "funcNome": "Funcionário 16",
+    "funcTelefone": "(11) 98888-3016",
+    "funcEmail": "funcionario16@demoestoque.com",
+    "username": "usuario16",
+    "cargo": "Estoquista",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000017",
+    "funcNome": "Funcionário 17",
+    "funcTelefone": "(11) 98888-3017",
+    "funcEmail": "funcionario17@demoestoque.com",
+    "username": "usuario17",
+    "cargo": "Caixa",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000018",
+    "funcNome": "Funcionário 18",
+    "funcTelefone": "(11) 98888-3018",
+    "funcEmail": "funcionario18@demoestoque.com",
+    "username": "usuario18",
+    "cargo": "Comprador",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000019",
+    "funcNome": "Funcionário 19",
+    "funcTelefone": "(11) 98888-3019",
+    "funcEmail": "funcionario19@demoestoque.com",
+    "username": "usuario19",
+    "cargo": "Auxiliar",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": null
+  },
+  {
+    "funcCpf": "10000000020",
+    "funcNome": "Funcionário 20",
+    "funcTelefone": "(11) 98888-3020",
+    "funcEmail": "funcionario20@demoestoque.com",
+    "username": "usuario20",
+    "cargo": "Estoquista",
+    "tipoAcesso": 1,
+    "funcSenha": "123456",
+    "dataDemissao": "2026-04-07"
+  }
+]

@@ -1,0 +1,80 @@
+.admin-acao-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.admin-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.admin-filtros .form-control,
+.admin-filtros .form-select {
+  min-height: 46px;
+}
+
+.admin-acoes-logs {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+#tabelaLogsSistema thead th {
+  text-align: center;
+}
+
+#tabelaLogsSistema td {
+  vertical-align: middle;
+}
+
+#tabelaLogsSistema td:first-child,
+#tabelaLogsSistema td:nth-child(2),
+#tabelaLogsSistema td:nth-child(3) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-log-mensagem {
+  min-width: 320px;
+  white-space: normal;
+  line-height: 1.45;
+}
+
+.admin-operacao-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(var(--brand-primary-rgb), 0.08);
+  color: var(--brand-primary-dark);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .admin-acao-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-acao-grid .btn {
+    width: 100%;
+  }
+
+  .admin-acoes-logs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-acoes-logs .btn {
+    width: 100%;
+  }
+
+  .admin-log-mensagem {
+    min-width: 0;
+  }
+}

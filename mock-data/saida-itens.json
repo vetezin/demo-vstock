@@ -1,0 +1,182 @@
+[
+  {
+    "saidaEstoqueSaidaCod": 1,
+    "produtoProdCod": 1,
+    "quantidade": 2,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 2,
+    "produtoProdCod": 2,
+    "quantidade": 5,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 3,
+    "produtoProdCod": 3,
+    "quantidade": 11,
+    "motivo": "PERDA",
+    "observacao": "Ajuste demonstrativo",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 4,
+    "produtoProdCod": 4,
+    "quantidade": 2,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 13.15,
+    "valorTotal": 26.3
+  },
+  {
+    "saidaEstoqueSaidaCod": 5,
+    "produtoProdCod": 5,
+    "quantidade": 11,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 15.5,
+    "valorTotal": 170.5
+  },
+  {
+    "saidaEstoqueSaidaCod": 6,
+    "produtoProdCod": 6,
+    "quantidade": 3,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 17.85,
+    "valorTotal": 53.55
+  },
+  {
+    "saidaEstoqueSaidaCod": 7,
+    "produtoProdCod": 7,
+    "quantidade": 3,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 8,
+    "produtoProdCod": 8,
+    "quantidade": 9,
+    "motivo": "AVARIA",
+    "observacao": "Ajuste demonstrativo",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 9,
+    "produtoProdCod": 9,
+    "quantidade": 1,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 10,
+    "produtoProdCod": 10,
+    "quantidade": 9,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 27.25,
+    "valorTotal": 245.25
+  },
+  {
+    "saidaEstoqueSaidaCod": 11,
+    "produtoProdCod": 11,
+    "quantidade": 5,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 12,
+    "produtoProdCod": 12,
+    "quantidade": 8,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 13,
+    "produtoProdCod": 13,
+    "quantidade": 14,
+    "motivo": "PERDA",
+    "observacao": "Ajuste demonstrativo",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 14,
+    "produtoProdCod": 14,
+    "quantidade": 1,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 36.65,
+    "valorTotal": 36.65
+  },
+  {
+    "saidaEstoqueSaidaCod": 15,
+    "produtoProdCod": 15,
+    "quantidade": 7,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 39.0,
+    "valorTotal": 273.0
+  },
+  {
+    "saidaEstoqueSaidaCod": 16,
+    "produtoProdCod": 16,
+    "quantidade": 3,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 41.35,
+    "valorTotal": 124.05
+  },
+  {
+    "saidaEstoqueSaidaCod": 17,
+    "produtoProdCod": 17,
+    "quantidade": 6,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 18,
+    "produtoProdCod": 18,
+    "quantidade": 12,
+    "motivo": "AVARIA",
+    "observacao": "Ajuste demonstrativo",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 19,
+    "produtoProdCod": 19,
+    "quantidade": 3,
+    "motivo": "USO_INTERNO",
+    "observacao": "Baixa interna",
+    "valorUnitarioAplicado": null,
+    "valorTotal": null
+  },
+  {
+    "saidaEstoqueSaidaCod": 20,
+    "produtoProdCod": 20,
+    "quantidade": 12,
+    "motivo": "VENDA",
+    "observacao": "Venda balcão",
+    "valorUnitarioAplicado": 50.75,
+    "valorTotal": 609.0
+  }
+]

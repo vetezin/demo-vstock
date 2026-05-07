@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Movimentações | Plataforma de Gestão</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/app.css" rel="stylesheet"/>
+  <link href="css/principal.css" rel="stylesheet"/>
+  <link href="css/historico.css" rel="stylesheet"/>
+</head>
+<body>
+  <nav class="navbar brand-navbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png"/>
+      </a>
+
+      <div class="text-white text-end">
+        <div class="navbar-date">
+          <i class="bi bi-calendar3"></i>
+          <span id="current-date"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
+
+      <a class="nav-btn" href="index.html">
+        <i class="bi bi-house-heart"></i> Dashboard
+      </a>
+
+      <a class="nav-btn" href="parametrizacao.html">
+        <i class="bi bi-sliders"></i> Parametrização
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-journal-text"></i> CADASTROS</small>
+      </div>
+
+      <a class="nav-btn" href="cadastro-fornecedor.html">
+        <i class="bi bi-truck"></i> Fornecedores
+      </a>
+
+      <a class="nav-btn" href="cadastro-categoria.html">
+        <i class="bi bi-tags"></i> Categorias
+      </a>
+
+      <a class="nav-btn" href="cadastro-produto.html">
+        <i class="bi bi-box-seam"></i> Produtos
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-box"></i> CONTROLE DE ESTOQUE</small>
+      </div>
+
+      <a class="nav-btn" href="entrada-compra.html">
+        <i class="bi bi-pencil-square"></i> Entrada de Estoque
+      </a>
+
+      <a class="nav-btn" href="saida-estoque.html">
+        <i class="bi bi-box-arrow-up"></i> Saída de Estoque
+      </a>
+
+      <a class="nav-btn" href="estoque.html">
+        <i class="bi bi-archive"></i> Estoque
+      </a>
+
+      <a class="nav-btn active" href="historico.html">
+        <i class="bi bi-clock-history"></i> Movimentações
+      </a>
+
+      <div class="module-development">
+        <small><i class="bi bi-stars"></i> EVOLUÇÕES</small>
+      </div>
+
+      <a class="nav-btn" href="alertas.html">
+        <i class="bi bi-bell"></i> Alertas
+      </a>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-speedometer2"></i> Dashboard Avançado
+      </button>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-shield-lock"></i> Perfis e Permissões
+      </button>
+
+      <hr class="brand-divider"/>
+
+      <div class="stats-card">
+        <h6><i class="bi bi-shield-check"></i> Plataforma</h6>
+        <small>Versão 1.0 Beta</small><br/>
+        <small><i class="bi bi-circle-fill text-success"></i> Operacional</small><br/>
+        <small class="stats-card-meta">
+          <i class="bi bi-clock"></i> Atualizado hoje
+        </small>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div id="mensagens" class="mb-3"></div>
+
+      <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap mb-4">
+        <div>
+          <h2 class="h4 mb-1">
+            <i class="bi bi-clock-history text-danger"></i>
+            Movimentações
+          </h2>
+          <p class="text-muted mb-0">Linha do tempo única com entradas em verde e saídas em vermelho.</p>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <strong><i class="bi bi-funnel"></i> Filtros</strong>
+        </div>
+        <div class="card-body">
+          <div class="historico-filtros mb-3">
+            <div>
+              <label class="form-label">Data Inicial</label>
+              <input type="date" id="filtroDataInicio" class="form-control" />
+            </div>
+            <div>
+              <label class="form-label">Data Final</label>
+              <input type="date" id="filtroDataFim" class="form-control" />
+            </div>
+            <div>
+              <label class="form-label">Tipo</label>
+              <select id="filtroTipo" class="form-select">
+                <option value="">Todos</option>
+                <option value="ENTRADA">Entrada</option>
+                <option value="SAIDA">Saída</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Produto</label>
+              <input type="text" id="filtroProduto" class="form-control" placeholder="Buscar produto..." />
+            </div>
+            <div>
+              <label class="form-label">Funcionário</label>
+              <input type="text" id="filtroFuncionario" class="form-control" placeholder="Nome do funcionário" />
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <button id="btnLimparHistorico" class="btn btn-outline-warning" type="button">
+              <i class="bi bi-eraser"></i> Limpar
+            </button>
+            <button id="btnFiltrarHistorico" class="btn btn-success" type="button">
+              <i class="bi bi-search"></i> Filtrar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-lista" id="timelineHistorico"></div>
+    </main>
+  </div>
+
+  <div class="footer-info">
+    <i class="bi bi-box-seam"></i> Plataforma de Estoque v1.0 &copy; 2025
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/historico.js"></script>
+</body>
+</html>
+
+

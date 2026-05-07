@@ -1,0 +1,233 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Funcionários | Plataforma de Gestão</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link href="css/principal.css" rel="stylesheet" />
+  <link href="css/cadastro-base.css" rel="stylesheet" />
+</head>
+<body>
+  <nav class="navbar brand-navbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" />
+      </a>
+
+      <div class="text-white text-end">
+        <div class="navbar-date">
+          <i class="bi bi-calendar3"></i>
+          <span id="current-date"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
+
+      <a class="nav-btn" href="index.html">
+        <i class="bi bi-house-heart"></i> Dashboard
+      </a>
+
+      <a class="nav-btn" href="parametrizacao.html">
+        <i class="bi bi-sliders"></i> Parametrização
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-journal-text"></i> CADASTROS</small>
+      </div>
+
+      <a class="nav-btn" href="cadastro-fornecedor.html">
+        <i class="bi bi-truck"></i> Fornecedores
+      </a>
+
+      <a class="nav-btn" href="cadastro-categoria.html">
+        <i class="bi bi-tags"></i> Categorias
+      </a>
+
+      <a class="nav-btn" href="cadastro-produto.html">
+        <i class="bi bi-box-seam"></i> Produtos
+      </a>
+
+      <a class="nav-btn active" href="cadastro-funcionario.html">
+        <i class="bi bi-person-gear"></i> Funcionarios
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-box"></i> CONTROLE DE ESTOQUE</small>
+      </div>
+
+      <a class="nav-btn" href="entrada-compra.html">
+        <i class="bi bi-pencil-square"></i> Entrada de Estoque
+      </a>
+
+      <a class="nav-btn" href="saida-estoque.html">
+        <i class="bi bi-box-arrow-up"></i> Saída de Estoque
+      </a>
+
+      <a class="nav-btn" href="estoque.html">
+        <i class="bi bi-archive"></i> Estoque
+      </a>
+
+      <a class="nav-btn" href="historico.html">
+        <i class="bi bi-clock-history"></i> Movimentações
+      </a>
+
+      <div class="module-development">
+        <small><i class="bi bi-stars"></i> EVOLUÇÕES</small>
+      </div>
+
+      <a class="nav-btn" href="alertas.html">
+        <i class="bi bi-bell"></i> Alertas
+      </a>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-speedometer2"></i> Dashboard Avançado
+      </button>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-shield-lock"></i> Perfis e Permissões
+      </button>
+
+      <hr class="brand-divider"/>
+
+      <div class="stats-card">
+        <h6><i class="bi bi-shield-check"></i> Plataforma</h6>
+        <small>Versão 1.0 Beta</small><br/>
+        <small><i class="bi bi-circle-fill text-success"></i> Operacional</small><br/>
+        <small class="stats-card-meta">
+          <i class="bi bi-clock"></i> Atualizado hoje
+        </small>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div id="mensagens" class="mb-3"></div>
+
+      <div class="page-header">
+        <div class="page-header-title-center">
+          <h2><i class="bi bi-person-gear text-danger"></i> Cadastro de Funcionários</h2>
+          <p class="text-muted mb-0">Tela administrativa para criar, editar e inativar acessos do sistema.</p>
+        </div>
+      </div>
+
+      <div class="card simple-card mb-4">
+        <div class="card-header">
+          <span id="tituloFormularioFuncionario"><i class="bi bi-person-plus"></i> Novo Funcionário</span>
+        </div>
+        <div class="card-body">
+          <form id="funcionarioForm" class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label required">CPF</label>
+              <input type="text" id="funcCpf" class="form-control" placeholder="000.000.000-00" required />
+            </div>
+
+            <div class="col-md-8">
+              <label class="form-label required">Nome</label>
+              <input type="text" id="funcNome" class="form-control" placeholder="Nome do funcionário" required />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">Telefone</label>
+              <input type="text" id="funcTelefone" class="form-control" placeholder="(18)99999-9999" required />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">Email</label>
+              <input type="email" id="funcEmail" class="form-control" placeholder="funcionario@empresa.com" required />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">Usuário</label>
+              <input type="text" id="funcUsername" class="form-control" placeholder="usuário de acesso" required />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">Cargo</label>
+              <input type="text" id="funcCargo" class="form-control" placeholder="Cargo do funcionário" required />
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required">Perfil</label>
+              <select id="funcTipoAcesso" class="form-select" required>
+                <option value="1">Operador</option>
+                <option value="99">Administrador</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required" id="labelSenhaFuncionario">Senha</label>
+              <input type="password" id="funcSenha" class="form-control" placeholder="Senha de acesso" />
+              <small class="text-muted" id="senhaHelperFuncionario">Obrigatória no cadastro. Em edição, deixe vazio para manter.</small>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button type="button" id="btnCancelarEdicaoFuncionario" class="btn btn-outline-secondary d-none">
+                <i class="bi bi-x-circle"></i> Cancelar edição
+              </button>
+              <button type="button" id="btnLimparFuncionario" class="btn btn-outline-warning">
+                <i class="bi bi-eraser"></i> Limpar
+              </button>
+              <button type="submit" id="btnSalvarFuncionario" class="btn btn-success">
+                <i class="bi bi-check2-circle"></i> Salvar funcionário
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card simple-card">
+        <div class="card-header">
+          <i class="bi bi-list-ul"></i> Funcionários Cadastrados
+        </div>
+        <div class="card-body">
+          <div class="cadastro-toolbar mb-3">
+            <div class="cadastro-filtro">
+              <label class="form-label" for="filtroNomeFuncionario">Filtrar por nome</label>
+              <input type="text" id="filtroNomeFuncionario" class="form-control" placeholder="Buscar funcionário pelo nome" />
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tabelaFuncionarios">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Email</th>
+                  <th>Telefone</th>
+                  <th>Cargo</th>
+                  <th>Perfil</th>
+                  <th>Status</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div id="paginacaoFuncionarios" class="paginacao-cadastro"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="footer-info">
+    <i class="bi bi-box-seam"></i> Plataforma de Estoque v1.0 &copy; 2025
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/cadastro-funcionario.js"></script>
+</body>
+</html>
+
+
+

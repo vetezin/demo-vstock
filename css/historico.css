@@ -1,0 +1,125 @@
+.historico-filtros {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.timeline-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  position: relative;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(229, 217, 207, 0.9);
+  border-left: 6px solid transparent;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+}
+
+.timeline-item.entrada {
+  border-left-color: #198754;
+  background: rgba(25, 135, 84, 0.06);
+}
+
+.timeline-item.saida {
+  border-left-color: #dc3545;
+  background: rgba(220, 53, 69, 0.05);
+}
+
+.timeline-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.timeline-titulo {
+  font-weight: 700;
+  color: #22302c;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.timeline-meta {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.timeline-meta-bloco {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(229, 217, 207, 0.8);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.timeline-meta-bloco small {
+  display: block;
+  color: #6c757d;
+  margin-bottom: 0.3rem;
+}
+
+.timeline-meta-bloco-destaque {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+}
+
+.timeline-meta-bloco-destaque strong {
+  color: #1f5136;
+}
+
+.timeline-meta-bloco strong {
+  line-height: 1.35;
+}
+
+.timeline-vazio {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6c757d;
+  border: 1px dashed rgba(229, 217, 207, 0.9);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.badge-tipo {
+  font-size: 0.78rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 999px;
+}
+
+.badge-entrada {
+  background: #198754;
+  color: #fff;
+}
+
+.badge-saida {
+  background: #dc3545;
+  color: #fff;
+}
+
+@media (max-width: 992px) {
+  .historico-filtros,
+  .timeline-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .historico-filtros,
+  .timeline-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline-topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

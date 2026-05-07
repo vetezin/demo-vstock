@@ -1,0 +1,344 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parametrização | Plataforma de Gestão</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="css/principal.css" />
+  <link rel="stylesheet" href="css/parametrizacao.css" />
+</head>
+
+<body>
+  <nav class="navbar brand-navbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img src="larSantaFilomena.png" alt="Logo da plataforma" class="logo" />
+      </a>
+
+      <div class="text-white d-flex align-items-center gap-2">
+        <i class="bi bi-calendar3"></i>
+        <span id="current-date" class="fw-medium"></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <aside class="sidebar">
+      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
+
+      <a class="nav-btn" href="index.html">
+        <i class="bi bi-house-heart"></i> Dashboard
+      </a>
+
+      <a class="nav-btn active" href="parametrizacao.html">
+        <i class="bi bi-sliders"></i> Parametrização
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-journal-text"></i> CADASTROS</small>
+      </div>
+
+      <a class="nav-btn" href="cadastro-fornecedor.html">
+        <i class="bi bi-truck"></i> Fornecedores
+      </a>
+
+      <a class="nav-btn" href="cadastro-categoria.html">
+        <i class="bi bi-tags"></i> Categorias
+      </a>
+
+      <a class="nav-btn" href="cadastro-produto.html">
+        <i class="bi bi-box-seam"></i> Produtos
+      </a>
+
+      <div class="module-divider">
+        <small><i class="bi bi-box"></i> CONTROLE DE ESTOQUE</small>
+      </div>
+
+      <a class="nav-btn" href="entrada-compra.html">
+        <i class="bi bi-pencil-square"></i> Entrada de Estoque
+      </a>
+
+      <a class="nav-btn" href="saida-estoque.html">
+        <i class="bi bi-box-arrow-up"></i> Saída de Estoque
+      </a>
+
+      <a class="nav-btn" href="estoque.html">
+        <i class="bi bi-archive"></i> Estoque
+      </a>
+
+      <a class="nav-btn" href="historico.html">
+        <i class="bi bi-clock-history"></i> Movimentações
+      </a>
+
+      <div class="module-development">
+        <small><i class="bi bi-stars"></i> EVOLUÇÕES</small>
+      </div>
+
+      <a class="nav-btn" href="alertas.html">
+        <i class="bi bi-bell"></i> Alertas
+      </a>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-speedometer2"></i> Dashboard Avançado
+      </button>
+
+      <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
+        <i class="bi bi-shield-lock"></i> Perfis e Permissões
+      </button>
+
+    </aside>
+
+    <main class="content form-page">
+      <div class="page-title">
+        <h2><i class="bi bi-building"></i> Parametrização da Empresa</h2>
+        <small>Defina os dados da empresa, os logotipos e os módulos liberados para este cliente.</small>
+      </div>
+
+      <form id="paramForm" class="needs-validation" novalidate enctype="multipart/form-data">
+        <section class="section-card">
+          <div class="section-header">
+            <i class="bi bi-person-vcard"></i>
+            <span>Identidade e Contato</span>
+          </div>
+
+          <div class="mb-3">
+            <label for="razao_social" class="form-label">
+              Razao Social <span class="required">*</span>
+            </label>
+            <input type="text" class="form-control form-control-lg" id="razao_social" name="razao_social" required minlength="3" maxlength="120" />
+            <div class="invalid-feedback">Informe a razão social.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="nome_fantasia" class="form-label">
+              Nome Fantasia <span class="required">*</span>
+            </label>
+            <input type="text" class="form-control form-control-lg" id="nome_fantasia" name="nome_fantasia" required minlength="2" maxlength="120" />
+            <div class="invalid-feedback">Informe o nome fantasia.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="telefone" class="form-label">
+              Telefone <span class="required">*</span>
+            </label>
+            <input type="tel" class="form-control form-control-lg" id="telefone" name="telefone" required pattern="^\(\d{2}\)\s?\d{4,5}-\d{4}$" placeholder="(11) 91234-5678" />
+            <div class="invalid-feedback">Telefone inválido.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">
+              E-mail <span class="required">*</span>
+            </label>
+            <input type="email" class="form-control form-control-lg" id="email" name="email" required />
+            <div class="invalid-feedback">Informe um e-mail válido.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="site" class="form-label">Site</label>
+            <input type="url" class="form-control form-control-lg" id="site" name="site" maxlength="120" placeholder="https://exemplo.com.br" />
+            <div class="form-text">Opcional.</div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-header">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>Endereço</span>
+          </div>
+
+          <div class="form-grid-2col">
+            <div>
+              <label for="rua" class="form-label">
+                Rua <span class="required">*</span>
+              </label>
+              <input type="text" class="form-control form-control-lg" id="rua" name="rua" required minlength="3" maxlength="120" />
+              <div class="invalid-feedback">Informe a rua.</div>
+            </div>
+
+            <div>
+              <label for="bairro" class="form-label">
+                Bairro <span class="required">*</span>
+              </label>
+              <input type="text" class="form-control form-control-lg" id="bairro" name="bairro" required minlength="2" maxlength="80" />
+              <div class="invalid-feedback">Informe o bairro.</div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <label for="cidade" class="form-label">
+              Cidade <span class="required">*</span>
+            </label>
+            <input type="text" class="form-control form-control-lg" id="cidade" name="cidade" required minlength="2" maxlength="80" />
+            <div class="invalid-feedback">Informe a cidade.</div>
+          </div>
+
+          <div class="form-grid-2col mt-3">
+            <div class="preview-uf-field">
+              <label for="uf" class="form-label">
+                UF <span class="required">*</span>
+              </label>
+              <input type="text" class="form-control form-control-lg text-uppercase" id="uf" name="uf" required minlength="2" maxlength="2" pattern="^[A-Za-z]{2}$" placeholder="SP" />
+              <div class="invalid-feedback">UF inválida.</div>
+            </div>
+
+            <div>
+              <label for="cep" class="form-label">
+                CEP <span class="required">*</span>
+              </label>
+              <input type="text" class="form-control form-control-lg" id="cep" name="cep" required minlength="8" maxlength="9" pattern="^\d{5}-?\d{3}$" placeholder="01000-000" />
+              <div class="invalid-feedback">Informe o CEP.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-header">
+            <i class="bi bi-image"></i>
+            <span>Identidade Visual</span>
+          </div>
+
+          <div class="form-grid-2col">
+            <div>
+              <label for="logotipo_small" class="form-label">Logotipo Small</label>
+              <input type="file" class="form-control form-control-lg" id="logotipo_small" name="logotipo_small" accept="image/*" />
+              <div class="form-text">Opcional.</div>
+            </div>
+
+            <div>
+              <label for="logotipo_big" class="form-label">
+                Logotipo Big
+              </label>
+              <input type="file" class="form-control form-control-lg" id="logotipo_big" name="logotipo_big" accept="image/*" />
+              <div class="form-text">Opcional.</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="form-label">Pré-visualização</label>
+            <div class="logo-preview-wrapper d-flex flex-wrap gap-4 align-items-start">
+              <div>
+                <div class="logo-label">Small</div>
+                <img id="logoPreviewSmall" alt="Preview Small" class="logo-preview-small" />
+              </div>
+
+              <div>
+                <div class="logo-label">Big</div>
+                <img id="logoPreviewBig" alt="Preview Big" class="logo-preview-big" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-header">
+            <i class="bi bi-grid"></i>
+            <span>Módulos Liberados</span>
+          </div>
+
+          <div class="module-grid">
+            <label class="module-option-card" for="modulo_estoque">
+              <div>
+                <div class="module-option-title">Módulo Estoque</div>
+                <div class="form-text">Tudo que existe hoje no sistema: cadastros, entradas, saídas, estoque e movimentações.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_estoque" checked>
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_alertas">
+              <div>
+                <div class="module-option-title">Módulo Alertas</div>
+                <div class="form-text">Acesso à tela de alertas e acompanhamento visual.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_alertas" checked>
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_vendas">
+              <div>
+                <div class="module-option-title">Módulo Vendas</div>
+                <div class="form-text">Preparado para a futura frente comercial, sem telas ativas no momento.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_vendas">
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_financeiro">
+              <div>
+                <div class="module-option-title">Módulo Financeiro</div>
+                <div class="form-text">Reservado para o núcleo financeiro futuro do sistema.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_financeiro">
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_contas_pagar">
+              <div>
+                <div class="module-option-title">Contas a Pagar</div>
+                <div class="form-text">Pré-cadastro de disponibilidade para controle de pagamentos.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_contas_pagar">
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_contas_receber">
+              <div>
+                <div class="module-option-title">Contas a Receber</div>
+                <div class="form-text">Pré-cadastro de disponibilidade para recebimentos futuros.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_contas_receber">
+              </div>
+            </label>
+
+            <label class="module-option-card" for="modulo_relatorios">
+              <div>
+                <div class="module-option-title">Módulo Relatórios</div>
+                <div class="form-text">Estrutura pronta para relatórios gerenciais quando o módulo existir.</div>
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="modulo_relatorios">
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="actions-row">
+            <button id="submitBtn" type="submit" class="btn btn-success btn-lg d-flex align-items-center gap-2">
+              <i class="bi bi-save"></i>
+              <span>Salvar Parametrização</span>
+            </button>
+
+            <div class="text-success" id="msg"></div>
+            <div class="text-danger" id="error"></div>
+          </div>
+        </section>
+      </form>
+    </main>
+  </div>
+
+  <footer class="footer-info">
+    <i class="bi bi-box-seam"></i> VStock v1.0 &copy; 2025
+  </footer>
+
+  <script src="https://unpkg.com/imask"></script>
+  <script src="js/mock-api.js"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/parametrizacao.js"></script>
+</body>
+</html>
+
+
+
+

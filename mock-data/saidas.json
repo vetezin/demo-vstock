@@ -1,0 +1,102 @@
+[
+  {
+    "saida_cod": 1,
+    "data_saida": "2026-04-08",
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "saida_cod": 2,
+    "data_saida": "2026-04-09",
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "saida_cod": 3,
+    "data_saida": "2026-04-10",
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "saida_cod": 4,
+    "data_saida": "2026-04-11",
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "saida_cod": 5,
+    "data_saida": "2026-04-12",
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "saida_cod": 6,
+    "data_saida": "2026-04-13",
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "saida_cod": 7,
+    "data_saida": "2026-04-14",
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "saida_cod": 8,
+    "data_saida": "2026-04-15",
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "saida_cod": 9,
+    "data_saida": "2026-04-16",
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "saida_cod": 10,
+    "data_saida": "2026-04-17",
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "saida_cod": 11,
+    "data_saida": "2026-04-18",
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "saida_cod": 12,
+    "data_saida": "2026-04-19",
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "saida_cod": 13,
+    "data_saida": "2026-04-20",
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "saida_cod": 14,
+    "data_saida": "2026-04-21",
+    "funcionario_func_cpf": "10000000006"
+  },
+  {
+    "saida_cod": 15,
+    "data_saida": "2026-04-22",
+    "funcionario_func_cpf": "10000000007"
+  },
+  {
+    "saida_cod": 16,
+    "data_saida": "2026-04-23",
+    "funcionario_func_cpf": "10000000002"
+  },
+  {
+    "saida_cod": 17,
+    "data_saida": "2026-04-24",
+    "funcionario_func_cpf": "10000000003"
+  },
+  {
+    "saida_cod": 18,
+    "data_saida": "2026-04-25",
+    "funcionario_func_cpf": "10000000004"
+  },
+  {
+    "saida_cod": 19,
+    "data_saida": "2026-04-26",
+    "funcionario_func_cpf": "10000000005"
+  },
+  {
+    "saida_cod": 20,
+    "data_saida": "2026-04-27",
+    "funcionario_func_cpf": "10000000006"
+  }
+]
