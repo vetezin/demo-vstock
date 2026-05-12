@@ -1,4 +1,4 @@
-const API_CLIENTE = {
+﻿const API_CLIENTE = {
   LISTA: "http://localhost:8080/api/cliente/all",
   NOVO: "http://localhost:8080/api/cliente",
   ATUALIZAR: (id) => `http://localhost:8080/api/cliente/${id}`,
@@ -290,3 +290,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+

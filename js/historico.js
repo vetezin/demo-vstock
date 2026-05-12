@@ -1,4 +1,4 @@
-const API_HISTORICO = {
+﻿const API_HISTORICO = {
   LISTA: "http://localhost:8080/api/historico-movimentacoes"
 };
 
@@ -430,3 +430,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarHistorico(1);
   });
 });
+

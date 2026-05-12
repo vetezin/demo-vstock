@@ -1,4 +1,4 @@
-const API_FORNECEDOR = {
+﻿const API_FORNECEDOR = {
   LISTA: "http://localhost:8080/api/fornecedor/all",
   NOVO: "http://localhost:8080/api/fornecedor",
   ATUALIZAR: (id) => `http://localhost:8080/api/fornecedor/${id}`,
@@ -333,3 +333,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+

@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+﻿document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("paramForm");
   const mensagemSucesso = document.getElementById("msg");
   const mensagemErro = document.getElementById("error");
@@ -251,3 +251,4 @@ function exibirErro(err, texto) {
     err.textContent = texto;
   }
 }
+

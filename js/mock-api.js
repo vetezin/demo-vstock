@@ -361,7 +361,7 @@
       if (!funcionario) return text('Funcionario nao encontrado.', 404);
       if (funcionario.funcSenha !== senha) return text('Senha incorreta.', 401);
       if (!funcionarioAtivo(funcionario)) return text('Funcionario inativo na demonstracao.', 403);
-      addLog('LOGIN', `Acesso de demonstraÃ§Ã£o para ${funcionario.funcNome}.`);
+      addLog('LOGIN', `Acesso de demonstração para ${funcionario.funcNome}.`);
       return json({ token: `mock-token-${funcionario.funcCpf}`, funcionario: sanitizarFuncionario(funcionario) });
     }
 
@@ -381,7 +381,7 @@
       if (!funcionario) return text('Funcionario nao encontrado.', 404);
       funcionario.dataDemissao = ativo ? null : todayIso();
       persistDb();
-      addLog('FUNCIONARIO_STATUS', `FuncionÃ¡rio ${funcionario.funcNome} ${ativo ? 'reativado' : 'inativado'}.`);
+      addLog('FUNCIONARIO_STATUS', `Funcionário ${funcionario.funcNome} ${ativo ? 'reativado' : 'inativado'}.`);
       return text('OK');
     }
 
@@ -401,7 +401,7 @@
       });
       if (body.funcSenha) funcionario.funcSenha = body.funcSenha;
       persistDb();
-      addLog('FUNCIONARIO_UPDATE', `FuncionÃ¡rio ${funcionario.funcNome} atualizado.`);
+      addLog('FUNCIONARIO_UPDATE', `Funcionário ${funcionario.funcNome} atualizado.`);
       return text('OK');
     }
 
@@ -420,7 +420,7 @@
       };
       db.funcionarios.unshift(novo);
       persistDb();
-      addLog('FUNCIONARIO_INSERT', `FuncionÃ¡rio ${novo.funcNome} cadastrado.`);
+      addLog('FUNCIONARIO_INSERT', `Funcionário ${novo.funcNome} cadastrado.`);
       return json(sanitizarFuncionario(novo), 201);
     }
 
@@ -435,8 +435,8 @@
     if (path === '/api/parametrizacao' && method === 'POST') {
       db.parametrizacao = parseJsonBody(init);
       persistDb();
-      addLog('PARAMETRIZACAO_UPDATE', 'ParametrizaÃ§Ã£o da demonstraÃ§Ã£o atualizada.');
-      return text('ParametrizaÃ§Ã£o salva com sucesso.');
+      addLog('PARAMETRIZACAO_UPDATE', 'Parametrização da demonstração atualizada.');
+      return text('Parametrização salva com sucesso.');
     }
 
     if (path === '/api/categorias-produto' && method === 'GET') {
@@ -814,7 +814,7 @@
         valorTotal: item.valorTotal == null ? null : Number(item.valorTotal || 0)
       }));
       persistDb();
-      addLog('SAIDA_INSERT', `SaÃ­da #${saidaCod} cadastrada.`);
+      addLog('SAIDA_INSERT', `Saída #${saidaCod} cadastrada.`);
       return text('OK');
     }
     const saidaMatch = path.match(/^\/api\/saida-estoque\/(\d+)(?:\/itens)?$/);
@@ -839,7 +839,7 @@
         valorTotal: item.valorTotal == null ? null : Number(item.valorTotal || 0)
       }));
       persistDb();
-      addLog('SAIDA_UPDATE', `SaÃ­da #${id} atualizada.`);
+      addLog('SAIDA_UPDATE', `Saída #${id} atualizada.`);
       return text('OK');
     }
 
@@ -873,7 +873,7 @@
       });
     }
 
-    return text(`Rota mock nÃ£o implementada: ${method} ${path}`, 404);
+    return text(`Rota mock não implementada: ${method} ${path}`, 404);
   }
 
   window.fetch = async function (input, init) {
@@ -894,6 +894,7 @@
     }
   };
 })();
+
 
 
 

@@ -1,4 +1,4 @@
-const API_PRODUTO = {
+﻿const API_PRODUTO = {
   LISTA: "http://localhost:8080/api/produtos/lista",
   NOVO: "http://localhost:8080/api/produtos",
   ATUALIZAR: (id) => `http://localhost:8080/api/produtos/${id}`,
@@ -374,3 +374,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+

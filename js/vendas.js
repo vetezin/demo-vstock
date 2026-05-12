@@ -1,4 +1,4 @@
-const API_VENDAS = {
+﻿const API_VENDAS = {
   ESTOQUE_RESUMO: "http://localhost:8080/api/estoque/resumo?ativosOnly=true",
   CLIENTES: "http://localhost:8080/api/cliente/all?ativosOnly=true",
   CLIENTE_NOVO: "http://localhost:8080/api/cliente",
@@ -994,3 +994,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+

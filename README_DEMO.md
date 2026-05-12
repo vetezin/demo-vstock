@@ -1,4 +1,4 @@
-# WebEstoque Demo
+﻿# WebEstoque Demo
 
 Projeto estático para demonstração visual do VStock sem backend.
 
@@ -25,3 +25,4 @@ No console do navegador:
 ```js
 VStockDemo.reset()
 ```
+

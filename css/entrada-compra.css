@@ -1,4 +1,4 @@
-/* Layout geral da página */
+﻿/* Layout geral da página */
 body {
   background-color: transparent;
   min-height: 100vh;
@@ -161,12 +161,12 @@ body {
   }
 }
 
-/* ✅ NOVO: garante espaço para a barra de ações */
+/* �o. NOVO: garante espaço para a barra de ações */
 .page-wrapper {
   padding-bottom: 6.5rem;
 }
 
-/* ✅ NOVO: barra de ações sempre visível */
+/* �o. NOVO: barra de ações sempre visível */
 .actions-bar {
   position: sticky;
   bottom: 0;
@@ -593,3 +593,4 @@ textarea.form-control:focus {
     align-items: stretch;
   }
 }
+
