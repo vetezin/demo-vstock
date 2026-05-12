@@ -457,6 +457,65 @@ input[type="text"] {
   border-radius: 999px;
 }
 
+.vstock-filter-dropdown-group {
+  position: relative;
+}
+
+.vstock-filter-dropdown-input {
+  padding-right: 2.8rem;
+}
+
+.vstock-filter-dropdown-addon {
+  position: absolute;
+  top: 50%;
+  right: 0.95rem;
+  transform: translateY(-50%);
+  color: #6c757d;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.vstock-filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 35;
+  display: none;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fffdfa;
+  border: 1px solid rgba(205, 192, 182, 0.95);
+  border-radius: 14px;
+  box-shadow: 0 14px 34px rgba(58, 36, 24, 0.12);
+  padding: 0.35rem;
+}
+
+.vstock-filter-dropdown-menu.ativo {
+  display: block;
+}
+
+.vstock-filter-dropdown-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.8rem 0.9rem;
+  border-radius: 10px;
+  color: #2d342f;
+}
+
+.vstock-filter-dropdown-item:hover,
+.vstock-filter-dropdown-item.ativo {
+  background: rgba(var(--brand-primary-rgb), 0.1);
+  color: var(--brand-primary-dark);
+}
+
+.vstock-filter-dropdown-item.vazio {
+  color: #6c757d;
+  cursor: default;
+}
+
 @media (max-width: 992px) {
   .main-container {
     gap: 1rem;

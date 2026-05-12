@@ -80,10 +80,7 @@ function formatarDataBr(valor) {
 }
 
 function formatarMoeda(valor) {
-  return Number(valor || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
+  return window.vstockCurrency.formatMoney(valor || 0);
 }
 
 function formatarMoedaCampo(valor) {
@@ -156,6 +153,13 @@ function atualizarResumoRecebimentoDinheiro() {
 
   el("#totalVendaRecebimento").value = formatarMoeda(totalVenda);
   el("#trocoVendaRecebimento").value = formatarMoeda(troco);
+}
+
+function atualizarResumoObservacaoTemporaria() {
+  const campoResumo = el("#observacaoResumo");
+  if (!campoResumo) return;
+
+  campoResumo.value = observacaoTemporaria || "";
 }
 
 function abrirModalRecebimentoDinheiro() {
@@ -420,7 +424,9 @@ function quantidadeReservadaProduto(prodCod, ignorarIndice = null) {
 }
 
 function atualizarTotalItens() {
+  const totalItensLista = itensDaSaida.length;
   const total = itensDaSaida.reduce((acc, item) => acc + Number(item.qtd || 0), 0);
+  el("#resumoSaidaItens").textContent = String(totalItensLista);
   el("#totalItensSaida").textContent = total;
   el("#totalVendaSaida").textContent = formatarMoeda(
     itensDaSaida.reduce((acc, item) => acc + Number(item.valorTotal || 0), 0)
@@ -432,6 +438,23 @@ function redesenharTabela() {
   if (!tbody) return;
 
   tbody.innerHTML = "";
+
+  if (!itensDaSaida.length) {
+    const totalColunas = el("#tabelaItens thead tr")?.children?.length || 8;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="${totalColunas}">
+          <div class="saida-empty-state">
+            <i class="bi bi-box-seam"></i>
+            <strong>Nenhum item adicionado ainda.</strong>
+            <span>Adicione produtos acima para começar a saída.</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    atualizarTotalItens();
+    return;
+  }
 
   itensDaSaida.forEach((item, indice) => {
     const emEdicao = indiceEditando === indice;
@@ -557,6 +580,7 @@ function adicionarItem() {
   el("#valorUnitarioProduto").value = formatarMoedaCampo(0);
   el("#subtotalItemSaida").value = formatarMoedaCampo(0);
   observacaoTemporaria = "";
+  atualizarResumoObservacaoTemporaria();
   atualizarResumoFinanceiroSaida();
   atualizarVisibilidadeRecebimentoDinheiro();
 }
@@ -636,6 +660,7 @@ function limparTudo() {
   el("#valorUnitarioProduto").value = formatarMoedaCampo(0);
   el("#subtotalItemSaida").value = formatarMoedaCampo(0);
   limparOpcaoRecebimentoDinheiro();
+  atualizarResumoObservacaoTemporaria();
   atualizarVisibilidadeRecebimentoDinheiro();
   focarLeituraCodigoBarras();
 
@@ -748,6 +773,10 @@ function limparFiltrosSaidas() {
   el("#filtroSaidaDataFim").value = "";
   el("#filtroSaidaProduto").value = "";
   el("#filtroSaidaFuncionario").value = "";
+}
+
+function obterOpcoesFiltroSaidaProduto() {
+  return todasSaidas.map((saida) => saida.produtoResumo);
 }
 
 function atualizarPaginacaoSaidas(pagina = 1) {
@@ -1055,6 +1084,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   el("#dataSaida").value = hojeISO();
   el("#motivo").value = "VENDA";
+  atualizarResumoObservacaoTemporaria();
   await preencherFuncionarioLogado();
 
   await carregarProdutos();
@@ -1080,6 +1110,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   el("#buscaProdutoSaida")?.addEventListener("input", agendarFiltroProdutos);
   el("#buscaProdutoSaida")?.addEventListener("focus", () => renderizarDropdownProdutos(produtosVisiveis.length ? produtosVisiveis : cacheProdutos, true));
+  window.vstockFilterDropdown.attach({
+    input: "#filtroSaidaProduto",
+    getOptions: obterOpcoesFiltroSaidaProduto
+  });
   el("#codigoBarrasSaida")?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -1096,6 +1130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   el("#btnSalvarObservacao")?.addEventListener("click", () => {
     observacaoTemporaria = el("#observacaoItem")?.value?.trim() || "";
+    atualizarResumoObservacaoTemporaria();
     modalObservacao.hide();
   });
   el("#dropdownProdutosSaida")?.addEventListener("click", (e) => {

@@ -1,0 +1,17 @@
+﻿[
+  {
+    "formaPagamentoId": 1,
+    "nome": "Dinheiro",
+    "ativo": true
+  },
+  {
+    "formaPagamentoId": 2,
+    "nome": "Pix",
+    "ativo": true
+  },
+  {
+    "formaPagamentoId": 3,
+    "nome": "Cartão",
+    "ativo": true
+  }
+]

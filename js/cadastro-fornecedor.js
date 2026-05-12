@@ -16,32 +16,6 @@ function formFornecedor() {
   return $fornecedor("#fornecedorForm");
 }
 
-function aplicarMascaraTelefone(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 11);
-
-  if (numeros.length <= 2) return numeros ? `(${numeros}` : "";
-  if (numeros.length <= 6) return `(${numeros.slice(0, 2)})${numeros.slice(2)}`;
-  if (numeros.length <= 10) return `(${numeros.slice(0, 2)})${numeros.slice(2, 6)}-${numeros.slice(6)}`;
-  return `(${numeros.slice(0, 2)})${numeros.slice(2, 7)}-${numeros.slice(7)}`;
-}
-
-function aplicarMascaraCpfCnpj(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 14);
-
-  if (numeros.length <= 11) {
-    if (numeros.length <= 3) return numeros;
-    if (numeros.length <= 6) return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
-    if (numeros.length <= 9) return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
-    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
-  }
-
-  if (numeros.length <= 2) return numeros;
-  if (numeros.length <= 5) return `${numeros.slice(0, 2)}.${numeros.slice(2)}`;
-  if (numeros.length <= 8) return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5)}`;
-  if (numeros.length <= 12) return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5, 8)}/${numeros.slice(8)}`;
-  return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5, 8)}/${numeros.slice(8, 12)}-${numeros.slice(12)}`;
-}
-
 function msgFornecedor(texto, tipo = "danger") {
   const box = $fornecedor("#mensagens");
   if (!box) return;
@@ -106,8 +80,8 @@ function preencherFormularioFornecedor(fornecedor) {
   $fornecedor("#nome").value = fornecedor.nome ?? "";
   $fornecedor("#contato").value = fornecedor.contato ?? "";
   $fornecedor("#email").value = fornecedor.email ?? "";
-  $fornecedor("#telefone").value = fornecedor.telefone ?? "";
-  $fornecedor("#cpfCnpj").value = aplicarMascaraCpfCnpj(fornecedor.cpfCnpj ?? fornecedor.cpf_cnpj ?? "");
+  $fornecedor("#telefone").value = window.vstockMasks.phone(fornecedor.telefone ?? "");
+  $fornecedor("#cpfCnpj").value = window.vstockMasks.cpfCnpj(fornecedor.cpfCnpj ?? fornecedor.cpf_cnpj ?? "");
   $fornecedor("#descricao").value = fornecedor.descricao ?? "";
   atualizarModoFormulario();
   window.destacarFormularioEdicao?.(formFornecedor(), "#nome");
@@ -123,6 +97,10 @@ function obterFornecedoresFiltrados() {
     const matchContato = !filtroContato || String(fornecedor.contato ?? "").toLowerCase().includes(filtroContato);
     return matchNome && matchContato;
   });
+}
+
+function obterOpcoesNomeFornecedor() {
+  return fornecedoresCache.map((fornecedor) => fornecedor.nome);
 }
 
 function renderizarPaginacaoFornecedores(totalItens) {
@@ -184,8 +162,8 @@ function renderizarFornecedores() {
     return `
       <tr>
         <td>${fornecedor.nome ?? "-"}</td>
-        <td>${aplicarMascaraCpfCnpj(fornecedor.cpfCnpj ?? fornecedor.cpf_cnpj ?? "") || "-"}</td>
-        <td>${fornecedor.telefone ?? "-"}</td>
+        <td>${window.vstockMasks.cpfCnpj(fornecedor.cpfCnpj ?? fornecedor.cpf_cnpj ?? "") || "-"}</td>
+        <td>${window.vstockMasks.phone(fornecedor.telefone ?? "") || "-"}</td>
         <td>${fornecedor.email ?? "-"}</td>
         <td>${fornecedor.contato ?? "-"}</td>
         <td>${formatarDataFornecedor(fornecedor.dataCadastro ?? fornecedor.data_cadastro)}</td>
@@ -316,18 +294,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   $fornecedor("#btnLimpar")?.addEventListener("click", limparFormularioFornecedor);
   $fornecedor("#btnCancelarEdicao")?.addEventListener("click", limparFormularioFornecedor);
   $fornecedor("#telefone")?.addEventListener("input", (event) => {
-    event.target.value = aplicarMascaraTelefone(event.target.value);
+    event.target.value = window.vstockMasks.phone(event.target.value);
   });
   $fornecedor("#cpfCnpj")?.addEventListener("input", (event) => {
-    event.target.value = aplicarMascaraCpfCnpj(event.target.value);
-  });
-  $fornecedor("#filtroNomeFornecedor")?.addEventListener("input", () => {
-    paginaAtualFornecedores = 1;
-    renderizarFornecedores();
+    event.target.value = window.vstockMasks.cpfCnpj(event.target.value);
   });
   $fornecedor("#filtroContatoFornecedor")?.addEventListener("input", () => {
     paginaAtualFornecedores = 1;
     renderizarFornecedores();
+  });
+  window.vstockFilterDropdown.attach({
+    input: "#filtroNomeFornecedor",
+    getOptions: obterOpcoesNomeFornecedor,
+    onInputValueChange: () => {
+      paginaAtualFornecedores = 1;
+      renderizarFornecedores();
+    },
+    onOptionSelect: () => {
+      paginaAtualFornecedores = 1;
+      renderizarFornecedores();
+    }
   });
 
   $fornecedor("#tabelaFornecedores tbody")?.addEventListener("click", (event) => {

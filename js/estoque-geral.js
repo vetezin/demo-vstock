@@ -172,6 +172,14 @@ function limparFiltros() {
   $estoque("#filtroValidadeEstoque").value = "";
 }
 
+function obterOpcoesProdutoEstoque() {
+  return listaEstoque.map((item) => item.prod_descr);
+}
+
+function obterOpcoesCategoriaEstoque() {
+  return listaEstoque.map((item) => item.categoria);
+}
+
 async function carregarEstoque() {
   try {
     const resp = await fetch(API_ESTOQUE.CONSULTA);
@@ -187,6 +195,19 @@ async function carregarEstoque() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   await carregarEstoque();
+
+  window.vstockFilterDropdown.attach({
+    input: "#filtroProdutoEstoque",
+    getOptions: obterOpcoesProdutoEstoque,
+    onInputValueChange: () => renderizarTudo(1),
+    onOptionSelect: () => renderizarTudo(1)
+  });
+  window.vstockFilterDropdown.attach({
+    input: "#filtroCategoriaEstoque",
+    getOptions: obterOpcoesCategoriaEstoque,
+    onInputValueChange: () => renderizarTudo(1),
+    onOptionSelect: () => renderizarTudo(1)
+  });
 
   $estoque("#btnFiltrarEstoque")?.addEventListener("click", () => renderizarTudo(1));
   $estoque("#btnLimparEstoque")?.addEventListener("click", async () => {

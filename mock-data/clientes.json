@@ -1,0 +1,20 @@
+﻿[
+  {
+    "clienteId": 1,
+    "nome": "Cliente Balcão",
+    "cpfCnpj": "",
+    "telefone": "",
+    "observacao": "Cliente padrão para vendas rápidas.",
+    "createdAt": "2026-05-01",
+    "ativo": true
+  },
+  {
+    "clienteId": 2,
+    "nome": "Maria Souza",
+    "cpfCnpj": "12345678909",
+    "telefone": "18999990000",
+    "observacao": "Prefere contato por WhatsApp.",
+    "createdAt": "2026-05-02",
+    "ativo": true
+  }
+]

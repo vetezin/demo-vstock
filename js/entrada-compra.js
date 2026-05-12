@@ -30,41 +30,6 @@ let totalPaginasCompras = 1;
 let totalCompras = 0;
 const ITENS_POR_PAGINA_COMPRAS = 10;
 
-function aplicarMascaraTelefone(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 11);
-
-  if (numeros.length <= 2) {
-    return numeros ? `(${numeros}` : "";
-  }
-
-  if (numeros.length <= 6) {
-    return `(${numeros.slice(0, 2)})${numeros.slice(2)}`;
-  }
-
-  if (numeros.length <= 10) {
-    return `(${numeros.slice(0, 2)})${numeros.slice(2, 6)}-${numeros.slice(6)}`;
-  }
-
-  return `(${numeros.slice(0, 2)})${numeros.slice(2, 7)}-${numeros.slice(7)}`;
-}
-
-function aplicarMascaraCpfCnpj(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 14);
-
-  if (numeros.length <= 11) {
-    if (numeros.length <= 3) return numeros;
-    if (numeros.length <= 6) return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
-    if (numeros.length <= 9) return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
-    return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
-  }
-
-  if (numeros.length <= 2) return numeros;
-  if (numeros.length <= 5) return `${numeros.slice(0, 2)}.${numeros.slice(2)}`;
-  if (numeros.length <= 8) return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5)}`;
-  if (numeros.length <= 12) return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5, 8)}/${numeros.slice(8)}`;
-  return `${numeros.slice(0, 2)}.${numeros.slice(2, 5)}.${numeros.slice(5, 8)}/${numeros.slice(8, 12)}-${numeros.slice(12)}`;
-}
-
 function hojeISO() {
   const agora = new Date();
   const saoPaulo = new Intl.DateTimeFormat("en-CA", {
@@ -94,11 +59,7 @@ function msg(texto, tipo = "danger") {
 }
 
 function fmt(valor) {
-  const numero = Number(valor) || 0;
-  return numero.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  return window.vstockCurrency.formatNumber(valor || 0);
 }
 
 function formatarDataBr(valor) {
@@ -233,6 +194,7 @@ function selecionarProduto(produto) {
   }
   renderizarDropdownProdutos(produtosVisiveis, false);
   fecharDropdownProdutos();
+  atualizarResumoFormularioEntrada();
 }
 
 function focarLeituraCodigoBarras() {
@@ -270,6 +232,7 @@ function processarLeituraCodigoBarras() {
 
   selecionarProduto(produto);
   inputQuantidade.value = String(produtoJaSelecionado && quantidadeAtual > 0 ? quantidadeAtual + 1 : 1);
+  atualizarResumoFormularioEntrada();
   msg(`Produto ${produto.prodDescr} identificado pela leitura.`, "success");
   inputCodigo.select();
 }
@@ -393,10 +356,46 @@ async function preencherFuncionarioLogado() {
   return funcionario;
 }
 
+function obterSaldoProdutoSelecionado(produto) {
+  return Number(
+    produto?.saldo
+    ?? produto?.saldoAtual
+    ?? produto?.estoqueAtual
+    ?? produto?.quantidadeEstoque
+    ?? 0
+  );
+}
+
+function formatarMoedaCompleta(valor) {
+  return `R$ ${fmt(valor)}`;
+}
+
+function localizarProdutoSelecionado() {
+  const select = el("#listaProdutos");
+  if (!select?.value) return null;
+  return cacheProdutos.find((produto) => String(produto.prodCod) === String(select.value)) || null;
+}
+
+function atualizarResumoFormularioEntrada() {
+  const quantidade = Number(el("#quantidade")?.value || 0);
+  const valorTotalInformado = window.vstockCurrency.parse(el("#valorTotalItem")?.value || "");
+  const valorTotal = Number.isFinite(valorTotalInformado) && valorTotalInformado > 0 ? valorTotalInformado : 0;
+  const valorUnitario = quantidade > 0 && valorTotal > 0 ? valorTotal / quantidade : 0;
+  const campoValorUnitario = el("#valorUnitarioItem");
+  if (campoValorUnitario) campoValorUnitario.value = fmt(valorUnitario);
+}
+
 function atualizarTotal() {
   const total = itensDaEntrada.reduce((acc, item) => acc + item.valorTotal, 0);
+  const totalItens = itensDaEntrada.length;
+  const quantidadeTotal = itensDaEntrada.reduce((acc, item) => acc + Number(item.qtd || 0), 0);
+
   const span = el("#totalGeralCompra");
-  if (span) span.textContent = fmt(total);
+  if (span) span.textContent = formatarMoedaCompleta(total);
+
+  el("#resumoEntradaItens").textContent = String(totalItens);
+  el("#resumoEntradaQuantidade").textContent = String(quantidadeTotal);
+  el("#resumoEntradaValor").textContent = formatarMoedaCompleta(total);
 }
 
 function redesenharTabela() {
@@ -405,15 +404,33 @@ function redesenharTabela() {
 
   tbody.innerHTML = "";
 
+  if (!itensDaEntrada.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="saida-empty-state">
+            <i class="bi bi-box-seam"></i>
+            <strong>Nenhum item adicionado ainda.</strong>
+            <span>Adicione produtos acima para começar a entrada.</span>
+          </div>
+        </td>
+      </tr>
+    `;
+    atualizarTotal();
+    return;
+  }
+
   itensDaEntrada.forEach((item, indice) => {
     const emEdicao = indiceEditando === indice;
+    const valorUnitario = item.qtd > 0 ? item.valorTotal / item.qtd : 0;
 
     if (!emEdicao) {
       tbody.innerHTML += `
         <tr>
           <td>${item.descrProduto}</td>
           <td class="text-end">${item.qtd}</td>
-          <td class="text-end">R$ ${fmt(item.valorTotal)}</td>
+          <td class="text-end">${formatarMoedaCompleta(valorUnitario)}</td>
+          <td class="text-end">${formatarMoedaCompleta(item.valorTotal)}</td>
           <td>${item.validade || "-"}</td>
           <td class="text-center d-flex flex-column flex-sm-row gap-1 justify-content-center">
             <button class="btn btn-sm btn-outline-primary" data-acao="editar" data-idx="${indice}">
@@ -432,6 +449,7 @@ function redesenharTabela() {
           <td class="text-end">
             <input type="number" min="1" step="1" class="form-control form-control-sm text-end" id="edit-qtd-${indice}" value="${item.qtd}">
           </td>
+          <td class="text-end">${formatarMoedaCompleta(valorUnitario)}</td>
           <td class="text-end">
             <div class="campo-moeda">
               <span class="campo-moeda-prefixo">R$</span>
@@ -503,6 +521,7 @@ function adicionarItem() {
   el("#valorTotalItem").value = "";
   el("#validade").value = "";
   el("#codigoBarrasCompra").value = "";
+  atualizarResumoFormularioEntrada();
   focarLeituraCodigoBarras();
 }
 
@@ -565,6 +584,8 @@ function limparTudo() {
   el("#quantidade").value = "";
   el("#valorTotalItem").value = "";
   el("#validade").value = "";
+  el("#codigoBarrasCompra").value = "";
+  atualizarResumoFormularioEntrada();
 
   redesenharTabela();
 }
@@ -672,6 +693,10 @@ function limparFiltrosCompras() {
   el("#filtroCompraProduto").value = "";
   el("#filtroCompraValor").value = "";
   el("#filtroCompraFuncionario").value = "";
+}
+
+function obterOpcoesFiltroCompraProduto() {
+  return todasCompras.map((entrada) => entrada.produtoResumo);
 }
 
 function atualizarPaginacaoCompras(pagina = 1) {
@@ -1092,6 +1117,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   await carregarCategoriasProduto();
   await carregarFornecedores();
   await carregarCompras();
+  atualizarResumoFormularioEntrada();
+  redesenharTabela();
   focarLeituraCodigoBarras();
 
   el("#btnFiltrarCompras")?.addEventListener("click", () => {
@@ -1104,6 +1131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   el("#buscaProdutoCompra")?.addEventListener("input", agendarFiltroProdutos);
   el("#buscaProdutoCompra")?.addEventListener("focus", () => renderizarDropdownProdutos(produtosVisiveis.length ? produtosVisiveis : cacheProdutos, true));
+  window.vstockFilterDropdown.attach({
+    input: "#filtroCompraProduto",
+    getOptions: obterOpcoesFiltroCompraProduto
+  });
+  el("#listaProdutos")?.addEventListener("change", atualizarResumoFormularioEntrada);
+  el("#quantidade")?.addEventListener("input", atualizarResumoFormularioEntrada);
+  el("#valorTotalItem")?.addEventListener("input", atualizarResumoFormularioEntrada);
   el("#codigoBarrasCompra")?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -1118,10 +1152,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   el("#btnCadastroProduto")?.addEventListener("click", () => modalNovoProduto.show());
   el("#btnSalvarProduto")?.addEventListener("click", salvarProdutoRapido);
   el("#novoFornecedorTelefone")?.addEventListener("input", (e) => {
-    e.target.value = aplicarMascaraTelefone(e.target.value);
+    e.target.value = window.vstockMasks.phone(e.target.value);
   });
   el("#novoFornecedorCpfCnpj")?.addEventListener("input", (e) => {
-    e.target.value = aplicarMascaraCpfCnpj(e.target.value);
+    e.target.value = window.vstockMasks.cpfCnpj(e.target.value);
   });
 
   el("#dropdownProdutosCompra")?.addEventListener("click", (e) => {

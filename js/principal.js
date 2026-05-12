@@ -26,30 +26,7 @@
     localStorage.removeItem('funcionarioLogado');
   }
 
-  function criarSessaoVisualPadrao() {
-    return {
-      funcCpf: '000.000.000-00',
-      funcNome: 'Operador Local',
-      funcEmail: 'admin@admin.login',
-      funcTelefone: '',
-      tipoAcesso: 99,
-      username: 'operador.local',
-      cargo: 'Administrador'
-    };
-  }
-
-  function garantirSessaoVisual() {
-    const funcionarioAtual = localStorage.getItem('funcionarioLogado');
-    if ((funcionarioAtual || '').trim()) {
-      return;
-    }
-
-    localStorage.setItem('funcionarioLogado', JSON.stringify(criarSessaoVisualPadrao()));
-  }
-
   window.vstockFrontendSecurity = {
-    criarSessaoVisualPadrao,
-    garantirSessaoVisual,
     limparSessao,
     paginaAtualNome,
     paginaEhPublica
@@ -82,10 +59,21 @@
       headers.set('Authorization', `Bearer ${token}`);
     }
 
+    if (!token && !publicApiPaths.has(path) && !paginaEhPublica()) {
+      limparSessao();
+      window.location.href = 'login.html';
+      throw new Error('Sessao expirada.');
+    }
+
     const response = await originalFetch(input, {
       ...init,
       headers
     });
+
+    if (response.status === 401 && !publicApiPaths.has(path) && !paginaEhPublica()) {
+      limparSessao();
+      window.location.href = 'login.html';
+    }
 
     return response;
   };
@@ -135,6 +123,66 @@ window.destacarFormularioEdicao = function (formularioOuContainer, primeiroCampo
   });
 };
 
+window.vstockMasks = {
+  onlyDigits: function (valor, limite) {
+    var digits = String(valor || '').replace(/\D/g, '');
+    if (!limite || limite < 1) {
+      return digits;
+    }
+    return digits.slice(0, limite);
+  },
+
+  cpf: function (valor) {
+    var numeros = this.onlyDigits(valor, 11);
+    if (numeros.length <= 3) {
+      return numeros;
+    }
+    if (numeros.length <= 6) {
+      return numeros.slice(0, 3) + '.' + numeros.slice(3);
+    }
+    if (numeros.length <= 9) {
+      return numeros.slice(0, 3) + '.' + numeros.slice(3, 6) + '.' + numeros.slice(6);
+    }
+    return numeros.slice(0, 3) + '.' + numeros.slice(3, 6) + '.' + numeros.slice(6, 9) + '-' + numeros.slice(9);
+  },
+
+  cnpj: function (valor) {
+    var numeros = this.onlyDigits(valor, 14);
+    if (numeros.length <= 2) {
+      return numeros;
+    }
+    if (numeros.length <= 5) {
+      return numeros.slice(0, 2) + '.' + numeros.slice(2);
+    }
+    if (numeros.length <= 8) {
+      return numeros.slice(0, 2) + '.' + numeros.slice(2, 5) + '.' + numeros.slice(5);
+    }
+    if (numeros.length <= 12) {
+      return numeros.slice(0, 2) + '.' + numeros.slice(2, 5) + '.' + numeros.slice(5, 8) + '/' + numeros.slice(8);
+    }
+    return numeros.slice(0, 2) + '.' + numeros.slice(2, 5) + '.' + numeros.slice(5, 8) + '/' + numeros.slice(8, 12) + '-' + numeros.slice(12);
+  },
+
+  cpfCnpj: function (valor) {
+    var numeros = this.onlyDigits(valor, 14);
+    return numeros.length <= 11 ? this.cpf(numeros) : this.cnpj(numeros);
+  },
+
+  phone: function (valor) {
+    var numeros = this.onlyDigits(valor, 11);
+    if (numeros.length <= 2) {
+      return numeros ? '(' + numeros : '';
+    }
+    if (numeros.length <= 6) {
+      return '(' + numeros.slice(0, 2) + ')' + numeros.slice(2);
+    }
+    if (numeros.length <= 10) {
+      return '(' + numeros.slice(0, 2) + ')' + numeros.slice(2, 6) + '-' + numeros.slice(6);
+    }
+    return '(' + numeros.slice(0, 2) + ')' + numeros.slice(2, 7) + '-' + numeros.slice(7);
+  }
+};
+
 window.vstockCurrency = {
   formatInputValue: function (valor) {
     var digits = String(valor || '').replace(/\D/g, '');
@@ -158,6 +206,18 @@ window.vstockCurrency = {
     return numero.toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
+    });
+  },
+
+  formatMoney: function (valor) {
+    var numero = Number(valor || 0);
+    if (!Number.isFinite(numero)) {
+      return '';
+    }
+
+    return numero.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
     });
   },
 
@@ -194,6 +254,209 @@ window.vstockCurrency = {
     }
   }
 };
+
+window.vstockFilterDropdown = (function () {
+  var instances = [];
+  var closeHandlerBound = false;
+
+  function normalizarTexto(valor) {
+    return String(valor || '').trim().toLowerCase();
+  }
+
+  function normalizarOpcoes(lista) {
+    var vistos = new Set();
+    return (Array.isArray(lista) ? lista : [])
+      .map(function (item) {
+        return String(item || '').trim();
+      })
+      .filter(function (item) {
+        if (!item) {
+          return false;
+        }
+
+        var chave = normalizarTexto(item);
+        if (vistos.has(chave)) {
+          return false;
+        }
+
+        vistos.add(chave);
+        return true;
+      })
+      .sort(function (a, b) {
+        return a.localeCompare(b, 'pt-BR');
+      });
+  }
+
+  function garantirEstrutura(input) {
+    var grupo = input.closest('.vstock-filter-dropdown-group');
+    if (!grupo) {
+      grupo = document.createElement('div');
+      grupo.className = 'vstock-filter-dropdown-group';
+      input.parentNode.insertBefore(grupo, input);
+      grupo.appendChild(input);
+    }
+
+    var addon = grupo.querySelector('.vstock-filter-dropdown-addon');
+    if (!addon) {
+      addon = document.createElement('span');
+      addon.className = 'vstock-filter-dropdown-addon';
+      addon.innerHTML = '<i class="bi bi-search"></i>';
+      grupo.appendChild(addon);
+    }
+
+    var dropdown = grupo.querySelector('.vstock-filter-dropdown-menu');
+    if (!dropdown) {
+      dropdown = document.createElement('div');
+      dropdown.className = 'vstock-filter-dropdown-menu';
+      grupo.appendChild(dropdown);
+    }
+
+    input.setAttribute('autocomplete', 'off');
+    input.classList.add('vstock-filter-dropdown-input');
+
+    return {
+      group: grupo,
+      dropdown: dropdown
+    };
+  }
+
+  function fecharTodos(exceto) {
+    instances.forEach(function (instance) {
+      if (instance !== exceto) {
+        instance.dropdown.classList.remove('ativo');
+      }
+    });
+  }
+
+  function obterOpcoesFiltradas(instance) {
+    var opcoes = normalizarOpcoes(instance.getOptions());
+    var termo = normalizarTexto(instance.input.value);
+
+    if (!termo) {
+      return opcoes;
+    }
+
+    return opcoes.filter(function (item) {
+      return normalizarTexto(item).includes(termo);
+    });
+  }
+
+  function renderizar(instance, aberto) {
+    var opcoes = obterOpcoesFiltradas(instance);
+    instance.dropdown.innerHTML = '';
+
+    if (!opcoes.length) {
+      var vazio = document.createElement('button');
+      vazio.type = 'button';
+      vazio.disabled = true;
+      vazio.className = 'vstock-filter-dropdown-item vazio';
+      vazio.textContent = instance.emptyText || 'Nenhuma opção encontrada';
+      instance.dropdown.appendChild(vazio);
+      instance.dropdown.classList.toggle('ativo', aberto);
+      return;
+    }
+
+    var selecionado = normalizarTexto(instance.input.value);
+
+    opcoes.forEach(function (item) {
+      var botao = document.createElement('button');
+      botao.type = 'button';
+      botao.className = 'vstock-filter-dropdown-item';
+      if (normalizarTexto(item) === selecionado) {
+        botao.classList.add('ativo');
+      }
+      botao.dataset.value = item;
+      botao.textContent = item;
+      instance.dropdown.appendChild(botao);
+    });
+
+    instance.dropdown.classList.toggle('ativo', aberto);
+  }
+
+  function bindCloseHandler() {
+    if (closeHandlerBound) {
+      return;
+    }
+
+    closeHandlerBound = true;
+    document.addEventListener('click', function (event) {
+      var grupo = event.target.closest('.vstock-filter-dropdown-group');
+      if (!grupo) {
+        fecharTodos();
+      }
+    });
+  }
+
+  function attach(config) {
+    if (!config) {
+      return null;
+    }
+
+    var input = typeof config.input === 'string'
+      ? document.querySelector(config.input)
+      : config.input;
+
+    if (!input || input.dataset.vstockFilterDropdownBound === 'true') {
+      return input || null;
+    }
+
+    var estrutura = garantirEstrutura(input);
+    var instance = {
+      input: input,
+      dropdown: estrutura.dropdown,
+      getOptions: typeof config.getOptions === 'function' ? config.getOptions : function () { return []; },
+      onInputValueChange: typeof config.onInputValueChange === 'function' ? config.onInputValueChange : null,
+      onOptionSelect: typeof config.onOptionSelect === 'function' ? config.onOptionSelect : null,
+      emptyText: config.emptyText || 'Nenhuma opção encontrada'
+    };
+
+    input.dataset.vstockFilterDropdownBound = 'true';
+    instances.push(instance);
+    bindCloseHandler();
+
+    input.addEventListener('focus', function () {
+      fecharTodos(instance);
+      renderizar(instance, true);
+    });
+
+    input.addEventListener('input', function () {
+      fecharTodos(instance);
+      renderizar(instance, true);
+      if (instance.onInputValueChange) {
+        instance.onInputValueChange(input.value);
+      }
+    });
+
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        instance.dropdown.classList.remove('ativo');
+      }
+    });
+
+    instance.dropdown.addEventListener('click', function (event) {
+      var botao = event.target.closest('[data-value]');
+      if (!botao) {
+        return;
+      }
+
+      input.value = botao.dataset.value || '';
+      renderizar(instance, false);
+      if (instance.onOptionSelect) {
+        instance.onOptionSelect(input.value);
+      } else if (instance.onInputValueChange) {
+        instance.onInputValueChange(input.value);
+      }
+    });
+
+    return instance;
+  }
+
+  return {
+    attach: attach,
+    closeAll: fecharTodos,
+    normalizeOptions: normalizarOpcoes
+  };
+})();
 
 window.vstockPagination = {
   paginate: function (items, page, pageSize) {
@@ -282,8 +545,17 @@ document.addEventListener('DOMContentLoaded', async function () {
   var SIDEBAR_SCROLL_KEY = 'vstockSidebarScrollTop';
   var statusLicencaAtual = null;
 
-  if (paginaAtual !== 'login.html') {
-    window.vstockFrontendSecurity.garantirSessaoVisual();
+  if (paginaAtual !== 'login.html' && !(localStorage.getItem('authToken') || '').trim()) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  function redirecionarParaLoginPorLicenca(mensagem) {
+    window.vstockFrontendSecurity.limparSessao();
+    if (mensagem) {
+      alert(mensagem);
+    }
+    window.location.href = 'login.html';
   }
 
   async function verificarLicencaDaPaginaAtual() {
@@ -307,11 +579,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         return true;
       }
 
-      statusLicencaAtual = status;
-      return true;
+      const mensagem = (status && status.motivo)
+        ? status.motivo
+        : 'Sua licença não está ativa. Faça uma nova liberação para continuar.';
+      redirecionarParaLoginPorLicenca(mensagem);
+      return false;
     } catch (erro) {
       console.error('Erro ao verificar licença da página:', erro);
-      return true;
+      redirecionarParaLoginPorLicenca('Não foi possível validar a licença desta sessão. Faça login novamente.');
+      return false;
     }
   }
 
@@ -411,11 +687,12 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   function normalizarModulos(empresa) {
-    return {
-      estoque: empresa ? empresa.moduloEstoque !== false : true,
-      alertas: empresa ? empresa.moduloAlertas !== false : true
-    };
-  }
+      return {
+        estoque: empresa ? empresa.moduloEstoque !== false : true,
+        alertas: empresa ? empresa.moduloAlertas !== false : true,
+        vendas: empresa ? empresa.moduloVendas === true : false
+      };
+    }
 
   function obterLogoSistema(empresa) {
     var logoBanco = empresa && (empresa.logotipoBig || empresa.logotipoSmall);
@@ -586,8 +863,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   function fazerLogout() {
     window.vstockFrontendSecurity.limparSessao();
-    window.vstockFrontendSecurity.garantirSessaoVisual();
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
   }
 
   if (paginaAtual !== 'login.html') {
@@ -618,11 +894,15 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   function paginaDesabilitadaPorModulo() {
-    if (!modulos.estoque && ['cadastro-fornecedor.html', 'cadastro-categoria.html', 'cadastro-produto.html', 'entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html'].includes(paginaAtual)) {
+    if (!modulos.estoque && ['cadastro-fornecedor.html', 'cadastro-cliente.html', 'cadastro-categoria.html', 'cadastro-produto.html', 'entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html'].includes(paginaAtual)) {
       return true;
     }
 
     if (!modulos.alertas && paginaAtual === 'alertas.html') {
+      return true;
+    }
+
+    if (!modulos.vendas && paginaAtual === 'vendas.html') {
       return true;
     }
 
@@ -707,12 +987,28 @@ document.addEventListener('DOMContentLoaded', async function () {
         <i class="bi bi-truck"></i> Fornecedores
       </a>
 
+      <a class="${classeLinkSidebar('cadastro-cliente.html')}" href="cadastro-cliente.html">
+        <i class="bi bi-people"></i> Clientes
+      </a>
+
       <a class="${classeLinkSidebar('cadastro-categoria.html')}" href="cadastro-categoria.html">
         <i class="bi bi-tags"></i> Categorias
       </a>
 
       <a class="${classeLinkSidebar('cadastro-produto.html')}" href="cadastro-produto.html">
         <i class="bi bi-box-seam"></i> Produtos
+      </a>
+      `
+      : '';
+
+    var linksVendas = modulos.vendas
+      ? `
+      <div class="module-divider">
+        <small><i class="bi bi-cart-check"></i> VENDAS</small>
+      </div>
+
+      <a class="${classeLinkSidebar('vendas.html')}" href="vendas.html">
+        <i class="bi bi-cart-check"></i> Vendas
       </a>
       `
       : '';
@@ -783,6 +1079,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       ${blocoAdmin}
 
       ${linksCadastro}
+
+      ${linksVendas}
 
       ${linksControleEstoque}
 

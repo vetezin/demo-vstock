@@ -4,6 +4,10 @@
 
 const $alerta = (sel) => document.querySelector(sel);
 let listaAlertas = [];
+let alertasPaginados = [];
+let paginaAtualAlertas = 1;
+let totalAlertas = 0;
+const ITENS_POR_PAGINA_ALERTAS = 10;
 
 function fmtDataAlerta(valor) {
   if (!valor) return "-";
@@ -16,26 +20,82 @@ function fmtDataAlerta(valor) {
   return valor;
 }
 
+function renderizarPaginacaoAlertas() {
+  window.vstockPagination.render({
+    container: "#paginacaoAlertas",
+    variant: "listagem",
+    itemLabel: "alertas",
+    page: paginaAtualAlertas,
+    pageSize: ITENS_POR_PAGINA_ALERTAS,
+    totalItems: totalAlertas,
+    idPrefix: "Alertas",
+    onPageChange: (novaPagina) => {
+      atualizarPaginacaoAlertas(novaPagina);
+    }
+  });
+}
+
+function normalizarTextoAlerta(valor) {
+  return String(valor || "").trim().toLowerCase();
+}
+
+function obterOpcoesProdutoAlerta() {
+  return listaAlertas
+    .filter((item) => window.calcularStatusEstoque(item).chave !== "EM_ESTOQUE")
+    .map((item) => item.prod_descr);
+}
+
+function obterOpcoesCategoriaAlerta() {
+  return listaAlertas
+    .filter((item) => window.calcularStatusEstoque(item).chave !== "EM_ESTOQUE")
+    .map((item) => item.categoria);
+}
+
+function aplicarFiltrosAlertas() {
+  const produto = normalizarTextoAlerta($alerta("#filtroProdutoAlerta")?.value);
+  const categoria = normalizarTextoAlerta($alerta("#filtroCategoriaAlerta")?.value);
+  const status = $alerta("#filtroStatusAlerta")?.value || "";
+
+  return listaAlertas.filter((item) => {
+    const statusItem = window.calcularStatusEstoque(item);
+    if (statusItem.chave === "EM_ESTOQUE") {
+      return false;
+    }
+
+    const matchProduto = !produto || String(item.prod_descr || "").toLowerCase().includes(produto);
+    const matchCategoria = !categoria || String(item.categoria || "").toLowerCase().includes(categoria);
+    const matchStatus = !status || statusItem.chave === status;
+
+    return matchProduto && matchCategoria && matchStatus;
+  });
+}
+
+function limparFiltrosAlertas() {
+  $alerta("#filtroProdutoAlerta").value = "";
+  $alerta("#filtroCategoriaAlerta").value = "";
+  $alerta("#filtroStatusAlerta").value = "";
+}
+
 function renderizarAlertas() {
   const tbody = $alerta("#tabelaAlertas tbody");
   const vazio = $alerta("#estadoVazioAlertas");
+  const paginacao = $alerta("#paginacaoAlertas");
   if (!tbody || !vazio) return;
 
-  const lista = listaAlertas.filter((item) => window.calcularStatusEstoque(item).chave !== "EM_ESTOQUE");
-  $alerta("#qtdAlertasResumo").textContent = lista.length;
+  $alerta("#qtdAlertasResumo").textContent = totalAlertas;
 
-  if (!lista.length) {
+  if (!alertasPaginados.length && totalAlertas === 0) {
     tbody.innerHTML = "";
     vazio.classList.remove("d-none");
+    if (paginacao) paginacao.innerHTML = "";
     return;
   }
 
   vazio.classList.add("d-none");
-  tbody.innerHTML = lista.map((item) => {
+  tbody.innerHTML = alertasPaginados.map((item) => {
     const status = window.calcularStatusEstoque(item);
     return `
       <tr>
-        <td>${item.prod_cod}</td>
         <td>${item.prod_descr || "-"}</td>
         <td>${item.categoria || "-"}</td>
         <td class="text-end">${Number(item.saldo_atual || 0)}</td>
@@ -49,6 +109,17 @@ function renderizarAlertas() {
       </tr>
     `;
   }).join("");
+
+  renderizarPaginacaoAlertas();
+}
+
+function atualizarPaginacaoAlertas(pagina = 1) {
+  const listaFiltrada = aplicarFiltrosAlertas();
+  const paginacao = window.vstockPagination.paginate(listaFiltrada, pagina, ITENS_POR_PAGINA_ALERTAS);
+  totalAlertas = paginacao.totalItems;
+  paginaAtualAlertas = paginacao.page;
+  alertasPaginados = paginacao.items;
+  renderizarAlertas();
 }
 
 async function carregarAlertas() {
@@ -58,7 +129,7 @@ async function carregarAlertas() {
   }
 
   listaAlertas = await resp.json();
-  renderizarAlertas();
+  atualizarPaginacaoAlertas(1);
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -67,5 +138,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (erro) {
     console.error(erro);
   }
+
+  $alerta("#btnFiltrarAlertas")?.addEventListener("click", () => atualizarPaginacaoAlertas(1));
+  $alerta("#btnLimparAlertas")?.addEventListener("click", () => {
+    limparFiltrosAlertas();
+    atualizarPaginacaoAlertas(1);
+  });
+  $alerta("#filtroStatusAlerta")?.addEventListener("change", () => atualizarPaginacaoAlertas(1));
+  window.vstockFilterDropdown.attach({
+    input: "#filtroProdutoAlerta",
+    getOptions: obterOpcoesProdutoAlerta,
+    onInputValueChange: () => atualizarPaginacaoAlertas(1),
+    onOptionSelect: () => atualizarPaginacaoAlertas(1)
+  });
+  window.vstockFilterDropdown.attach({
+    input: "#filtroCategoriaAlerta",
+    getOptions: obterOpcoesCategoriaAlerta,
+    onInputValueChange: () => atualizarPaginacaoAlertas(1),
+    onOptionSelect: () => atualizarPaginacaoAlertas(1)
+  });
 });
 

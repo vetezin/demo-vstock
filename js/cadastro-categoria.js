@@ -79,6 +79,10 @@ function obterCategoriasFiltradas() {
   );
 }
 
+function obterOpcoesNomeCategoria() {
+  return categoriasCache.map((categoria) => categoria.catDescr ?? categoria.cat_descr);
+}
+
 function renderizarCategorias() {
   const tbody = $categoria("#tabelaCategorias tbody");
   if (!tbody) return;
@@ -209,9 +213,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   $categoria("#categoriaForm")?.addEventListener("submit", salvarCategoria);
   $categoria("#btnLimpar")?.addEventListener("click", limparFormularioCategoria);
   $categoria("#btnCancelarEdicao")?.addEventListener("click", limparFormularioCategoria);
-  $categoria("#filtroNomeCategoria")?.addEventListener("input", () => {
-    paginaAtualCategorias = 1;
-    renderizarCategorias();
+  window.vstockFilterDropdown.attach({
+    input: "#filtroNomeCategoria",
+    getOptions: obterOpcoesNomeCategoria,
+    onInputValueChange: () => {
+      paginaAtualCategorias = 1;
+      renderizarCategorias();
+    },
+    onOptionSelect: () => {
+      paginaAtualCategorias = 1;
+      renderizarCategorias();
+    }
   });
 
   $categoria("#tabelaCategorias tbody")?.addEventListener("click", (e) => {

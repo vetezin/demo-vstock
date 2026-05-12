@@ -1,0 +1,422 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Vendas | Plataforma de GestÃ£o</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/app.css" rel="stylesheet"/>
+  <link href="css/principal.css" rel="stylesheet"/>
+  <link href="css/entrada-compra.css" rel="stylesheet"/>
+  <link href="css/estoque-paginas.css" rel="stylesheet"/>
+</head>
+<body>
+  <nav class="navbar brand-navbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png"/>
+      </a>
+
+      <div class="text-white text-end">
+        <div class="navbar-date">
+          <i class="bi bi-calendar3"></i>
+          <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <aside class="sidebar"></aside>
+
+    <div class="content">
+      <main class="page-wrapper">
+        <div id="mensagens" class="mb-3"></div>
+
+        <div class="venda-page-header">
+          <div class="venda-page-header-icon">
+            <i class="bi bi-cart-check"></i>
+          </div>
+          <div>
+            <h2 class="h3 mb-1">Nova Venda</h2>
+            <p class="venda-page-subtitle mb-0">Adicione produtos, aplique descontos, informe o pagamento e finalize a venda.</p>
+          </div>
+        </div>
+
+        <div class="card mb-4 card-entrada-unificada venda-shell-card">
+          <div class="card-header card-header-flex venda-shell-header">
+            <i class="bi bi-receipt-cutoff text-danger"></i>
+            <span>Nova Venda</span>
+          </div>
+
+          <div class="card-body">
+            <div class="entrada-section">
+              <div class="entrada-section-header">
+                <i class="bi bi-journal-text text-danger"></i>
+                <span>Dados da Venda</span>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label required">Data/Hora da Venda</label>
+                  <input type="datetime-local" id="dataVenda" class="form-control"/>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Cliente</label>
+                  <select id="clienteVenda" class="form-select">
+                    <option value="">Venda sem cliente identificado</option>
+                  </select>
+                  <div class="mt-2 d-flex gap-2 flex-wrap">
+                    <button type="button" id="btnAbrirModalClienteVenda" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-person-plus"></i> Cadastrar cliente
+                    </button>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <label class="form-label required">Status</label>
+                  <select id="statusVenda" class="form-select">
+                    <option value="FINALIZADA" selected>Finalizada</option>
+                    <option value="ABERTA">Aberta</option>
+                  </select>
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label required">FuncionÃ¡rio Logado</label>
+                  <input class="form-control" id="funcionarioNomeVenda" disabled placeholder="-"/>
+                  <input type="hidden" id="funcionarioCpfVenda"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="entrada-section-divider"></div>
+
+            <div class="venda-grid-top">
+              <div class="entrada-section venda-card-bloco venda-card-principal">
+                <div class="entrada-section-header">
+                  <i class="bi bi-box2-heart text-danger"></i>
+                  <span>Produto</span>
+                </div>
+
+                <div class="row g-3 estoque-form-row">
+                  <div class="col-xl-3 col-lg-4 col-md-6">
+                    <label class="form-label">CÃ³digo de Barras</label>
+                    <input id="codigoBarrasVenda" class="form-control" placeholder="Leia o cÃ³digo com o scanner" autocomplete="off"/>
+                  </div>
+
+                  <div class="col-xl-3 col-lg-4 col-md-6">
+                    <label class="form-label required">Produto</label>
+                    <div class="produto-busca-grupo">
+                      <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto..." autocomplete="off"/>
+                      <div id="dropdownProdutosVenda" class="produto-dropdown"></div>
+                    </div>
+
+                    <select id="listaProdutosVenda" class="form-select d-none">
+                      <option disabled selected>Carregando...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-xl-2 col-lg-2 col-md-4">
+                    <label class="form-label required">Quantidade</label>
+                    <input type="number" id="quantidadeVenda" min="1" step="1" class="form-control text-end"/>
+                  </div>
+
+                  <div class="col-xl-2 col-lg-2 col-md-4">
+                    <label class="form-label">Subtotal do Item</label>
+                    <div class="campo-moeda">
+                      <span class="campo-moeda-prefixo">R$</span>
+                      <input type="text" id="subtotalItemVenda" class="form-control" disabled placeholder="0,00"/>
+                    </div>
+                  </div>
+
+                  <div class="col-xl-2 col-lg-2 col-md-4 estoque-form-action">
+                    <label class="form-label form-label-placeholder">Adicionar</label>
+                    <button id="btnAddItemVenda" class="btn btn-success btn-add-item" type="button">
+                      <i class="bi bi-plus-circle"></i>
+                      <span>Adicionar item</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-1">
+                  <div class="col-xl-3 col-lg-4 col-md-5">
+                    <label class="form-label">Saldo Estoque</label>
+                    <input type="text" id="saldoProdutoVenda" class="form-control text-end" disabled placeholder="0"/>
+                  </div>
+
+                  <div class="col-xl-3 col-lg-4 col-md-5">
+                    <label class="form-label">Valor UnitÃ¡rio</label>
+                    <div class="campo-moeda">
+                      <span class="campo-moeda-prefixo">R$</span>
+                      <input type="text" id="valorUnitarioVenda" class="form-control" disabled placeholder="0,00"/>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-responsive mt-4">
+                  <table class="table table-sm align-middle" id="tabelaItensVenda">
+                    <thead>
+                      <tr>
+                        <th>Produto</th>
+                        <th class="text-end">Saldo</th>
+                        <th class="text-end">Qtd</th>
+                        <th class="text-end">Valor Unit.</th>
+                        <th class="text-end">Subtotal</th>
+                        <th class="text-center">AÃ§Ãµes</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="venda-grid-bottom">
+              <div class="entrada-section venda-card-bloco">
+                <div class="entrada-section-header">
+                  <i class="bi bi-percent text-danger"></i>
+                  <span>Desconto</span>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Tipo</label>
+                    <select id="tipoDescontoVenda" class="form-select">
+                      <option value="NENHUM" selected>Sem desconto</option>
+                      <option value="VALOR">Valor</option>
+                      <option value="PERCENTUAL">Percentual</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">Valor</label>
+                    <input type="text" id="valorDescontoVenda" class="form-control" placeholder="0,00"/>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label">ObservaÃ§Ã£o</label>
+                    <textarea id="observacaoVenda" class="form-control" rows="2" placeholder="Opcional"></textarea>
+                  </div>
+                </div>
+
+                
+              </div>
+
+              <div class="entrada-section venda-card-bloco">
+                <div class="entrada-section-header d-flex justify-content-between align-items-center w-100">
+                  <span><i class="bi bi-wallet2 text-danger"></i> Pagamento</span>
+                  <button type="button" id="btnAbrirModalFormaPagamento" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-plus-circle"></i> Cadastrar
+                  </button>
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label required">Forma de Pagamento</label>
+                    <select id="formaPagamentoVenda" class="form-select">
+                      <option value="">Selecione...</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-3" id="blocoValorRecebidoVenda">
+                    <label class="form-label">Valor Recebido</label>
+                    <input type="text" id="valorRecebidoVendaTela" class="form-control" placeholder="0,00"/>
+                  </div>
+
+                  <div class="col-md-3" id="blocoTrocoVenda">
+                    <label class="form-label">Troco</label>
+                    <input type="text" id="trocoVendaTela" class="form-control" disabled placeholder="0,00"/>
+                  </div>
+                </div>
+
+                
+              </div>
+            </div>
+
+            <div class="venda-acoes-rodape">
+              <button id="btnLimparVenda" class="btn btn-outline-warning" type="button">
+                <i class="bi bi-eraser"></i> Limpar
+              </button>
+              <button id="btnSalvarVenda" class="btn btn-success" type="button">
+                <i class="bi bi-check2-circle"></i> Finalizar venda
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalFormaPagamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-wallet2 text-danger"></i> Formas de Pagamento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formaPagamentoForm" class="row g-3 mb-4">
+            <input type="hidden" id="formaPagamentoIdEdicao"/>
+            <div class="col-md-8">
+              <label class="form-label required">Nome</label>
+              <input type="text" id="formaPagamentoNome" class="form-control" placeholder="Ex.: ConvÃªnio" required maxlength="60"/>
+            </div>
+            <div class="col-md-4 d-flex align-items-end gap-2">
+              <button type="submit" class="btn btn-success flex-fill">
+                <i class="bi bi-check2-circle"></i> Salvar
+              </button>
+              <button type="button" id="btnCancelarEdicaoFormaPagamento" class="btn btn-outline-secondary d-none">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+          </form>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle" id="tabelaFormasPagamento">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Status</th>
+                  <th class="text-center">AÃ§Ãµes</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalClienteVenda" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-people text-danger"></i> Novo Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="clienteVendaForm" class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label required">Nome</label>
+              <input type="text" id="clienteVendaNome" class="form-control" maxlength="120" required />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">CPF/CNPJ</label>
+              <input type="text" id="clienteVendaCpfCnpj" class="form-control" maxlength="18" />
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Telefone</label>
+              <input type="text" id="clienteVendaTelefone" class="form-control" maxlength="20" />
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">ObservaÃ§Ã£o</label>
+              <textarea id="clienteVendaObservacao" class="form-control" rows="3" maxlength="500"></textarea>
+            </div>
+
+            <div class="col-12 d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </button>
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check2-circle"></i> Salvar cliente
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalConfirmarVenda" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-receipt-cutoff text-danger"></i> Confirmar Venda</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-3">Confira os detalhes da venda antes de confirmar.</p>
+
+          <div class="table-responsive mb-3 venda-modal-produtos-card">
+            <table class="table table-sm align-middle modal-resumo-venda-tabela">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th class="text-end">Qtd</th>
+                  <th class="text-end">Valor Unit.</th>
+                  <th class="text-end">Total</th>
+                </tr>
+              </thead>
+              <tbody id="resumoConfirmacaoVendaItens"></tbody>
+            </table>
+          </div>
+
+          <div class="venda-modal-resumo-card">
+            <div class="venda-resumo-linha">
+              <span>Subtotal</span>
+              <strong id="resumoConfirmacaoVendaSubtotal">R$ 0,00</strong>
+            </div>
+            <div class="venda-resumo-linha">
+              <span>Desconto</span>
+              <strong id="resumoConfirmacaoVendaDesconto">R$ 0,00</strong>
+            </div>
+            <div class="venda-resumo-total venda-resumo-total-destaque">
+              <span>Total Final</span>
+              <strong id="resumoConfirmacaoVendaTotal">R$ 0,00</strong>
+            </div>
+          </div>
+
+          <div class="venda-modal-resumo-card">
+            <div class="venda-resumo-linha">
+              <span>Forma de Pagamento</span>
+              <strong id="resumoConfirmacaoVendaFormaPagamento">-</strong>
+            </div>
+            <div class="venda-resumo-linha d-none" id="resumoConfirmacaoVendaLinhaRecebido">
+              <span>Valor Recebido</span>
+              <strong id="resumoConfirmacaoVendaRecebido">R$ 0,00</strong>
+            </div>
+            <div class="venda-resumo-linha d-none" id="resumoConfirmacaoVendaLinhaTroco">
+              <span>Troco</span>
+              <strong class="text-success" id="resumoConfirmacaoVendaTroco">R$ 0,00</strong>
+            </div>
+          </div>
+
+          <div class="saida-info-banner mt-3">
+            <i class="bi bi-info-circle"></i>
+            <span>Ao confirmar, o estoque serÃ¡ atualizado e a venda serÃ¡ registrada.</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-success" id="btnConfirmarVendaModal">
+            <i class="bi bi-check2-circle"></i> Confirmar venda
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="js/principal.js"></script>
+<script src="js/vendas.js"></script>
+</body>
+</html>
+
+
+

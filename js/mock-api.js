@@ -1,4 +1,4 @@
-
+﻿
 (function () {
   const DATA_FILES = {
     categorias: 'mock-data/categorias.json',
@@ -10,7 +10,10 @@
     saidas: 'mock-data/saidas.json',
     saidaItens: 'mock-data/saida-itens.json',
     logs: 'mock-data/logs.json',
-    parametrizacao: 'mock-data/parametrizacao.json'
+    parametrizacao: 'mock-data/parametrizacao.json',
+    clientes: 'mock-data/clientes.json',
+    formasPagamento: 'mock-data/formas-pagamento.json',
+    vendas: 'mock-data/vendas.json'
   };
 
   const DB_KEY = 'vstock_demo_db_v1';
@@ -358,7 +361,7 @@
       if (!funcionario) return text('Funcionario nao encontrado.', 404);
       if (funcionario.funcSenha !== senha) return text('Senha incorreta.', 401);
       if (!funcionarioAtivo(funcionario)) return text('Funcionario inativo na demonstracao.', 403);
-      addLog('LOGIN', `Acesso de demonstração para ${funcionario.funcNome}.`);
+      addLog('LOGIN', `Acesso de demonstraÃ§Ã£o para ${funcionario.funcNome}.`);
       return json({ token: `mock-token-${funcionario.funcCpf}`, funcionario: sanitizarFuncionario(funcionario) });
     }
 
@@ -378,7 +381,7 @@
       if (!funcionario) return text('Funcionario nao encontrado.', 404);
       funcionario.dataDemissao = ativo ? null : todayIso();
       persistDb();
-      addLog('FUNCIONARIO_STATUS', `Funcionário ${funcionario.funcNome} ${ativo ? 'reativado' : 'inativado'}.`);
+      addLog('FUNCIONARIO_STATUS', `FuncionÃ¡rio ${funcionario.funcNome} ${ativo ? 'reativado' : 'inativado'}.`);
       return text('OK');
     }
 
@@ -398,7 +401,7 @@
       });
       if (body.funcSenha) funcionario.funcSenha = body.funcSenha;
       persistDb();
-      addLog('FUNCIONARIO_UPDATE', `Funcionário ${funcionario.funcNome} atualizado.`);
+      addLog('FUNCIONARIO_UPDATE', `FuncionÃ¡rio ${funcionario.funcNome} atualizado.`);
       return text('OK');
     }
 
@@ -417,7 +420,7 @@
       };
       db.funcionarios.unshift(novo);
       persistDb();
-      addLog('FUNCIONARIO_INSERT', `Funcionário ${novo.funcNome} cadastrado.`);
+      addLog('FUNCIONARIO_INSERT', `FuncionÃ¡rio ${novo.funcNome} cadastrado.`);
       return json(sanitizarFuncionario(novo), 201);
     }
 
@@ -432,8 +435,8 @@
     if (path === '/api/parametrizacao' && method === 'POST') {
       db.parametrizacao = parseJsonBody(init);
       persistDb();
-      addLog('PARAMETRIZACAO_UPDATE', 'Parametrização da demonstração atualizada.');
-      return text('Parametrização salva com sucesso.');
+      addLog('PARAMETRIZACAO_UPDATE', 'ParametrizaÃ§Ã£o da demonstraÃ§Ã£o atualizada.');
+      return text('ParametrizaÃ§Ã£o salva com sucesso.');
     }
 
     if (path === '/api/categorias-produto' && method === 'GET') {
@@ -555,6 +558,151 @@
       return text('OK');
     }
 
+    if (path === '/api/cliente/all' && method === 'GET') {
+      let lista = db.clientes.map(sanitizarCliente);
+      if (String(url.searchParams.get('ativosOnly')).toLowerCase() === 'true') {
+        lista = lista.filter((item) => item.ativo !== false);
+      }
+      return json(lista);
+    }
+    if (path === '/api/cliente' && method === 'POST') {
+      const body = parseJsonBody(init);
+      const novo = {
+        clienteId: nextNumericId(db.clientes, 'clienteId'),
+        nome: body.nome,
+        cpfCnpj: body.cpfCnpj || '',
+        telefone: body.telefone || '',
+        observacao: body.observacao || '',
+        createdAt: todayIso(),
+        ativo: true
+      };
+      db.clientes.unshift(novo);
+      persistDb();
+      addLog('CLIENTE_INSERT', `Cliente ${novo.nome} cadastrado.`);
+      return json(sanitizarCliente(novo), 201);
+    }
+    const clienteMatch = path.match(/^\/api\/cliente\/(\d+)(?:\/status)?$/);
+    if (clienteMatch && !path.endsWith('/status') && method === 'PUT') {
+      const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(clienteMatch[1]));
+      if (!cliente) return text('Cliente nao encontrado.', 404);
+      const body = parseJsonBody(init);
+      Object.assign(cliente, {
+        nome: body.nome,
+        cpfCnpj: body.cpfCnpj || '',
+        telefone: body.telefone || '',
+        observacao: body.observacao || ''
+      });
+      persistDb();
+      addLog('CLIENTE_UPDATE', `Cliente ${cliente.nome} atualizado.`);
+      return text('OK');
+    }
+    if (clienteMatch && path.endsWith('/status') && method === 'PATCH') {
+      const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(clienteMatch[1]));
+      if (!cliente) return text('Cliente nao encontrado.', 404);
+      cliente.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
+      persistDb();
+      addLog('CLIENTE_STATUS', `Cliente ${cliente.nome} ${cliente.ativo ? 'reativado' : 'inativado'}.`);
+      return text('OK');
+    }
+
+    if (path === '/api/forma-pagamento/all' && method === 'GET') {
+      let lista = db.formasPagamento.map(sanitizarFormaPagamento);
+      if (String(url.searchParams.get('ativosOnly')).toLowerCase() === 'true') {
+        lista = lista.filter((item) => item.ativo !== false);
+      }
+      return json(lista);
+    }
+    if (path === '/api/forma-pagamento' && method === 'POST') {
+      const body = parseJsonBody(init);
+      const novo = {
+        formaPagamentoId: nextNumericId(db.formasPagamento, 'formaPagamentoId'),
+        nome: body.nome,
+        ativo: true
+      };
+      db.formasPagamento.unshift(novo);
+      persistDb();
+      addLog('FORMA_PAGAMENTO_INSERT', `Forma de pagamento ${novo.nome} cadastrada.`);
+      return json(sanitizarFormaPagamento(novo), 201);
+    }
+    const formaPagamentoMatch = path.match(/^\/api\/forma-pagamento\/(\d+)(?:\/status)?$/);
+    if (formaPagamentoMatch && !path.endsWith('/status') && method === 'PUT') {
+      const formaPagamento = db.formasPagamento.find((item) => Number(item.formaPagamentoId) === Number(formaPagamentoMatch[1]));
+      if (!formaPagamento) return text('Forma de pagamento nao encontrada.', 404);
+      formaPagamento.nome = parseJsonBody(init).nome;
+      persistDb();
+      addLog('FORMA_PAGAMENTO_UPDATE', `Forma de pagamento ${formaPagamento.nome} atualizada.`);
+      return text('OK');
+    }
+    if (formaPagamentoMatch && path.endsWith('/status') && method === 'PATCH') {
+      const formaPagamento = db.formasPagamento.find((item) => Number(item.formaPagamentoId) === Number(formaPagamentoMatch[1]));
+      if (!formaPagamento) return text('Forma de pagamento nao encontrada.', 404);
+      formaPagamento.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
+      persistDb();
+      addLog('FORMA_PAGAMENTO_STATUS', `Forma de pagamento ${formaPagamento.nome} ${formaPagamento.ativo ? 'reativada' : 'inativada'}.`);
+      return text('OK');
+    }
+
+    if (path === '/api/vendas' && method === 'POST') {
+      const body = parseJsonBody(init);
+      const itens = Array.isArray(body.itens) ? body.itens : [];
+      if (!itens.length) return text('Venda sem itens.', 400);
+
+      const estoqueAtual = new Map(buildEstoqueConsulta().map((item) => [Number(item.prod_cod), Number(item.saldo_atual || 0)]));
+      for (const item of itens) {
+        const saldo = estoqueAtual.get(Number(item.produtoCod)) || 0;
+        if (Number(item.quantidade || 0) > saldo) {
+          return text('Estoque insuficiente para concluir a venda.', 400);
+        }
+      }
+
+      const vendaId = nextNumericId(db.vendas, 'vendaId');
+      const saidaCod = nextNumericId(db.saidas, 'saida_cod');
+      const venda = {
+        vendaId,
+        dataVenda: body.dataVenda,
+        clienteId: body.clienteId == null ? null : Number(body.clienteId),
+        formaPagamentoId: Number(body.formaPagamentoId || 0),
+        valorSubtotal: Number(body.valorSubtotal || 0),
+        tipoDesconto: body.tipoDesconto || 'NENHUM',
+        valorDesconto: Number(body.valorDesconto || 0),
+        valorTotal: Number(body.valorTotal || 0),
+        valorRecebido: body.valorRecebido == null ? null : Number(body.valorRecebido || 0),
+        troco: body.troco == null ? null : Number(body.troco || 0),
+        status: body.status || 'FINALIZADA',
+        observacao: body.observacao || '',
+        funcionarioCpf: String(body.codFuncionario || ''),
+        itens: itens.map((item) => ({
+          produtoCod: Number(item.produtoCod),
+          quantidade: Number(item.quantidade || 0),
+          valorUnitario: Number(item.valorUnitario || 0),
+          valorSubtotal: Number(item.valorSubtotal || 0)
+        }))
+      };
+
+      db.vendas.unshift(venda);
+      db.saidas.unshift({
+        saida_cod: saidaCod,
+        data_saida: String(body.dataVenda || '').slice(0, 10),
+        funcionario_func_cpf: String(body.codFuncionario || '')
+      });
+
+      itens.forEach((item) => {
+        db.saidaItens.push({
+          saidaEstoqueSaidaCod: saidaCod,
+          produtoProdCod: Number(item.produtoCod),
+          quantidade: Number(item.quantidade || 0),
+          motivo: 'VENDA',
+          observacao: body.observacao || '',
+          valorUnitarioAplicado: Number(item.valorUnitario || 0),
+          valorTotal: Number(item.valorSubtotal || 0)
+        });
+      });
+
+      persistDb();
+      addLog('VENDA_INSERT', `Venda #${vendaId} registrada com ${itens.length} item(ns).`);
+      return json(venda, 201);
+    }
+
     if (path === '/api/estoque/consulta' && method === 'GET') return json(buildEstoqueConsulta());
     if (path === '/api/estoque/resumo' && method === 'GET') {
       let lista = buildEstoqueResumo();
@@ -666,7 +814,7 @@
         valorTotal: item.valorTotal == null ? null : Number(item.valorTotal || 0)
       }));
       persistDb();
-      addLog('SAIDA_INSERT', `Saída #${saidaCod} cadastrada.`);
+      addLog('SAIDA_INSERT', `SaÃ­da #${saidaCod} cadastrada.`);
       return text('OK');
     }
     const saidaMatch = path.match(/^\/api\/saida-estoque\/(\d+)(?:\/itens)?$/);
@@ -691,7 +839,7 @@
         valorTotal: item.valorTotal == null ? null : Number(item.valorTotal || 0)
       }));
       persistDb();
-      addLog('SAIDA_UPDATE', `Saída #${id} atualizada.`);
+      addLog('SAIDA_UPDATE', `SaÃ­da #${id} atualizada.`);
       return text('OK');
     }
 
@@ -725,7 +873,7 @@
       });
     }
 
-    return text(`Rota mock não implementada: ${method} ${path}`, 404);
+    return text(`Rota mock nÃ£o implementada: ${method} ${path}`, 404);
   }
 
   window.fetch = async function (input, init) {
@@ -746,3 +894,7 @@
     }
   };
 })();
+
+
+
+

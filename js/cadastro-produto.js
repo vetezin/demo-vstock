@@ -48,10 +48,7 @@ function badgeStatus(ativo) {
 }
 
 function formatarMoedaProduto(valor) {
-  return Number(valor || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
+  return window.vstockCurrency.formatMoney(valor || 0);
 }
 
 function atualizarModoFormulario() {
@@ -135,6 +132,10 @@ function obterProdutosFiltrados() {
   return produtosCache.filter((produto) =>
     String(produto.prodDescr ?? produto.prod_descr ?? "").toLowerCase().includes(filtro)
   );
+}
+
+function obterOpcoesNomeProduto() {
+  return produtosCache.map((produto) => produto.prodDescr ?? produto.prod_descr);
 }
 
 function renderizarPaginacaoProdutos(totalItens) {
@@ -343,9 +344,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   $produto("#produtoForm")?.addEventListener("submit", salvarProduto);
   $produto("#btnLimpar")?.addEventListener("click", limparFormularioProduto);
   $produto("#btnCancelarEdicao")?.addEventListener("click", limparFormularioProduto);
-  $produto("#filtroNomeProduto")?.addEventListener("input", () => {
-    paginaAtualProdutos = 1;
-    renderizarProdutos();
+  window.vstockFilterDropdown.attach({
+    input: "#filtroNomeProduto",
+    getOptions: obterOpcoesNomeProduto,
+    onInputValueChange: () => {
+      paginaAtualProdutos = 1;
+      renderizarProdutos();
+    },
+    onOptionSelect: () => {
+      paginaAtualProdutos = 1;
+      renderizarProdutos();
+    }
   });
 
   $produto("#tabelaProdutos tbody")?.addEventListener("click", (event) => {

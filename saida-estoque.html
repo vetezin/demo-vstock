@@ -115,22 +115,22 @@
       <main class="page-wrapper">
         <div id="mensagens" class="mb-3"></div>
 
-        <h2 class="h4 mb-1">
-          <i class="bi bi-box-arrow-up text-danger"></i>
-          Saída de Estoque
-        </h2>
-        <p class="text-muted mb-4">Registre as retiradas do estoque com motivo e quantidade de forma controlada.</p>
-
-        <div class="card mb-4 card-entrada-unificada">
-          <div class="card-header bg-light card-header-flex">
-            <i class="bi bi-arrow-up-right-square text-danger"></i>
-            <span>Nova Saída</span>
+        <section class="saida-page-header mb-4">
+          <div class="saida-page-header-icon">
+            <i class="bi bi-box-arrow-up"></i>
           </div>
+          <div>
+            <h2 class="h4 mb-1">Saída De Estoque</h2>
+            <p class="text-muted mb-0">Registre os itens que estão saindo do estoque.</p>
+          </div>
+        </section>
+
+        <div class="card mb-4 card-entrada-unificada saida-card">
 
           <div class="card-body">
-            <div class="entrada-section">
+            <div class="entrada-section saida-section-card">
               <div class="entrada-section-header">
-                <i class="bi bi-journal-text text-danger"></i>
+                <span class="saida-step-badge">1</span>
                 <span>Dados da Saída</span>
               </div>
 
@@ -144,29 +144,34 @@
                 <label class="form-label required">Funcionário Logado</label>
                 <input class="form-control" id="funcionarioNome" disabled placeholder="-"/>
                 <input type="hidden" id="funcionarioCpf"/>
-                <small class="text-muted">Responsável pela retirada</small>
               </div>
             </div>
             </div>
 
-            <div class="entrada-section-divider"></div>
-
-            <div class="entrada-section">
+            <div class="entrada-section saida-section-card">
               <div class="entrada-section-header">
-                <i class="bi bi-box2-heart text-danger"></i>
-                <span>Itens da Saída</span>
+                <span class="saida-step-badge">2</span>
+                <span>Adicionar item à saída</span>
               </div>
 
             <div class="row g-3 estoque-form-row">
               <div class="col-xl-3 col-lg-4 col-md-6">
                 <label class="form-label">Código de Barras</label>
-                <input id="codigoBarrasSaida" class="form-control" placeholder="Leia o código com o scanner" autocomplete="off"/>
+                <div class="input-icon-wrapper">
+                  <input id="codigoBarrasSaida" class="form-control" placeholder="Leia o código com o scanner" autocomplete="off"/>
+                  <span class="input-icon-addon">
+                    <i class="bi bi-upc-scan"></i>
+                  </span>
+                </div>
               </div>
 
               <div class="col-xl-4 col-lg-4 col-md-6">
                 <label class="form-label required">Produto</label>
                 <div class="produto-busca-grupo">
                   <input id="buscaProdutoSaida" class="form-control" placeholder="Buscar produto..." autocomplete="off"/>
+                  <span class="input-icon-addon input-icon-addon-inline">
+                    <i class="bi bi-search"></i>
+                  </span>
                   <div id="dropdownProdutosSaida" class="produto-dropdown"></div>
                 </div>
 
@@ -176,7 +181,7 @@
               </div>
 
               <div class="col-xl-2 col-lg-2 col-md-4">
-                <label class="form-label">Saldo Estoque</label>
+                <label class="form-label">Saldo em Estoque</label>
                 <input type="text" id="saldoProduto" class="form-control text-end" disabled placeholder="0"/>
               </div>
 
@@ -225,22 +230,38 @@
                 </div>
               </div>
 
-              <div class="col-xl-2 col-lg-2 col-md-3">
-                <label class="form-label">Obs.</label>
-                <button id="btnAbrirObservacao" class="btn btn-outline-secondary w-100" type="button">
-                  <i class="bi bi-chat-left-text"></i>
-                </button>
+              <div class="col-xl-3 col-lg-4 col-md-6">
+                <label class="form-label">Observação</label>
+                <div class="input-group observacao-trigger-group">
+                  <input id="observacaoResumo" class="form-control" type="text" placeholder="Opcional" readonly/>
+                  <button id="btnAbrirObservacao" class="btn btn-outline-secondary" type="button" aria-label="Editar observação">
+                    <i class="bi bi-card-text"></i>
+                  </button>
+                </div>
               </div>
 
-              <div class="col-xl-1 col-lg-2 col-md-2 estoque-form-action">
+              <div class="col-xl-2 col-lg-3 col-md-6 estoque-form-action">
                 <label class="form-label form-label-placeholder">Adicionar</label>
-                <button id="btnAddItem" class="btn btn-danger" type="button">
+                <button id="btnAddItem" class="btn btn-success btn-add-item" type="button">
                   <i class="bi bi-plus-circle"></i>
+                  <span>Adicionar item</span>
                 </button>
               </div>
             </div>
 
-            <div class="table-responsive mt-4">
+            <div class="saida-info-banner mt-3">
+              <i class="bi bi-info-circle"></i>
+              <span>Informe os dados do item e clique em "Adicionar item" para incluí-lo na lista de saída.</span>
+            </div>
+            </div>
+
+            <div class="entrada-section saida-section-card">
+              <div class="entrada-section-header">
+                <span class="saida-step-badge">3</span>
+                <span>Itens da Saída</span>
+              </div>
+
+            <div class="table-responsive mt-1 itens-saida-box">
               <table class="table table-sm align-middle" id="tabelaItens">
                 <thead>
                   <tr>
@@ -248,7 +269,7 @@
                     <th class="text-end">Saldo</th>
                     <th class="text-end">Qtd</th>
                     <th>Motivo</th>
-                    <th class="text-end">Valor</th>
+                    <th class="text-end">Valor Unitário</th>
                     <th class="text-end">Subtotal</th>
                     <th>Observação</th>
                     <th class="text-center">Ações</th>
@@ -258,12 +279,18 @@
               </table>
             </div>
 
-            <div class="d-flex justify-content-end mt-3 flex-column align-items-end">
-              <div class="totais-box">
-                Total de Itens: <span id="totalItensSaida">0</span>
+            <div class="saida-totais mt-3">
+              <div class="totais-box totais-box-compacto">
+                <span>Itens na Lista</span>
+                <strong id="resumoSaidaItens">0</strong>
               </div>
-              <div class="totais-box mt-2" id="boxTotalVendaSaida">
-                Total da Venda: <span id="totalVendaSaida">R$ 0,00</span>
+              <div class="totais-box totais-box-compacto">
+                <span>Quantidade Total</span>
+                <strong id="totalItensSaida">0</strong>
+              </div>
+              <div class="totais-box totais-box-total" id="boxTotalVendaSaida">
+                <span>Total Geral</span>
+                <strong id="totalVendaSaida">R$ 0,00</strong>
               </div>
             </div>
             </div>
@@ -411,9 +438,11 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mock-api.js"></script>
-    <script src="js/principal.js"></script>
-  <script src="js/saida-estoque.js"></script>
+<script src="js/mock-api.js"></script>
+<script src="js/principal.js"></script>
+<script src="js/saida-estoque.js"></script>
 </body>
 </html>
+
+
 

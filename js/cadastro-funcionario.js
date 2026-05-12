@@ -48,24 +48,8 @@ function garantirAcessoAdmin() {
   return true;
 }
 
-function aplicarMascaraTelefone(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 11);
-  if (numeros.length <= 2) return numeros ? `(${numeros}` : "";
-  if (numeros.length <= 6) return `(${numeros.slice(0, 2)})${numeros.slice(2)}`;
-  if (numeros.length <= 10) return `(${numeros.slice(0, 2)})${numeros.slice(2, 6)}-${numeros.slice(6)}`;
-  return `(${numeros.slice(0, 2)})${numeros.slice(2, 7)}-${numeros.slice(7)}`;
-}
-
-function aplicarMascaraCpf(valor) {
-  const numeros = String(valor || "").replace(/\D/g, "").slice(0, 11);
-  if (numeros.length <= 3) return numeros;
-  if (numeros.length <= 6) return `${numeros.slice(0, 3)}.${numeros.slice(3)}`;
-  if (numeros.length <= 9) return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6)}`;
-  return `${numeros.slice(0, 3)}.${numeros.slice(3, 6)}.${numeros.slice(6, 9)}-${numeros.slice(9)}`;
-}
-
 function limparCpf(valor) {
-  return String(valor || "").replace(/\D/g, "");
+  return window.vstockMasks.onlyDigits(valor, 11);
 }
 
 function msgFuncionario(texto, tipo = "danger") {
@@ -142,9 +126,9 @@ function limparFormularioFuncionario() {
 
 function preencherFormularioFuncionario(funcionario) {
   cpfEditando = funcionario.funcCpf;
-  $funcionario("#funcCpf").value = aplicarMascaraCpf(funcionario.funcCpf);
+  $funcionario("#funcCpf").value = window.vstockMasks.cpf(funcionario.funcCpf);
   $funcionario("#funcNome").value = funcionario.funcNome ?? "";
-  $funcionario("#funcTelefone").value = funcionario.funcTelefone ?? "";
+  $funcionario("#funcTelefone").value = window.vstockMasks.phone(funcionario.funcTelefone ?? "");
   $funcionario("#funcEmail").value = funcionario.funcEmail ?? "";
   $funcionario("#funcUsername").value = funcionario.username ?? "";
   $funcionario("#funcCargo").value = funcionario.cargo ?? "";
@@ -369,10 +353,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   $funcionario("#btnLimparFuncionario")?.addEventListener("click", limparFormularioFuncionario);
   $funcionario("#btnCancelarEdicaoFuncionario")?.addEventListener("click", limparFormularioFuncionario);
   $funcionario("#funcCpf")?.addEventListener("input", (e) => {
-    e.target.value = aplicarMascaraCpf(e.target.value);
+    e.target.value = window.vstockMasks.cpf(e.target.value);
   });
   $funcionario("#funcTelefone")?.addEventListener("input", (e) => {
-    e.target.value = aplicarMascaraTelefone(e.target.value);
+    e.target.value = window.vstockMasks.phone(e.target.value);
   });
   $funcionario("#filtroNomeFuncionario")?.addEventListener("input", () => {
     paginaAtualFuncionarios = 1;
