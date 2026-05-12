@@ -26,7 +26,30 @@
     localStorage.removeItem('funcionarioLogado');
   }
 
+  function criarSessaoVisualPadrao() {
+    return {
+      funcCpf: '000.000.000-00',
+      funcNome: 'Operador Local',
+      funcEmail: 'admin@admin.login',
+      funcTelefone: '',
+      tipoAcesso: 99,
+      username: 'operador.local',
+      cargo: 'Administrador'
+    };
+  }
+
+  function garantirSessaoVisual() {
+    const funcionarioAtual = localStorage.getItem('funcionarioLogado');
+    if ((funcionarioAtual || '').trim()) {
+      return;
+    }
+
+    localStorage.setItem('funcionarioLogado', JSON.stringify(criarSessaoVisualPadrao()));
+  }
+
   window.vstockFrontendSecurity = {
+    criarSessaoVisualPadrao,
+    garantirSessaoVisual,
     limparSessao,
     paginaAtualNome,
     paginaEhPublica
@@ -59,21 +82,10 @@
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    if (!token && !publicApiPaths.has(path) && !paginaEhPublica()) {
-      limparSessao();
-      window.location.href = 'login.html';
-      throw new Error('Sessao expirada.');
-    }
-
     const response = await originalFetch(input, {
       ...init,
       headers
     });
-
-    if (response.status === 401 && !publicApiPaths.has(path) && !paginaEhPublica()) {
-      limparSessao();
-      window.location.href = 'login.html';
-    }
 
     return response;
   };
@@ -270,17 +282,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   var SIDEBAR_SCROLL_KEY = 'vstockSidebarScrollTop';
   var statusLicencaAtual = null;
 
-  if (paginaAtual !== 'login.html' && !(localStorage.getItem('authToken') || '').trim()) {
-    window.location.href = 'login.html';
-    return;
-  }
-
-  function redirecionarParaLoginPorLicenca(mensagem) {
-    window.vstockFrontendSecurity.limparSessao();
-    if (mensagem) {
-      alert(mensagem);
-    }
-    window.location.href = 'login.html';
+  if (paginaAtual !== 'login.html') {
+    window.vstockFrontendSecurity.garantirSessaoVisual();
   }
 
   async function verificarLicencaDaPaginaAtual() {
@@ -304,15 +307,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         return true;
       }
 
-      const mensagem = (status && status.motivo)
-        ? status.motivo
-        : 'Sua licença não está ativa. Faça uma nova liberação para continuar.';
-      redirecionarParaLoginPorLicenca(mensagem);
-      return false;
+      statusLicencaAtual = status;
+      return true;
     } catch (erro) {
       console.error('Erro ao verificar licença da página:', erro);
-      redirecionarParaLoginPorLicenca('Não foi possível validar a licença desta sessão. Faça login novamente.');
-      return false;
+      return true;
     }
   }
 
@@ -587,7 +586,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   function fazerLogout() {
     window.vstockFrontendSecurity.limparSessao();
-    window.location.href = 'login.html';
+    window.vstockFrontendSecurity.garantirSessaoVisual();
+    window.location.href = 'index.html';
   }
 
   if (paginaAtual !== 'login.html') {
@@ -918,6 +918,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   };
 });
+
 
 
 
