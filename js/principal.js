@@ -735,11 +735,107 @@ document.addEventListener('DOMContentLoaded', async function () {
     logoContainer.appendChild(img);
   }
 
+  function obterTituloPaginaTopo() {
+    var tituloPagina = document.querySelector('.page-header h1, .page-header h2, .page-title h1, .page-title h2');
+    if (tituloPagina) {
+      return tituloPagina.textContent.trim();
+    }
+
+    var base = String(document.title || '').split('|')[0].trim();
+    return base || 'Painel operacional';
+  }
+
+  function obterDescricaoPaginaTopo() {
+    var descricao = document.querySelector('.page-header p, .page-title p, .page-subtitle');
+    return descricao ? descricao.textContent.trim() : '';
+  }
+
+  function normalizarLayoutAplicacao() {
+    if (paginaAtual === 'login.html' || paginaAtual === 'index.html') {
+      return;
+    }
+
+    document.body.classList.add('app-shell');
+
+    var mainContainer = document.querySelector('.main-container');
+    if (mainContainer) {
+      mainContainer.classList.add('app-layout');
+    }
+
+    var content = document.querySelector('.content');
+    if (content) {
+      content.classList.add('page-content');
+    }
+
+    var navbar = document.querySelector('.brand-navbar');
+    if (!navbar) {
+      return;
+    }
+
+    navbar.classList.add('app-topbar');
+
+    var container = navbar.querySelector('.container-fluid');
+    if (!container) {
+      return;
+    }
+
+    var brand = container.querySelector('.navbar-brand');
+    if (!brand) {
+      return;
+    }
+
+    var actions = null;
+    for (var i = 0; i < container.children.length; i++) {
+      if (container.children[i] !== brand) {
+        actions = container.children[i];
+        break;
+      }
+    }
+
+    if (!actions) {
+      actions = document.createElement('div');
+      container.appendChild(actions);
+    }
+
+    actions.classList.add('app-topbar-actions');
+
+    var main = container.querySelector('.app-topbar-main');
+    if (!main) {
+      main = document.createElement('div');
+      main.className = 'app-topbar-main';
+      container.appendChild(main);
+    }
+
+    var intro = main.querySelector('.app-topbar-page-intro');
+    if (!intro) {
+      intro = document.createElement('div');
+      intro.className = 'app-topbar-page-intro';
+      intro.innerHTML = '<h1 class="app-topbar-title"></h1><p class="app-topbar-subtitle"></p>';
+      main.appendChild(intro);
+    }
+
+    var titulo = intro.querySelector('.app-topbar-title');
+    if (titulo) {
+      titulo.textContent = obterTituloPaginaTopo();
+    }
+
+    var subtitulo = intro.querySelector('.app-topbar-subtitle');
+    if (subtitulo) {
+      subtitulo.textContent = '';
+      subtitulo.style.display = 'none';
+    }
+
+    if (actions.parentNode !== main) {
+      main.appendChild(actions);
+    }
+  }
+
   const empresa = await carregarEmpresaUnica();
   const modulos = normalizarModulos(empresa);
   aplicarTema(empresa);
   aplicarLogoNavbar(obterLogoSistema(empresa));
   simplificarBrandingNavbar();
+  normalizarLayoutAplicacao();
 
   var logoContainer = document.getElementById('logoEmpresa');
   if (empresa && logoContainer) {
@@ -757,9 +853,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   var funcionario = carregarFuncionarioLogado();
   var usuarioLogado = document.getElementById('usuario-logado');
+  var usuarioCargo = document.getElementById('usuario-cargo');
   var btnSair = document.getElementById('btnSairSistema');
-  var navbarUserExistente = document.querySelector('.navbar-user');
-  var topoDireitaBase = document.querySelector('.navbar .text-end') || document.querySelector('.brand-navbar .text-end') || document.querySelector('.navbar .text-white');
+  var topoDireitaBase = document.querySelector('.app-topbar-actions') || document.querySelector('.navbar .text-end') || document.querySelector('.brand-navbar .text-end') || document.querySelector('.navbar .text-white');
   var blocoTopoSistema = null;
 
   function formatarDataLicenca(valor) {
@@ -784,6 +880,68 @@ document.addEventListener('DOMContentLoaded', async function () {
     return expiraEm ? ('Licença válida até: ' + expiraEm) : 'Licença ativa';
   }
 
+  function obterNomeFuncionario(item) {
+    return item?.funcNome || item?.nome || 'Operador';
+  }
+
+  function obterCargoFuncionario(item) {
+    var cargo = String(item?.cargo || item?.funcCargo || '').trim();
+    if (cargo) {
+      return cargo;
+    }
+
+    return Number(item?.tipoAcesso) === 99 ? 'Administrador' : 'Operador';
+  }
+
+  function obterIniciaisFuncionario(nome) {
+    var base = String(nome || 'Operador').trim().split(/\s+/).filter(Boolean);
+    if (!base.length) {
+      return 'OP';
+    }
+
+    if (base.length === 1) {
+      return base[0].slice(0, 2).toUpperCase();
+    }
+
+    return (base[0][0] + base[base.length - 1][0]).toUpperCase();
+  }
+
+  function atualizarResumoContaNavbar(item) {
+    var nome = obterNomeFuncionario(item);
+    var cargo = obterCargoFuncionario(item);
+    var iniciais = obterIniciaisFuncionario(nome);
+
+    var nomeEl = document.getElementById('usuario-logado');
+    if (nomeEl) {
+      nomeEl.textContent = nome;
+    }
+
+    var cargoEl = document.getElementById('usuario-cargo');
+    if (cargoEl) {
+      cargoEl.textContent = cargo;
+    }
+
+    var nomeMenuEl = document.getElementById('usuario-logado-menu');
+    if (nomeMenuEl) {
+      nomeMenuEl.textContent = nome;
+    }
+
+    var cargoMenuEl = document.getElementById('usuario-cargo-menu');
+    if (cargoMenuEl) {
+      cargoMenuEl.textContent = cargo;
+    }
+
+    var iniciaisEl = document.getElementById('navbarAccountInitials');
+    if (iniciaisEl) {
+      iniciaisEl.textContent = iniciais;
+    }
+
+    var iniciaisMenuEl = document.getElementById('navbarAccountInitialsMenu');
+    if (iniciaisMenuEl) {
+      iniciaisMenuEl.textContent = iniciais;
+    }
+  }
+
   function garantirEstruturaTopoSistema() {
     if (!topoDireitaBase || paginaAtual === 'login.html') {
       return null;
@@ -800,35 +958,100 @@ document.addEventListener('DOMContentLoaded', async function () {
     wrapper.id = 'navbar-system-meta';
     wrapper.className = 'navbar-system-meta';
     wrapper.innerHTML = `
-      <div class="navbar-system-row" id="navbarSystemRowTop">
-        <div class="navbar-user navbar-user-inline">
-          <i class="bi bi-person-badge"></i>
-          <span id="usuario-logado">Operador</span>
+      <div class="navbar-account-menu" id="navbarAccountMenu">
+        <button type="button" class="navbar-account-toggle" id="navbarAccountToggle" aria-expanded="false" aria-haspopup="true">
+          <span class="navbar-account-avatar" id="navbarAccountInitials">OP</span>
+          <span class="navbar-account-summary">
+            <span class="navbar-account-name" id="usuario-logado">Operador</span>
+            <span class="navbar-account-role" id="usuario-cargo">Operador</span>
+          </span>
+          <i class="bi bi-chevron-down navbar-account-chevron" aria-hidden="true"></i>
+        </button>
+        <div class="navbar-account-dropdown" id="navbarAccountDropdown" hidden>
+          <div class="navbar-account-section">
+            <span class="navbar-account-section-label">Minha conta</span>
+            <div class="navbar-account-card">
+              <span class="navbar-account-avatar navbar-account-avatar-static" id="navbarAccountInitialsMenu">OP</span>
+              <div class="navbar-account-card-copy">
+                <strong id="usuario-logado-menu">Operador</strong>
+                <span id="usuario-cargo-menu">Operador</span>
+              </div>
+            </div>
+          </div>
+          <div class="navbar-account-section">
+            <div id="navbarLicenseStatusSlot"></div>
+          </div>
+          <div class="navbar-account-section navbar-account-section-actions">
+            <button type="button" class="btn navbar-logout-btn" id="btnSairSistema">
+              <i class="bi bi-box-arrow-right"></i>
+              Sair
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="navbar-system-row" id="navbarSystemRowBottom">
-        <div id="navbarLicenseStatusSlot"></div>
       </div>
     `;
 
     topoDireitaBase.innerHTML = '';
     topoDireitaBase.appendChild(wrapper);
 
-    var rowTop = document.getElementById('navbarSystemRowTop');
-    if (dataOriginal) {
-      rowTop.appendChild(dataOriginal);
+    usuarioLogado = document.getElementById('usuario-logado');
+    usuarioCargo = document.getElementById('usuario-cargo');
+    btnSair = document.getElementById('btnSairSistema');
+    atualizarResumoContaNavbar(funcionario);
+
+    var dataSlot = document.getElementById('navbarLicenseStatusSlot');
+    if (dataOriginal && dataSlot) {
+      dataOriginal.classList.add('navbar-date-inline');
+      dataSlot.appendChild(dataOriginal);
     }
 
-    var rowBottom = document.getElementById('navbarSystemRowBottom');
-    var logoutButton = document.createElement('button');
-    logoutButton.type = 'button';
-    logoutButton.className = 'btn btn-sm btn-outline-light navbar-logout-btn';
-    logoutButton.id = 'btnSairSistema';
-    logoutButton.innerHTML = '<i class="bi bi-box-arrow-right"></i> Sair';
-    rowBottom.appendChild(logoutButton);
+    var toggle = document.getElementById('navbarAccountToggle');
+    var dropdown = document.getElementById('navbarAccountDropdown');
+    var menu = document.getElementById('navbarAccountMenu');
 
-    usuarioLogado = document.getElementById('usuario-logado');
-    btnSair = document.getElementById('btnSairSistema');
+    function fecharMenuConta() {
+      if (!menu || !dropdown || !toggle) {
+        return;
+      }
+
+      menu.classList.remove('is-open');
+      dropdown.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    function abrirMenuConta() {
+      if (!menu || !dropdown || !toggle) {
+        return;
+      }
+
+      menu.classList.add('is-open');
+      dropdown.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    if (toggle && dropdown && menu) {
+      toggle.addEventListener('click', function (event) {
+        event.stopPropagation();
+        if (menu.classList.contains('is-open')) {
+          fecharMenuConta();
+        } else {
+          abrirMenuConta();
+        }
+      });
+
+      document.addEventListener('click', function (event) {
+        if (!menu.contains(event.target)) {
+          fecharMenuConta();
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          fecharMenuConta();
+        }
+      });
+    }
+
     return wrapper;
   }
 
@@ -858,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       slot.appendChild(existente);
     }
 
-    existente.innerHTML = '<i class="bi bi-patch-check"></i> <span>' + obterResumoLicenca(statusLicencaAtual) + '</span>';
+    existente.innerHTML = '<i class="bi bi-patch-check"></i><span>' + obterResumoLicenca(statusLicencaAtual) + '</span>';
   }
 
   function fazerLogout() {
@@ -870,9 +1093,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     blocoTopoSistema = garantirEstruturaTopoSistema();
   }
 
-  if (usuarioLogado && funcionario) {
-    usuarioLogado.textContent = funcionario.funcNome || funcionario.nome || 'Operador';
-  }
+  atualizarResumoContaNavbar(funcionario);
 
   if (btnSair) {
     btnSair.addEventListener('click', fazerLogout);
@@ -973,6 +1194,29 @@ document.addEventListener('DOMContentLoaded', async function () {
           }
         });
       }
+    }
+  }
+
+  function registrarTransicaoSuaveEntrePaginas() {
+    var conteudo = document.querySelector('.page-content');
+    if (!conteudo) {
+      return;
+    }
+
+    var linksInternos = document.querySelectorAll('a[href$=".html"]');
+    for (var i = 0; i < linksInternos.length; i++) {
+      linksInternos[i].addEventListener('click', function (event) {
+        if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+
+        var href = this.getAttribute('href');
+        if (!href || href.charAt(0) === '#') {
+          return;
+        }
+
+        conteudo.classList.add('is-loading');
+      });
     }
   }
 
@@ -1179,6 +1423,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
   renderizarSidebar();
   ajustarDashboardParaPerfil();
+  registrarTransicaoSuaveEntrePaginas();
 
   var btnMenuCompras = document.getElementById('btn-entrada-compra');
   if (btnMenuCompras) {
@@ -1216,7 +1461,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   };
 });
-
 
 
 
