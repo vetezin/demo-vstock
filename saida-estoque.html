@@ -15,8 +15,8 @@
   <link href="css/estoque-paginas.css" rel="stylesheet"/>
 </head>
 
-<body>
-  <nav class="navbar brand-navbar">
+<body class="app-shell">
+  <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
         <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png"/>
@@ -35,7 +35,7 @@
     </div>
   </nav>
 
-  <div class="main-container">
+  <div class="main-container app-layout">
     <div class="sidebar">
       <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
 
@@ -111,7 +111,7 @@
       </div>
     </div>
 
-    <div class="content">
+    <div class="content page-content">
       <main class="page-wrapper">
         <div id="mensagens" class="mb-3"></div>
 
@@ -185,14 +185,6 @@
                 <input type="text" id="saldoProduto" class="form-control text-end" disabled placeholder="0"/>
               </div>
 
-              <div class="col-xl-2 col-lg-2 col-md-4">
-                <label class="form-label">Valor Unitário</label>
-                <div class="campo-moeda">
-                  <span class="campo-moeda-prefixo">R$</span>
-                  <input type="text" id="valorUnitarioProduto" class="form-control" disabled placeholder="0,00"/>
-                </div>
-              </div>
-
               <div class="col-xl-2 col-lg-2 col-md-3">
                 <label class="form-label required">Quantidade</label>
                 <input type="number" id="quantidade" min="1" step="1" class="form-control text-end"/>
@@ -201,33 +193,10 @@
               <div class="col-xl-2 col-lg-3 col-md-3">
                 <label class="form-label required">Motivo</label>
                 <select id="motivo" class="form-select">
-                  <option value="VENDA" selected>Venda</option>
-                  <option value="USO_INTERNO">Uso interno</option>
+                  <option value="USO_INTERNO" selected>Uso interno</option>
                   <option value="PERDA">Perda</option>
                   <option value="AVARIA">Avaria</option>
                 </select>
-              </div>
-
-              <div class="col-xl-3 col-lg-3 col-md-4" id="blocoRecebimentoDinheiro">
-                <label class="form-label required">Recebimento em dinheiro</label>
-                <div class="d-flex gap-3 flex-wrap align-items-center h-100 pt-md-4">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="recebimentoDinheiro" id="recebimentoDinheiroSim" value="SIM">
-                    <label class="form-check-label" for="recebimentoDinheiroSim">Sim</label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="recebimentoDinheiro" id="recebimentoDinheiroNao" value="NAO">
-                    <label class="form-check-label" for="recebimentoDinheiroNao">Não</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-xl-2 col-lg-2 col-md-3">
-                <label class="form-label">Subtotal</label>
-                <div class="campo-moeda">
-                  <span class="campo-moeda-prefixo">R$</span>
-                  <input type="text" id="subtotalItemSaida" class="form-control" disabled placeholder="0,00"/>
-                </div>
               </div>
 
               <div class="col-xl-3 col-lg-4 col-md-6">
@@ -269,8 +238,6 @@
                     <th class="text-end">Saldo</th>
                     <th class="text-end">Qtd</th>
                     <th>Motivo</th>
-                    <th class="text-end">Valor Unitário</th>
-                    <th class="text-end">Subtotal</th>
                     <th>Observação</th>
                     <th class="text-center">Ações</th>
                   </tr>
@@ -287,10 +254,6 @@
               <div class="totais-box totais-box-compacto">
                 <span>Quantidade Total</span>
                 <strong id="totalItensSaida">0</strong>
-              </div>
-              <div class="totais-box totais-box-total" id="boxTotalVendaSaida">
-                <span>Total Geral</span>
-                <strong id="totalVendaSaida">R$ 0,00</strong>
               </div>
             </div>
             </div>
@@ -341,7 +304,6 @@
                     <tr>
                       <th>Produto</th>
                       <th class="text-end">Qtd</th>
-                      <th class="text-end">Total</th>
                       <th>Data</th>
                       <th>Funcionário</th>
                       <th class="text-center">Ações</th>
@@ -395,54 +357,13 @@
     </div>
   </div>
 
-  <div class="modal fade" id="modalRecebimentoDinheiro" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title">
-            <i class="bi bi-cash-coin"></i> Recebimento da Venda
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Total da venda</label>
-            <input id="totalVendaRecebimento" class="form-control" type="text" disabled placeholder="R$ 0,00">
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label required" for="valorRecebidoVenda">Valor recebido</label>
-            <div class="campo-moeda">
-              <span class="campo-moeda-prefixo">R$</span>
-              <input id="valorRecebidoVenda" class="form-control" type="text" placeholder="0,00" autocomplete="off">
-            </div>
-          </div>
-
-          <div>
-            <label class="form-label">Troco</label>
-            <input id="trocoVendaRecebimento" class="form-control" type="text" disabled placeholder="R$ 0,00">
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-success" id="btnConfirmarRecebimentoDinheiro" type="button">Confirmar venda</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="footer-info">
     <i class="bi bi-box-seam"></i> Plataforma de Estoque v1.0 &copy; 2025
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/mock-api.js"></script>
-<script src="js/principal.js"></script>
-<script src="js/saida-estoque.js"></script>
+  <script src="js/mock-api.js"></script>
+  <script src="js/principal.js"></script>
+  <script src="js/saida-estoque.js"></script>
 </body>
 </html>
-
-
-
