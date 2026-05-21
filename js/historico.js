@@ -1,8 +1,9 @@
-﻿const API_HISTORICO = {
+const API_HISTORICO = {
   LISTA: "http://localhost:8080/api/historico-movimentacoes"
 };
 
 const $historico = (sel) => document.querySelector(sel);
+const msgHistorico = window.vstockUi.createAlertHandler({ container: "#mensagens", clear: true });
 
 let todasMovimentacoes = [];
 let cardsMovimentacao = [];
@@ -12,47 +13,18 @@ let totalPaginasHistorico = 1;
 let totalMovimentacoes = 0;
 const ITENS_POR_PAGINA_HISTORICO = 10;
 
-function msgHistorico(texto, tipo = "danger") {
-  const box = $historico("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.innerHTML = "";
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-}
-
-function fmtData(valor) {
-  if (!valor) return "-";
-  return new Date(`${valor}T00:00:00`).toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  });
-}
-
 function fmtValor(valor) {
   if (valor === null || valor === undefined || Number.isNaN(Number(valor))) return "-";
-  return Number(valor).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
+  return window.vstockCurrency.formatMoney(valor);
 }
 
 function fmtSaldo(valor) {
   if (valor === null || valor === undefined || Number.isNaN(Number(valor))) return "-";
-  const quantidade = Number(valor || 0);
-  return `${quantidade} ${quantidade === 1 ? "unidade" : "unidades"}`;
+  return window.vstockFormatters.quantity(valor);
 }
 
 function fmtQuantidade(valor) {
-  const quantidade = Number(valor || 0);
-  return `${quantidade} ${quantidade === 1 ? "unidade" : "unidades"}`;
+  return window.vstockFormatters.quantity(valor);
 }
 
 function fmtMotivo(valor) {
@@ -317,7 +289,7 @@ function renderizarHistorico(lista) {
               <div class="timeline-titulo">${grupo.tipo || "-"} ${identificador}</div>
               <span class="badge-tipo ${badge}">${grupo.tipo || "-"}</span>
               <div class="timeline-topo-meta">
-                <span><i class="bi bi-calendar3"></i> ${fmtData(grupo.dataMovimentacao)}</span>
+                <span><i class="bi bi-calendar3"></i> ${window.vstockFormatters.date(grupo.dataMovimentacao)}</span>
               </div>
             </div>
             <div class="timeline-topo-apoio">${topoApoio}</div>
@@ -430,4 +402,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarHistorico(1);
   });
 });
-

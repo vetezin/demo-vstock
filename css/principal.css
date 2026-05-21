@@ -62,8 +62,7 @@ header {
 }
 
 .navbar-date {
-  font-size: 0.82rem;
-  font-weight: 600;
+  display: none !important;
 }
 
 .navbar-system-meta {
@@ -598,22 +597,64 @@ nav li ul {
   margin-left: 15px;
 }
 
-.module-divider,
-.module-development {
-  margin: 1rem 0 0.65rem;
-  padding: 0 0.55rem;
-  border: 0;
-  background: transparent;
-  border-radius: 0;
+.sidebar-group {
+  margin: 0.15rem 0 0.55rem;
 }
 
-.module-divider small,
-.module-development small {
+.sidebar-group-toggle {
+  width: 100%;
+  margin: 0;
+  padding: 0.42rem 0.55rem 0.55rem;
+  border: 0;
+  background: transparent;
   color: rgba(228, 244, 243, 0.72);
-  font-size: 0.69rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-group-toggle:hover {
+  color: #ffffff;
+  background: transparent;
+  transform: none;
+}
+
+.sidebar-group-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  min-width: 0;
+}
+
+.sidebar-group-label i {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.sidebar-group-label small {
+  color: inherit;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.sidebar-group-chevron {
+  font-size: 0.76rem;
+  transition: transform 0.18s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-group.is-collapsed .sidebar-group-chevron {
+  transform: rotate(180deg);
+}
+
+.sidebar-group-content {
+  display: grid;
+  gap: 0;
 }
 
 .nav-btn {

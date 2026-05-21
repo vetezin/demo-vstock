@@ -1,1 +1,218 @@
-﻿[]
+[
+  {
+    "vendaId": 1,
+    "saidaCod": 4,
+    "dataVenda": "2026-04-11T09:12:00",
+    "clienteId": 1,
+    "formaPagamentoId": 1,
+    "valorSubtotal": 26.3,
+    "tipoDesconto": "NENHUM",
+    "valorDesconto": 0,
+    "valorTotal": 26.3,
+    "valorRecebido": 30,
+    "troco": 3.7,
+    "status": "FINALIZADA",
+    "observacao": "Venda de balcao",
+    "funcionarioCpf": "10000000002",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 4,
+        "quantidade": 2,
+        "valorUnitario": 13.15,
+        "valorSubtotal": 26.3
+      }
+    ]
+  },
+  {
+    "vendaId": 2,
+    "saidaCod": 5,
+    "dataVenda": "2026-04-12T11:05:00",
+    "clienteId": 2,
+    "formaPagamentoId": 2,
+    "valorSubtotal": 170.5,
+    "tipoDesconto": "NENHUM",
+    "valorDesconto": 0,
+    "valorTotal": 170.5,
+    "valorRecebido": 170.5,
+    "troco": 0,
+    "status": "FINALIZADA",
+    "observacao": "Pedido retirado no caixa",
+    "funcionarioCpf": "10000000003",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 5,
+        "quantidade": 11,
+        "valorUnitario": 15.5,
+        "valorSubtotal": 170.5
+      }
+    ]
+  },
+  {
+    "vendaId": 3,
+    "saidaCod": 6,
+    "dataVenda": "2026-04-13T14:33:00",
+    "clienteId": 1,
+    "formaPagamentoId": 3,
+    "valorSubtotal": 53.55,
+    "tipoDesconto": "VALOR",
+    "valorDesconto": 3.55,
+    "valorTotal": 50,
+    "valorRecebido": 50,
+    "troco": 0,
+    "status": "FINALIZADA",
+    "observacao": "Campanha promocional",
+    "funcionarioCpf": "10000000004",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 6,
+        "quantidade": 3,
+        "valorUnitario": 17.85,
+        "valorSubtotal": 53.55
+      }
+    ]
+  },
+  {
+    "vendaId": 4,
+    "saidaCod": 10,
+    "dataVenda": "2026-04-17T16:48:00",
+    "clienteId": 2,
+    "formaPagamentoId": 2,
+    "valorSubtotal": 245.25,
+    "tipoDesconto": "NENHUM",
+    "valorDesconto": 0,
+    "valorTotal": 245.25,
+    "valorRecebido": 245.25,
+    "troco": 0,
+    "status": "FINALIZADA",
+    "observacao": "Venda para reposicao rapida",
+    "funcionarioCpf": "10000000002",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 10,
+        "quantidade": 9,
+        "valorUnitario": 27.25,
+        "valorSubtotal": 245.25
+      }
+    ]
+  },
+  {
+    "vendaId": 5,
+    "saidaCod": 14,
+    "dataVenda": "2026-04-21T10:19:00",
+    "clienteId": 1,
+    "formaPagamentoId": 1,
+    "valorSubtotal": 36.65,
+    "tipoDesconto": "NENHUM",
+    "valorDesconto": 0,
+    "valorTotal": 36.65,
+    "valorRecebido": 40,
+    "troco": 3.35,
+    "status": "FINALIZADA",
+    "observacao": "Venda avulsa",
+    "funcionarioCpf": "10000000006",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 14,
+        "quantidade": 1,
+        "valorUnitario": 36.65,
+        "valorSubtotal": 36.65
+      }
+    ]
+  },
+  {
+    "vendaId": 6,
+    "saidaCod": 15,
+    "dataVenda": "2026-04-22T12:07:00",
+    "clienteId": 2,
+    "formaPagamentoId": 3,
+    "valorSubtotal": 273,
+    "tipoDesconto": "PERCENTUAL",
+    "valorDesconto": 13.65,
+    "valorTotal": 259.35,
+    "valorRecebido": 259.35,
+    "troco": 0,
+    "status": "FINALIZADA",
+    "observacao": "Desconto comercial",
+    "funcionarioCpf": "10000000007",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 15,
+        "quantidade": 7,
+        "valorUnitario": 39,
+        "valorSubtotal": 273
+      }
+    ]
+  },
+  {
+    "vendaId": 7,
+    "saidaCod": 16,
+    "dataVenda": "2026-04-23T15:41:00",
+    "clienteId": 1,
+    "formaPagamentoId": 2,
+    "valorSubtotal": 124.05,
+    "tipoDesconto": "NENHUM",
+    "valorDesconto": 0,
+    "valorTotal": 124.05,
+    "valorRecebido": 124.05,
+    "troco": 0,
+    "status": "FINALIZADA",
+    "observacao": "Venda no caixa principal",
+    "funcionarioCpf": "10000000002",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 16,
+        "quantidade": 3,
+        "valorUnitario": 41.35,
+        "valorSubtotal": 124.05
+      }
+    ]
+  },
+  {
+    "vendaId": 8,
+    "saidaCod": 20,
+    "dataVenda": "2026-04-27T18:02:00",
+    "clienteId": 2,
+    "formaPagamentoId": 1,
+    "valorSubtotal": 609,
+    "tipoDesconto": "VALOR",
+    "valorDesconto": 9,
+    "valorTotal": 600,
+    "valorRecebido": 610,
+    "troco": 10,
+    "status": "FINALIZADA",
+    "observacao": "Fechamento do turno",
+    "funcionarioCpf": "10000000006",
+    "dataCancelamento": null,
+    "motivoCancelamento": "",
+    "adminCancelamentoEmail": "",
+    "itens": [
+      {
+        "produtoCod": 20,
+        "quantidade": 12,
+        "valorUnitario": 50.75,
+        "valorSubtotal": 609
+      }
+    ]
+  }
+]

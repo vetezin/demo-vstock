@@ -13,6 +13,7 @@
   <link href="css/principal.css" rel="stylesheet"/>
   <link href="css/entrada-compra.css" rel="stylesheet"/>
   <link href="css/estoque-paginas.css" rel="stylesheet"/>
+  <link href="css/vendas.css" rel="stylesheet"/>
 </head>
 <body class="app-shell">
   <nav class="navbar brand-navbar app-topbar">
@@ -41,217 +42,192 @@
       <main class="page-wrapper">
         <div id="mensagens" class="mb-3"></div>
 
-        <div class="venda-page-header">
-          <div class="venda-page-header-icon">
-            <i class="bi bi-cart-check"></i>
-          </div>
-          <div>
-            <h2 class="h3 mb-1">Nova Venda</h2>
-            <p class="venda-page-subtitle mb-0">Adicione produtos, aplique descontos, informe o pagamento e finalize a venda.</p>
-          </div>
-        </div>
-
-        <div class="card mb-4 card-entrada-unificada venda-shell-card">
-          <div class="card-header card-header-flex venda-shell-header">
-            <i class="bi bi-receipt-cutoff text-danger"></i>
-            <span>Nova Venda</span>
-          </div>
-
-          <div class="card-body">
-            <div class="entrada-section">
-              <div class="entrada-section-header">
-                <i class="bi bi-journal-text text-danger"></i>
-                <span>Dados da Venda</span>
-              </div>
-
-              <div class="row g-3">
-                <div class="col-md-3">
-                  <label class="form-label required">Data/Hora da Venda</label>
-                  <input type="datetime-local" id="dataVenda" class="form-control"/>
-                </div>
-
-                <div class="col-md-4">
-                  <label class="form-label">Cliente</label>
-                  <select id="clienteVenda" class="form-select">
-                    <option value="">Venda sem cliente identificado</option>
-                  </select>
-                  <div class="mt-2 d-flex gap-2 flex-wrap">
-                    <button type="button" id="btnAbrirModalClienteVenda" class="btn btn-sm btn-outline-secondary">
-                      <i class="bi bi-person-plus"></i> Cadastrar cliente
-                    </button>
-                  </div>
-                </div>
-
-                <div class="col-md-2">
-                  <label class="form-label required">Status</label>
-                  <select id="statusVenda" class="form-select">
-                    <option value="FINALIZADA" selected>Finalizada</option>
-                    <option value="ABERTA">Aberta</option>
-                  </select>
-                </div>
-
-                <div class="col-md-3">
-                  <label class="form-label required">Funcionário Logado</label>
-                  <input class="form-control" id="funcionarioNomeVenda" disabled placeholder="-"/>
-                  <input type="hidden" id="funcionarioCpfVenda"/>
-                </div>
-              </div>
+        <section class="pdv-page">
+          <div class="pdv-page-header">
+            <div>
+              <h1>PDV - Ponto de Venda</h1>
+              <p>Busque produtos, monte o carrinho e finalize a venda no mesmo fluxo operacional.</p>
             </div>
 
-            <div class="entrada-section-divider"></div>
-
-            <div class="venda-grid-top">
-              <div class="entrada-section venda-card-bloco venda-card-principal">
-                <div class="entrada-section-header">
-                  <i class="bi bi-box2-heart text-danger"></i>
-                  <span>Produto</span>
-                </div>
-
-                <div class="row g-3 estoque-form-row">
-                  <div class="col-xl-3 col-lg-4 col-md-6">
-                    <label class="form-label">Código de Barras</label>
-                    <input id="codigoBarrasVenda" class="form-control" placeholder="Leia o código com o scanner" autocomplete="off"/>
-                  </div>
-
-                  <div class="col-xl-3 col-lg-4 col-md-6">
-                    <label class="form-label required">Produto</label>
-                    <div class="produto-busca-grupo">
-                      <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto..." autocomplete="off"/>
-                      <div id="dropdownProdutosVenda" class="produto-dropdown"></div>
-                    </div>
-
-                    <select id="listaProdutosVenda" class="form-select d-none">
-                      <option disabled selected>Carregando...</option>
-                    </select>
-                  </div>
-
-                  <div class="col-xl-2 col-lg-2 col-md-4">
-                    <label class="form-label required">Quantidade</label>
-                    <input type="number" id="quantidadeVenda" min="1" step="1" class="form-control text-end"/>
-                  </div>
-
-                  <div class="col-xl-2 col-lg-2 col-md-4">
-                    <label class="form-label">Subtotal do Item</label>
-                    <div class="campo-moeda">
-                      <span class="campo-moeda-prefixo">R$</span>
-                      <input type="text" id="subtotalItemVenda" class="form-control" disabled placeholder="0,00"/>
-                    </div>
-                  </div>
-
-                  <div class="col-xl-2 col-lg-2 col-md-4 estoque-form-action">
-                    <label class="form-label form-label-placeholder">Adicionar</label>
-                    <button id="btnAddItemVenda" class="btn btn-success btn-add-item" type="button">
-                      <i class="bi bi-plus-circle"></i>
-                      <span>Adicionar item</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="row g-3 mt-1">
-                  <div class="col-xl-3 col-lg-4 col-md-5">
-                    <label class="form-label">Saldo Estoque</label>
-                    <input type="text" id="saldoProdutoVenda" class="form-control text-end" disabled placeholder="0"/>
-                  </div>
-
-                  <div class="col-xl-3 col-lg-4 col-md-5">
-                    <label class="form-label">Valor Unitário</label>
-                    <div class="campo-moeda">
-                      <span class="campo-moeda-prefixo">R$</span>
-                      <input type="text" id="valorUnitarioVenda" class="form-control" disabled placeholder="0,00"/>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="table-responsive mt-4">
-                  <table class="table table-sm align-middle" id="tabelaItensVenda">
-                    <thead>
-                      <tr>
-                        <th>Produto</th>
-                        <th class="text-end">Saldo</th>
-                        <th class="text-end">Qtd</th>
-                        <th class="text-end">Valor Unit.</th>
-                        <th class="text-end">Subtotal</th>
-                        <th class="text-center">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-              </div>
+            <div class="pdv-header-actions">
+              <button type="button" id="btnAbrirModalClienteVenda" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-person-plus"></i>
+                Cliente
+              </button>
+              <button type="button" id="btnAbrirModalFormaPagamento" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-wallet2"></i>
+                Pagamentos
+              </button>
             </div>
+          </div>
 
-            <div class="venda-grid-bottom">
-              <div class="entrada-section venda-card-bloco">
-                <div class="entrada-section-header">
-                  <i class="bi bi-percent text-danger"></i>
-                  <span>Desconto</span>
-                </div>
+          <div class="pdv-layout">
+            <section class="pdv-panel pdv-products-panel">
+              <div class="pdv-toolbar">
+                <label class="pdv-search-box" for="buscaProdutoVenda">
+                  <i class="bi bi-search"></i>
+                  <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto por nome ou código..." autocomplete="off"/>
+                </label>
 
-                <div class="row g-3">
-                  <div class="col-md-4">
-                    <label class="form-label">Tipo</label>
-                    <select id="tipoDescontoVenda" class="form-select">
-                      <option value="NENHUM" selected>Sem desconto</option>
-                      <option value="VALOR">Valor</option>
-                      <option value="PERCENTUAL">Percentual</option>
-                    </select>
-                  </div>
-
-                  <div class="col-md-4">
-                    <label class="form-label">Valor</label>
-                    <input type="text" id="valorDescontoVenda" class="form-control" placeholder="0,00"/>
-                  </div>
-
-                  <div class="col-md-4">
-                    <label class="form-label">Observação</label>
-                    <textarea id="observacaoVenda" class="form-control" rows="2" placeholder="Opcional"></textarea>
-                  </div>
-                </div>
-
-                
-              </div>
-
-              <div class="entrada-section venda-card-bloco">
-                <div class="entrada-section-header d-flex justify-content-between align-items-center w-100">
-                  <span><i class="bi bi-wallet2 text-danger"></i> Pagamento</span>
-                  <button type="button" id="btnAbrirModalFormaPagamento" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-plus-circle"></i> Cadastrar
+                <select id="filtroCategoriaVenda" class="form-select pdv-native-select">
+                  <option value="">Todas categorias</option>
+                </select>
+                <div class="pdv-custom-select" data-custom-select="filtroCategoriaVenda">
+                  <button type="button" class="pdv-custom-select-toggle" data-custom-select-toggle="filtroCategoriaVenda" aria-expanded="false">
+                    <span data-custom-select-label="filtroCategoriaVenda">Todas categorias</span>
+                    <i class="bi bi-chevron-down"></i>
                   </button>
+                  <div class="pdv-custom-select-menu" data-custom-select-menu="filtroCategoriaVenda"></div>
                 </div>
-
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label class="form-label required">Forma de Pagamento</label>
-                    <select id="formaPagamentoVenda" class="form-select">
-                      <option value="">Selecione...</option>
-                    </select>
-                  </div>
-
-                  <div class="col-md-3" id="blocoValorRecebidoVenda">
-                    <label class="form-label">Valor Recebido</label>
-                    <input type="text" id="valorRecebidoVendaTela" class="form-control" placeholder="0,00"/>
-                  </div>
-
-                  <div class="col-md-3" id="blocoTrocoVenda">
-                    <label class="form-label">Troco</label>
-                    <input type="text" id="trocoVendaTela" class="form-control" disabled placeholder="0,00"/>
-                  </div>
-                </div>
-
-                
               </div>
+
+              <div class="pdv-section-header">
+                <div class="pdv-section-title">
+                  <i class="bi bi-box-seam"></i>
+                  <h2>Produtos Disponíveis</h2>
+                </div>
+                <span class="pdv-count-pill" id="pdvProductCount">0 itens</span>
+              </div>
+
+              <div id="pdvProductGrid" class="pdv-product-grid"></div>
+              <div class="pdv-products-footer">
+                <span class="pdv-products-summary" id="pdvProductsSummary">Mostrando 0-0 de 0 produtos</span>
+                <div class="pdv-pagination" id="pdvPagination"></div>
+              </div>
+            </section>
+
+            <aside class="pdv-panel pdv-cart-panel">
+              <div class="pdv-cart-header">
+                <div class="pdv-section-title">
+                  <i class="bi bi-cart3"></i>
+                  <h2>Carrinho</h2>
+                  <span class="pdv-cart-badge" id="pdvCartCount">0</span>
+                </div>
+                <button id="btnLimparVenda" class="pdv-clear-btn" type="button">
+                  <i class="bi bi-x-lg"></i>
+                  Limpar
+                </button>
+              </div>
+
+              <div id="pdvCartItems" class="pdv-cart-items"></div>
+
+              <div class="pdv-cart-divider"></div>
+
+              <div class="pdv-field-group">
+                <label class="pdv-field-label" for="clienteVenda">Cliente</label>
+                <div class="pdv-inline-input">
+                  <i class="bi bi-person"></i>
+                  <select id="clienteVenda" class="form-select pdv-native-select">
+                    <option value="">Cliente Balcão</option>
+                  </select>
+                  <div class="pdv-custom-select pdv-custom-select-inline" data-custom-select="clienteVenda">
+                    <button type="button" class="pdv-custom-select-toggle" data-custom-select-toggle="clienteVenda" aria-expanded="false">
+                      <span data-custom-select-label="clienteVenda">Cliente Balcão</span>
+                      <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="pdv-custom-select-menu" data-custom-select-menu="clienteVenda"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pdv-field-row">
+                <div class="pdv-field-group">
+                  <label class="pdv-field-label" for="tipoDescontoVenda">Tipo de desconto</label>
+                  <select id="tipoDescontoVenda" class="form-select pdv-inline-select">
+                    <option value="NENHUM" selected>Sem desconto</option>
+                    <option value="VALOR">Valor</option>
+                    <option value="PERCENTUAL">Percentual</option>
+                  </select>
+                </div>
+
+                <div class="pdv-field-group">
+                  <label class="pdv-field-label" for="valorDescontoVenda">Desconto</label>
+                  <div class="pdv-discount-box">
+                    <input type="text" id="valorDescontoVenda" class="form-control" placeholder="0,00" disabled/>
+                    <span id="sufixoDescontoVenda">R$</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pdv-summary">
+                <div class="pdv-summary-row">
+                  <span>Subtotal</span>
+                  <strong id="pdvSubtotal">R$ 0,00</strong>
+                </div>
+                <div class="pdv-summary-row">
+                  <span>Desconto</span>
+                  <strong id="pdvDiscountSummary">R$ 0,00</strong>
+                </div>
+                <div class="pdv-summary-total">
+                  <span>Total</span>
+                  <strong id="pdvTotal">R$ 0,00</strong>
+                </div>
+              </div>
+
+              <div class="pdv-payment-grid" id="pdvPaymentOptions"></div>
+
+              <div class="pdv-cash-fields">
+                <div class="pdv-field-group d-none" id="blocoValorRecebidoVenda">
+                  <label class="pdv-field-label" for="valorRecebidoVendaTela">Valor Recebido</label>
+                  <input type="text" id="valorRecebidoVendaTela" class="form-control" placeholder="0,00"/>
+                </div>
+
+                <div class="pdv-field-group d-none" id="blocoTrocoVenda">
+                  <label class="pdv-field-label" for="trocoVendaTela">Troco</label>
+                  <input type="text" id="trocoVendaTela" class="form-control" disabled placeholder="0,00"/>
+                </div>
+              </div>
+
+              <button id="btnSalvarVenda" class="pdv-submit-btn" type="button">
+                <i class="bi bi-cash-coin"></i>
+                Finalizar Venda
+              </button>
+            </aside>
+          </div>
+
+          <div class="pdv-legacy-state d-none" aria-hidden="true">
+            <input type="datetime-local" id="dataVenda" class="form-control"/>
+            <select id="statusVenda" class="form-select">
+              <option value="FINALIZADA" selected>Finalizada</option>
+              <option value="ABERTA">Aberta</option>
+            </select>
+            <input class="form-control" id="funcionarioNomeVenda" disabled placeholder="-"/>
+            <input type="hidden" id="funcionarioCpfVenda"/>
+            <input id="codigoBarrasVenda" class="form-control" autocomplete="off"/>
+
+            <div class="produto-busca-grupo">
+              <div id="dropdownProdutosVenda" class="produto-dropdown"></div>
             </div>
 
-            <div class="venda-acoes-rodape">
-              <button id="btnLimparVenda" class="btn btn-outline-warning" type="button">
-                <i class="bi bi-eraser"></i> Limpar
-              </button>
-              <button id="btnSalvarVenda" class="btn btn-success" type="button">
-                <i class="bi bi-check2-circle"></i> Finalizar venda
-              </button>
-            </div>
+            <select id="listaProdutosVenda" class="form-select">
+              <option disabled selected>Carregando...</option>
+            </select>
+            <input type="number" id="quantidadeVenda" min="1" step="1" class="form-control text-end" value="1"/>
+            <input type="text" id="subtotalItemVenda" class="form-control" disabled placeholder="0,00"/>
+            <input type="text" id="saldoProdutoVenda" class="form-control text-end" disabled placeholder="0"/>
+            <input type="text" id="valorUnitarioVenda" class="form-control" disabled placeholder="0,00"/>
+            <button id="btnAddItemVenda" class="btn btn-success btn-add-item" type="button">Adicionar item</button>
+
+            <table class="table table-sm align-middle" id="tabelaItensVenda">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th class="text-end">Saldo</th>
+                  <th class="text-end">Qtd</th>
+                  <th class="text-end">Valor Unit.</th>
+                  <th class="text-end">Subtotal</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+
+            <select id="formaPagamentoVenda" class="form-select">
+              <option value="">Selecione...</option>
+            </select>
+            <textarea id="observacaoVenda" class="form-control" rows="2" placeholder="Opcional"></textarea>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   </div>

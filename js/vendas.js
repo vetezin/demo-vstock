@@ -1,5 +1,6 @@
-﻿const API_VENDAS = {
+const API_VENDAS = {
   ESTOQUE_RESUMO: "http://localhost:8080/api/estoque/resumo?ativosOnly=true",
+  PRODUTOS: "http://localhost:8080/api/produtos/lista?ativosOnly=true",
   CLIENTES: "http://localhost:8080/api/cliente/all?ativosOnly=true",
   CLIENTE_NOVO: "http://localhost:8080/api/cliente",
   FORMAS_PAGAMENTO: "http://localhost:8080/api/forma-pagamento/all",
@@ -10,6 +11,7 @@
 };
 
 const $venda = (selector) => document.querySelector(selector);
+const msgVenda = window.vstockUi.createAlertHandler({ container: "#mensagens", clear: true, autoRemoveMs: 4500 });
 
 let produtosVendaCache = [];
 let clientesVendaCache = [];
@@ -21,40 +23,160 @@ let modalFormaPagamento = null;
 let modalClienteVenda = null;
 let modalConfirmarVenda = null;
 let formaPagamentoEditandoId = null;
+let paginaAtualProdutos = 1;
 
-function msgVenda(texto, tipo = "danger") {
-  const box = $venda("#mensagens");
-  if (!box) return;
+const PRODUTOS_POR_PAGINA = 12;
 
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.innerHTML = "";
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
-function agoraInputLocal() {
-  const data = new Date();
-  const ajustada = new Date(data.getTime() - (data.getTimezoneOffset() * 60000));
-  return ajustada.toISOString().slice(0, 16);
-}
-
-function formatarMoeda(valor) {
-  return Number(valor || 0).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
+function fecharTodosCustomSelects(excetoId = "") {
+  document.querySelectorAll(".pdv-custom-select").forEach((wrapper) => {
+    const alvo = wrapper.getAttribute("data-custom-select") || "";
+    if (excetoId && alvo === excetoId) return;
+    wrapper.classList.remove("is-open");
+    const toggle = wrapper.querySelector(".pdv-custom-select-toggle");
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", "false");
+    }
   });
 }
 
-function formatarMoedaCampo(valor) {
-  return window.vstockCurrency.formatNumber(valor || 0);
+function sincronizarCustomSelect(selectId) {
+  const select = $venda(`#${selectId}`);
+  const wrapper = document.querySelector(`[data-custom-select="${selectId}"]`);
+  const label = document.querySelector(`[data-custom-select-label="${selectId}"]`);
+  const menu = document.querySelector(`[data-custom-select-menu="${selectId}"]`);
+  if (!select || !wrapper || !label || !menu) return;
+
+  const valorAtual = String(select.value || "");
+  const opcaoAtual = select.selectedOptions?.[0];
+  label.textContent = opcaoAtual?.textContent?.trim() || "Selecionar";
+
+  menu.innerHTML = Array.from(select.options).map((option) => {
+    const ativo = String(option.value || "") === valorAtual ? " is-active" : "";
+    return `
+      <button type="button" class="pdv-custom-select-option${ativo}" data-custom-option="${selectId}" data-value="${option.value}">
+        <span>${option.textContent}</span>
+        <i class="bi bi-check-lg pdv-custom-select-option-check"></i>
+      </button>
+    `;
+  }).join("");
+}
+
+function registrarCustomSelect(selectId) {
+  const select = $venda(`#${selectId}`);
+  const wrapper = document.querySelector(`[data-custom-select="${selectId}"]`);
+  const toggle = document.querySelector(`[data-custom-select-toggle="${selectId}"]`);
+  const menu = document.querySelector(`[data-custom-select-menu="${selectId}"]`);
+  if (!select || !wrapper || !toggle || !menu || wrapper.dataset.bound === "true") return;
+
+  wrapper.dataset.bound = "true";
+
+  toggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const vaiAbrir = !wrapper.classList.contains("is-open");
+    fecharTodosCustomSelects(vaiAbrir ? selectId : "");
+    wrapper.classList.toggle("is-open", vaiAbrir);
+    toggle.setAttribute("aria-expanded", vaiAbrir ? "true" : "false");
+  });
+
+  menu.addEventListener("click", (event) => {
+    const option = event.target.closest(`[data-custom-option="${selectId}"]`);
+    if (!option) return;
+
+    select.value = String(option.dataset.value || "");
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    sincronizarCustomSelect(selectId);
+    fecharTodosCustomSelects();
+  });
+
+  select.addEventListener("change", () => {
+    sincronizarCustomSelect(selectId);
+  });
+
+  sincronizarCustomSelect(selectId);
+}
+
+function obterCategoriaProduto(produto) {
+  const categoriaObj = produto?.categoria;
+  const categoriaAninhada =
+    categoriaObj?.catDescr ||
+    categoriaObj?.cat_descr ||
+    categoriaObj?.descricao ||
+    categoriaObj?.nome;
+
+  return String(
+    categoriaAninhada ||
+    produto?.categoria ||
+    produto?.categoriaNome ||
+    produto?.categoria_nome ||
+    produto?.categoriaDescricao ||
+    produto?.categoria_descricao ||
+    produto?.nomeCategoria ||
+    produto?.nome_categoria ||
+    produto?.grupo ||
+    produto?.grupoDescricao ||
+    produto?.grupo_descricao ||
+    "Sem categoria"
+  ).trim() || "Sem categoria";
+}
+
+function obterCodigoProduto(produto) {
+  return String(
+    produto?.prod_cod ??
+    produto?.prodCod ??
+    ""
+  ).trim();
+}
+
+function enriquecerProdutosComCategoria(estoqueResumo, produtosCompletos) {
+  const produtosPorCodigo = new Map(
+    (Array.isArray(produtosCompletos) ? produtosCompletos : []).map((produto) => [
+      obterCodigoProduto(produto),
+      produto
+    ])
+  );
+
+  return (Array.isArray(estoqueResumo) ? estoqueResumo : []).map((produtoResumo) => {
+    const produtoCompleto = produtosPorCodigo.get(obterCodigoProduto(produtoResumo));
+    if (!produtoCompleto) {
+      return produtoResumo;
+    }
+
+    return {
+      ...produtoCompleto,
+      ...produtoResumo,
+      categoria: produtoCompleto.categoria ?? produtoResumo.categoria,
+      categoriaNome:
+        produtoCompleto.categoria?.catDescr ??
+        produtoCompleto.categoria?.cat_descr ??
+        produtoCompleto.categoriaNome ??
+        produtoResumo.categoriaNome ??
+        produtoResumo.categoria
+    };
+  });
+}
+
+function popularCategoriasVenda() {
+  const select = $venda("#filtroCategoriaVenda");
+  if (!select) return;
+
+  const atual = select.value || "";
+  const categorias = Array.from(new Set(
+    produtosVendaCache.map((produto) => obterCategoriaProduto(produto))
+  )).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+  select.innerHTML = `<option value="">Todas categorias</option>`;
+  categorias.forEach((categoria) => {
+    const option = document.createElement("option");
+    option.value = categoria;
+    option.textContent = categoria;
+    select.appendChild(option);
+  });
+
+  if (atual && categorias.includes(atual)) {
+    select.value = atual;
+  }
+
+  sincronizarCustomSelect("filtroCategoriaVenda");
 }
 
 function parseMoeda(valor) {
@@ -62,24 +184,11 @@ function parseMoeda(valor) {
 }
 
 function carregarFuncionarioLogado() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch {
-    return null;
-  }
-}
-
-function normalizarCodigoBarras(valor) {
-  return String(valor || "").trim();
+  return window.vstockSession.getFuncionario();
 }
 
 function localizarProdutoPorCodigoBarras(codigo) {
-  const codigoNormalizado = normalizarCodigoBarras(codigo);
-  if (!codigoNormalizado) return null;
-
-  return produtosVendaCache.find((produto) =>
-    normalizarCodigoBarras(produto.codigo_barras) === codigoNormalizado
-  ) || null;
+  return window.vstockProducts.findByBarcode(produtosVendaCache, codigo, "codigo_barras");
 }
 
 function localizarProdutoSelecionado() {
@@ -138,6 +247,55 @@ function renderizarTabelaFormasPagamento() {
   }).join("");
 }
 
+function iconeFormaPagamento(nome) {
+  const normalizado = String(nome || "").trim().toLowerCase();
+  if (normalizado.includes("pix")) return "bi-qr-code";
+  if (normalizado.includes("cart")) return "bi-credit-card";
+  if (normalizado.includes("dinheiro")) return "bi-cash";
+  return "bi-wallet2";
+}
+
+function renderizarOpcoesPagamentoPdv() {
+  const container = $venda("#pdvPaymentOptions");
+  const select = $venda("#formaPagamentoVenda");
+  if (!container || !select) return;
+
+  const valorAtual = String(select.value || "");
+  const preferidos = [
+    { rotulo: "Dinheiro", icone: "bi-cash", chaves: ["dinheiro"] },
+    { rotulo: "Cartão", icone: "bi-credit-card", chaves: ["cartão", "cartao"] },
+    { rotulo: "PIX", icone: "bi-qr-code", chaves: ["pix"] }
+  ];
+
+  const opcoes = preferidos.map((preferido) => {
+    return formasPagamentoCache.find((item) => {
+      if (item.ativo === false) return false;
+      const nome = String(item.nome || "").trim().toLowerCase();
+      return preferido.chaves.some((chave) => nome === chave || nome.includes(chave));
+    }) || null;
+  });
+
+  container.innerHTML = opcoes.map((item, indice) => {
+    if (!item) {
+      return `
+        <button type="button" class="pdv-payment-option" disabled>
+          <i class="bi ${preferidos[indice].icone}"></i>
+          <span>${preferidos[indice].rotulo}</span>
+        </button>
+      `;
+    }
+
+    const id = String(item.formaPagamentoId ?? item.forma_pagamento_id);
+    const ativo = id === valorAtual ? " is-active" : "";
+    return `
+      <button type="button" class="pdv-payment-option${ativo}" data-forma-pagamento="${id}">
+        <i class="bi ${iconeFormaPagamento(item.nome)}"></i>
+        <span>${item.nome}</span>
+      </button>
+    `;
+  }).join("");
+}
+
 function renderizarSelectFormasPagamento() {
   const select = $venda("#formaPagamentoVenda");
   if (!select) return;
@@ -158,6 +316,8 @@ function renderizarSelectFormasPagamento() {
   if (valorAtual && ativos.some((item) => String(item.formaPagamentoId ?? item.forma_pagamento_id) === String(valorAtual))) {
     select.value = String(valorAtual);
   }
+
+  renderizarOpcoesPagamentoPdv();
 }
 
 async function carregarFormasPagamento(ativosOnly = false) {
@@ -242,13 +402,15 @@ async function carregarClientes() {
     const select = $venda("#clienteVenda");
     if (!select) return;
 
-    select.innerHTML = `<option value="">Venda sem cliente identificado</option>`;
+    select.innerHTML = `<option value="">Cliente Balcão</option>`;
     clientesVendaCache.forEach((cliente) => {
       const option = document.createElement("option");
       option.value = String(cliente.clienteId ?? cliente.cliente_id);
       option.textContent = cliente.nome ?? "Cliente";
       select.appendChild(option);
     });
+
+    sincronizarCustomSelect("clienteVenda");
   } catch (erro) {
     console.error(erro);
     msgVenda("Não foi possível carregar os clientes.", "danger");
@@ -290,6 +452,7 @@ async function salvarClienteVenda(event) {
     const idCliente = String(clienteSalvo.clienteId ?? clienteSalvo.cliente_id ?? "");
     if (idCliente) {
       $venda("#clienteVenda").value = idCliente;
+      sincronizarCustomSelect("clienteVenda");
     }
 
     limparFormularioClienteVenda();
@@ -312,6 +475,7 @@ function desenharSelectProdutos(lista) {
   if (!lista.length) {
     select.innerHTML = `<option value="" selected disabled>Nenhum produto encontrado</option>`;
     renderizarDropdownProdutos([]);
+    renderizarProdutosPdv([]);
     atualizarProdutoSelecionado();
     return;
   }
@@ -332,6 +496,89 @@ function desenharSelectProdutos(lista) {
   }
 
   renderizarDropdownProdutos(lista, false);
+  renderizarProdutosPdv(lista);
+}
+
+function renderizarProdutosPdv(lista) {
+  const grid = $venda("#pdvProductGrid");
+  const count = $venda("#pdvProductCount");
+  const resumo = $venda("#pdvProductsSummary");
+  const paginacao = $venda("#pdvPagination");
+  if (!grid || !count) return;
+
+  count.textContent = `${lista.length} item${lista.length === 1 ? "" : "s"}`;
+
+  if (!lista.length) {
+    grid.innerHTML = `
+      <div class="pdv-empty-state">
+        <i class="bi bi-search"></i>
+        <strong>Nenhum produto encontrado</strong>
+        <span>Ajuste a busca ou o filtro de categoria.</span>
+      </div>
+    `;
+    if (resumo) resumo.textContent = "Mostrando 0-0 de 0 produtos";
+    if (paginacao) paginacao.innerHTML = "";
+    return;
+  }
+
+  const totalItens = lista.length;
+  const totalPaginas = Math.max(1, Math.ceil(totalItens / PRODUTOS_POR_PAGINA));
+  paginaAtualProdutos = Math.min(Math.max(1, paginaAtualProdutos), totalPaginas);
+
+  const inicio = (paginaAtualProdutos - 1) * PRODUTOS_POR_PAGINA;
+  const fim = Math.min(inicio + PRODUTOS_POR_PAGINA, totalItens);
+  const paginaItens = lista.slice(inicio, fim);
+
+  grid.innerHTML = paginaItens.map((produto) => {
+    const saldo = Number(produto?.saldo || 0);
+    const categoria = obterCategoriaProduto(produto);
+    const classe = saldo <= 0 ? " pdv-product-card is-out" : " pdv-product-card";
+    return `
+      <button type="button" class="${classe.trim()}" data-produto-card="${produto.prod_cod}" aria-disabled="${saldo <= 0 ? "true" : "false"}">
+        <div class="pdv-product-meta">
+          <span class="pdv-category-pill">${categoria}</span>
+          <span class="pdv-stock-inline">${saldo} un</span>
+        </div>
+        <div>
+          <p class="pdv-product-name">${produto.prod_descr || "Produto"}</p>
+        </div>
+        <p class="pdv-product-price">${window.vstockCurrency.formatMoney(obterValorUnitarioProduto(produto))}</p>
+      </button>
+    `;
+  }).join("");
+
+  if (resumo) {
+    resumo.textContent = `Mostrando ${inicio + 1}-${fim} de ${totalItens} produtos`;
+  }
+
+  renderizarPaginacaoProdutos(totalPaginas);
+}
+
+function renderizarPaginacaoProdutos(totalPaginas) {
+  const container = $venda("#pdvPagination");
+  if (!container) return;
+
+  if (totalPaginas <= 1) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const paginas = [];
+  const inicio = Math.max(1, paginaAtualProdutos - 1);
+  const fim = Math.min(totalPaginas, inicio + 2);
+
+  for (let pagina = inicio; pagina <= fim; pagina += 1) {
+    const ativa = pagina === paginaAtualProdutos ? " is-active" : "";
+    paginas.push(`
+      <button type="button" class="pdv-pagination-page${ativa}" data-page="${pagina}">${pagina}</button>
+    `);
+  }
+
+  container.innerHTML = `
+    <button type="button" class="pdv-pagination-btn" data-page-nav="prev" ${paginaAtualProdutos === 1 ? "disabled" : ""}>Anterior</button>
+    ${paginas.join("")}
+    <button type="button" class="pdv-pagination-btn" data-page-nav="next" ${paginaAtualProdutos === totalPaginas ? "disabled" : ""}>Próxima</button>
+  `;
 }
 
 function renderizarDropdownProdutos(lista, aberto = true) {
@@ -378,7 +625,7 @@ function atualizarProdutoSelecionado() {
   const saldo = select?.selectedOptions?.[0]?.getAttribute("data-saldo") || "0";
   $venda("#saldoProdutoVenda").value = saldo;
   const produto = localizarProdutoSelecionado();
-  $venda("#valorUnitarioVenda").value = formatarMoedaCampo(obterValorUnitarioProduto(produto));
+  $venda("#valorUnitarioVenda").value = window.vstockCurrency.formatNumber(obterValorUnitarioProduto(produto));
   atualizarSubtotalItemAtual();
 }
 
@@ -386,12 +633,12 @@ function atualizarSubtotalItemAtual() {
   const produto = localizarProdutoSelecionado();
   const quantidade = Number($venda("#quantidadeVenda")?.value || 0);
   if (!produto || quantidade <= 0) {
-    $venda("#subtotalItemVenda").value = formatarMoedaCampo(0);
+    $venda("#subtotalItemVenda").value = window.vstockCurrency.formatNumber(0);
     return;
   }
 
   const subtotal = quantidade * obterValorUnitarioProduto(produto);
-  $venda("#subtotalItemVenda").value = formatarMoedaCampo(subtotal);
+  $venda("#subtotalItemVenda").value = window.vstockCurrency.formatNumber(subtotal);
 }
 
 function quantidadeReservadaProduto(prodCod, ignorarIndice = null) {
@@ -411,8 +658,8 @@ function renderizarItensVenda() {
       <td>${item.descrProduto}</td>
       <td class="text-end">${item.saldo}</td>
       <td class="text-end">${item.qtd}</td>
-      <td class="text-end">${formatarMoeda(item.valorUnitario)}</td>
-      <td class="text-end">${formatarMoeda(item.valorSubtotal)}</td>
+      <td class="text-end">${window.vstockCurrency.formatMoney(item.valorUnitario)}</td>
+      <td class="text-end">${window.vstockCurrency.formatMoney(item.valorSubtotal)}</td>
       <td class="text-center">
         <div class="d-flex gap-2 justify-content-center flex-wrap">
           <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar-item" data-idx="${indice}">
@@ -426,6 +673,7 @@ function renderizarItensVenda() {
     </tr>
   `).join("");
 
+  renderizarCarrinhoPdv();
   atualizarResumoVenda();
 }
 
@@ -435,9 +683,46 @@ function limparFormularioItem() {
   $venda("#listaProdutosVenda").value = "";
   $venda("#saldoProdutoVenda").value = "";
   $venda("#quantidadeVenda").value = "";
-  $venda("#valorUnitarioVenda").value = formatarMoedaCampo(0);
-  $venda("#subtotalItemVenda").value = formatarMoedaCampo(0);
+  $venda("#valorUnitarioVenda").value = window.vstockCurrency.formatNumber(0);
+  $venda("#subtotalItemVenda").value = window.vstockCurrency.formatNumber(0);
   fecharDropdownProdutos();
+  filtrarProdutos(false);
+}
+
+function adicionarProdutoAoCarrinho(produto, quantidade) {
+  const qtd = Number(quantidade || 0);
+
+  if (!produto) {
+    msgVenda("Selecione um produto.", "danger");
+    return;
+  }
+
+  if (!Number.isInteger(qtd) || qtd <= 0) {
+    msgVenda("Informe uma quantidade válida.", "danger");
+    return;
+  }
+
+  const saldo = Number(produto.saldo || 0);
+  const reservado = quantidadeReservadaProduto(produto.prod_cod);
+  if (qtd + reservado > saldo) {
+    msgVenda("A quantidade informada ultrapassa o saldo disponível.", "danger");
+    return;
+  }
+
+  const valorUnitario = obterValorUnitarioProduto(produto);
+  const valorSubtotal = Number((valorUnitario * qtd).toFixed(2));
+
+  itensDaVenda.push({
+    prodCod: Number(produto.prod_cod),
+    descrProduto: produto.prod_descr || "",
+    saldo,
+    qtd,
+    valorUnitario,
+    valorSubtotal
+  });
+
+  limparFormularioItem();
+  renderizarItensVenda();
 }
 
 function adicionarItemVenda() {
@@ -496,12 +781,81 @@ function removerItemVenda(indice) {
   renderizarItensVenda();
 }
 
+function ajustarQuantidadeItem(indice, delta) {
+  const item = itensDaVenda[indice];
+  if (!item) return;
+
+  const proximaQuantidade = Number(item.qtd || 0) + Number(delta || 0);
+  if (proximaQuantidade <= 0) {
+    removerItemVenda(indice);
+    return;
+  }
+
+  const reservado = quantidadeReservadaProduto(item.prodCod, indice);
+  if (proximaQuantidade + reservado > Number(item.saldo || 0)) {
+    msgVenda("A quantidade informada ultrapassa o saldo disponível.", "danger");
+    return;
+  }
+
+  item.qtd = proximaQuantidade;
+  item.valorSubtotal = Number((Number(item.valorUnitario || 0) * proximaQuantidade).toFixed(2));
+  renderizarItensVenda();
+}
+
+function renderizarCarrinhoPdv() {
+  const lista = $venda("#pdvCartItems");
+  const badge = $venda("#pdvCartCount");
+  if (!lista || !badge) return;
+
+  badge.textContent = String(itensDaVenda.length);
+
+  if (!itensDaVenda.length) {
+    lista.innerHTML = `
+      <div class="pdv-empty-state">
+        <i class="bi bi-cart-x"></i>
+        <strong>Nenhum item no carrinho</strong>
+        <span>Adicione produtos da lista para iniciar a venda.</span>
+      </div>
+    `;
+    return;
+  }
+
+  lista.innerHTML = itensDaVenda.map((item, indice) => `
+    <article class="pdv-cart-item">
+      <div class="pdv-cart-copy">
+        <strong>${item.descrProduto}</strong>
+        <small>${window.vstockCurrency.formatMoney(item.valorUnitario)}</small>
+      </div>
+      <div class="pdv-qty-controls">
+        <button type="button" class="pdv-qty-btn" data-acao="diminuir-item" data-idx="${indice}">−</button>
+        <span class="pdv-qty-value">${item.qtd}</span>
+        <button type="button" class="pdv-qty-btn" data-acao="aumentar-item" data-idx="${indice}">+</button>
+      </div>
+      <strong class="pdv-cart-total">${window.vstockCurrency.formatMoney(item.valorSubtotal)}</strong>
+      <button type="button" class="pdv-cart-remove" data-acao="remover-item" data-idx="${indice}" aria-label="Remover item">
+        <i class="bi bi-trash"></i>
+      </button>
+    </article>
+  `).join("");
+}
+
 async function carregarProdutos() {
   try {
-    const resp = await fetch(API_VENDAS.ESTOQUE_RESUMO);
-    if (!resp.ok) throw new Error("Falha ao carregar estoque.");
+    const [respEstoque, respProdutos] = await Promise.all([
+      fetch(API_VENDAS.ESTOQUE_RESUMO),
+      fetch(API_VENDAS.PRODUTOS)
+    ]);
 
-    produtosVendaCache = await resp.json();
+    if (!respEstoque.ok) throw new Error("Falha ao carregar estoque.");
+    if (!respProdutos.ok) throw new Error("Falha ao carregar produtos.");
+
+    const [estoqueResumo, produtosCompletos] = await Promise.all([
+      respEstoque.json(),
+      respProdutos.json()
+    ]);
+
+    produtosVendaCache = enriquecerProdutosComCategoria(estoqueResumo, produtosCompletos);
+    popularCategoriasVenda();
     desenharSelectProdutos(produtosVendaCache);
   } catch (erro) {
     console.error(erro);
@@ -509,18 +863,21 @@ async function carregarProdutos() {
   }
 }
 
-function filtrarProdutos() {
+function filtrarProdutos(resetPage = true) {
   const termo = ($venda("#buscaProdutoVenda")?.value || "").trim().toLowerCase();
-
-  if (!termo) {
-    desenharSelectProdutos(produtosVendaCache);
-    atualizarProdutoSelecionado();
-    return;
+  const categoria = ($venda("#filtroCategoriaVenda")?.value || "").trim();
+  if (resetPage) {
+    paginaAtualProdutos = 1;
   }
 
-  const filtrados = produtosVendaCache.filter((produto) =>
-    String(produto.prod_descr || "").toLowerCase().includes(termo)
-  );
+  const filtrados = produtosVendaCache.filter((produto) => {
+    const descricao = String(produto.prod_descr || "").toLowerCase();
+    const codigo = String(produto.codigo_barras || "").toLowerCase();
+    const categoriaProduto = obterCategoriaProduto(produto);
+    const matchTermo = !termo || descricao.includes(termo) || codigo.includes(termo);
+    const matchCategoria = !categoria || categoriaProduto === categoria;
+    return matchTermo && matchCategoria;
+  });
 
   desenharSelectProdutos(filtrados);
   atualizarProdutoSelecionado();
@@ -540,7 +897,7 @@ function agendarFiltroProdutos() {
 function processarLeituraCodigoBarras() {
   const inputCodigo = $venda("#codigoBarrasVenda");
   const inputQuantidade = $venda("#quantidadeVenda");
-  const codigo = normalizarCodigoBarras(inputCodigo?.value);
+  const codigo = window.vstockText.normalizeCode(inputCodigo?.value);
   if (!inputCodigo || !inputQuantidade || !codigo) return;
 
   const produto = localizarProdutoPorCodigoBarras(codigo);
@@ -587,6 +944,36 @@ function calcularDescontoAtual() {
   }
 
   return 0;
+}
+
+function atualizarEstadoCampoDesconto() {
+  const tipo = $venda("#tipoDescontoVenda")?.value || "NENHUM";
+  const input = $venda("#valorDescontoVenda");
+  const sufixo = $venda("#sufixoDescontoVenda");
+  const caixa = input?.closest(".pdv-discount-box");
+  if (!input || !sufixo) return;
+
+  const descontoHabilitado = tipo !== "NENHUM";
+  input.disabled = !descontoHabilitado;
+  caixa?.classList.toggle("is-disabled", !descontoHabilitado);
+
+  if (!descontoHabilitado) {
+    input.value = "";
+    input.placeholder = "0,00";
+    sufixo.textContent = "R$";
+    return;
+  }
+
+  if (tipo === "PERCENTUAL") {
+    input.placeholder = "0";
+    sufixo.textContent = "%";
+    input.value = String(input.value || "").replace(/[^\d,]/g, "");
+    return;
+  }
+
+  input.placeholder = "0,00";
+  sufixo.textContent = "R$";
+  input.value = window.vstockCurrency.formatInputValue(input.value);
 }
 
 function obterTotalVenda() {
@@ -712,9 +1099,11 @@ function atualizarVisibilidadePagamentoDinheiro() {
       valorRecebidoInput.value = "";
     }
     if (trocoInput) {
-      trocoInput.value = formatarMoedaCampo(0);
+      trocoInput.value = window.vstockCurrency.formatNumber(0);
     }
   }
+
+  renderizarOpcoesPagamentoPdv();
 }
 
 function atualizarTroco() {
@@ -731,27 +1120,40 @@ function atualizarTroco() {
   const valorRecebido = parseMoeda(valorRecebidoInput.value || "");
   const total = obterTotalVenda();
   const troco = Math.max(valorRecebido - total, 0);
-  trocoInput.value = formatarMoedaCampo(troco);
+  trocoInput.value = window.vstockCurrency.formatNumber(troco);
 }
 
 function atualizarResumoVenda() {
   atualizarTroco();
+  const subtotal = obterSubtotalVenda();
+  const desconto = calcularDescontoAtual();
+  const total = obterTotalVenda();
+
+  const subtotalEl = $venda("#pdvSubtotal");
+  const descontoEl = $venda("#pdvDiscountSummary");
+  const totalEl = $venda("#pdvTotal");
+
+  if (subtotalEl) subtotalEl.textContent = window.vstockCurrency.formatMoney(subtotal);
+  if (descontoEl) descontoEl.textContent = window.vstockCurrency.formatMoney(desconto);
+  if (totalEl) totalEl.textContent = window.vstockCurrency.formatMoney(total);
 }
 
 function limparVendaCompleta() {
   itensDaVenda = [];
-  $venda("#dataVenda").value = agoraInputLocal();
+  $venda("#dataVenda").value = window.vstockFormatters.nowInputLocal();
   $venda("#clienteVenda").value = "";
   $venda("#statusVenda").value = "FINALIZADA";
   $venda("#tipoDescontoVenda").value = "NENHUM";
   $venda("#valorDescontoVenda").value = "";
+  atualizarEstadoCampoDesconto();
   $venda("#observacaoVenda").value = "";
   $venda("#formaPagamentoVenda").value = "";
   $venda("#valorRecebidoVendaTela").value = "";
-  $venda("#trocoVendaTela").value = formatarMoedaCampo(0);
+  $venda("#trocoVendaTela").value = window.vstockCurrency.formatNumber(0);
   limparFormularioItem();
   renderizarItensVenda();
   atualizarVisibilidadePagamentoDinheiro();
+  sincronizarCustomSelect("clienteVenda");
 }
 
 function preencherModalConfirmacaoVenda() {
@@ -771,23 +1173,23 @@ function preencherModalConfirmacaoVenda() {
       <tr>
         <td>${item.descrProduto}</td>
         <td class="text-end">${item.qtd}</td>
-        <td class="text-end">${formatarMoeda(item.valorUnitario)}</td>
-        <td class="text-end">${formatarMoeda(item.valorSubtotal)}</td>
+        <td class="text-end">${window.vstockCurrency.formatMoney(item.valorUnitario)}</td>
+        <td class="text-end">${window.vstockCurrency.formatMoney(item.valorSubtotal)}</td>
       </tr>
     `).join("");
   }
 
-  $venda("#resumoConfirmacaoVendaSubtotal").textContent = formatarMoeda(subtotal);
-  $venda("#resumoConfirmacaoVendaDesconto").textContent = formatarMoeda(desconto);
-  $venda("#resumoConfirmacaoVendaTotal").textContent = formatarMoeda(total);
+  $venda("#resumoConfirmacaoVendaSubtotal").textContent = window.vstockCurrency.formatMoney(subtotal);
+  $venda("#resumoConfirmacaoVendaDesconto").textContent = window.vstockCurrency.formatMoney(desconto);
+  $venda("#resumoConfirmacaoVendaTotal").textContent = window.vstockCurrency.formatMoney(total);
   $venda("#resumoConfirmacaoVendaFormaPagamento").textContent = formaPagamentoNome;
 
   linhaRecebido?.classList.toggle("d-none", !exibeRecebido);
   linhaTroco?.classList.toggle("d-none", !exibeRecebido);
 
   if (exibeRecebido) {
-    $venda("#resumoConfirmacaoVendaRecebido").textContent = formatarMoeda(valorRecebido);
-    $venda("#resumoConfirmacaoVendaTroco").textContent = formatarMoeda(troco);
+    $venda("#resumoConfirmacaoVendaRecebido").textContent = window.vstockCurrency.formatMoney(valorRecebido);
+    $venda("#resumoConfirmacaoVendaTroco").textContent = window.vstockCurrency.formatMoney(troco);
   }
 }
 
@@ -886,12 +1288,14 @@ function preencherFuncionarioVenda() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  $venda("#dataVenda").value = agoraInputLocal();
+  $venda("#dataVenda").value = window.vstockFormatters.nowInputLocal();
   preencherFuncionarioVenda();
+  registrarCustomSelect("filtroCategoriaVenda");
+  registrarCustomSelect("clienteVenda");
   modalFormaPagamento = new bootstrap.Modal(document.getElementById("modalFormaPagamento"));
   modalClienteVenda = new bootstrap.Modal(document.getElementById("modalClienteVenda"));
   modalConfirmarVenda = new bootstrap.Modal(document.getElementById("modalConfirmarVenda"));
-  $venda("#trocoVendaTela").value = formatarMoedaCampo(0);
+  $venda("#trocoVendaTela").value = window.vstockCurrency.formatNumber(0);
   atualizarVisibilidadePagamentoDinheiro();
 
   await Promise.all([
@@ -920,11 +1324,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   $venda("#quantidadeVenda")?.addEventListener("input", atualizarSubtotalItemAtual);
   $venda("#buscaProdutoVenda")?.addEventListener("input", agendarFiltroProdutos);
   $venda("#buscaProdutoVenda")?.addEventListener("focus", () => renderizarDropdownProdutos(produtosVisiveisVenda, true));
+  $venda("#filtroCategoriaVenda")?.addEventListener("change", filtrarProdutos);
   $venda("#tipoDescontoVenda")?.addEventListener("change", () => {
     $venda("#valorDescontoVenda").value = "";
+    atualizarEstadoCampoDesconto();
     atualizarResumoVenda();
   });
   $venda("#valorDescontoVenda")?.addEventListener("input", () => {
+    if ($venda("#valorDescontoVenda").disabled) {
+      return;
+    }
     const tipo = $venda("#tipoDescontoVenda").value;
     if (tipo === "PERCENTUAL") {
       const valor = String($venda("#valorDescontoVenda").value || "").replace(/[^\d,]/g, "");
@@ -934,6 +1343,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     atualizarResumoVenda();
   });
+  atualizarEstadoCampoDesconto();
   $venda("#formaPagamentoVenda")?.addEventListener("change", atualizarTroco);
   $venda("#valorRecebidoVendaTela")?.addEventListener("input", () => {
     $venda("#valorRecebidoVendaTela").value = window.vstockCurrency.formatInputValue($venda("#valorRecebidoVendaTela").value);
@@ -952,8 +1362,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
   document.addEventListener("click", (event) => {
+    if (!event.target.closest(".pdv-custom-select")) {
+      fecharTodosCustomSelects();
+    }
+
     if (!event.target.closest(".produto-busca-grupo")) {
       fecharDropdownProdutos();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      fecharTodosCustomSelects();
     }
   });
 
@@ -965,6 +1385,50 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (produto) selecionarProduto(produto);
   });
 
+  $venda("#pdvProductGrid")?.addEventListener("click", (event) => {
+    const card = event.target.closest("[data-produto-card]");
+    if (!card) return;
+
+    const produto = produtosVendaCache.find((item) => String(item.prod_cod) === String(card.dataset.produtoCard));
+    if (produto) {
+      adicionarProdutoAoCarrinho(produto, 1);
+    }
+  });
+
+  $venda("#pdvPaymentOptions")?.addEventListener("click", (event) => {
+    const botao = event.target.closest("[data-forma-pagamento]");
+    if (!botao) return;
+
+    const select = $venda("#formaPagamentoVenda");
+    if (!select) return;
+
+    select.value = String(botao.dataset.formaPagamento || "");
+    atualizarTroco();
+    renderizarOpcoesPagamentoPdv();
+  });
+
+  $venda("#pdvPagination")?.addEventListener("click", (event) => {
+    const botaoPagina = event.target.closest("[data-page]");
+    if (botaoPagina) {
+      paginaAtualProdutos = Number(botaoPagina.dataset.page || 1);
+      desenharSelectProdutos(produtosVisiveisVenda);
+      return;
+    }
+
+    const botaoNav = event.target.closest("[data-page-nav]");
+    if (!botaoNav) return;
+
+    if (botaoNav.dataset.pageNav === "prev") {
+      paginaAtualProdutos = Math.max(1, paginaAtualProdutos - 1);
+    }
+
+    if (botaoNav.dataset.pageNav === "next") {
+      paginaAtualProdutos += 1;
+    }
+
+    desenharSelectProdutos(produtosVisiveisVenda);
+  });
+
   $venda("#tabelaItensVenda tbody")?.addEventListener("click", (event) => {
     const botao = event.target.closest("button");
     if (!botao) return;
@@ -972,6 +1436,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const indice = Number(botao.dataset.idx);
     if (botao.dataset.acao === "editar-item") {
       carregarItemParaEdicao(indice);
+    }
+    if (botao.dataset.acao === "remover-item") {
+      removerItemVenda(indice);
+    }
+  });
+
+  $venda("#pdvCartItems")?.addEventListener("click", (event) => {
+    const botao = event.target.closest("button");
+    if (!botao) return;
+
+    const indice = Number(botao.dataset.idx);
+    if (botao.dataset.acao === "aumentar-item") {
+      ajustarQuantidadeItem(indice, 1);
+    }
+    if (botao.dataset.acao === "diminuir-item") {
+      ajustarQuantidadeItem(indice, -1);
     }
     if (botao.dataset.acao === "remover-item") {
       removerItemVenda(indice);
@@ -993,5 +1473,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       alternarStatusFormaPagamento(id, botao.dataset.ativo === "true");
     }
   });
-});
 
+  renderizarCarrinhoPdv();
+  atualizarResumoVenda();
+});

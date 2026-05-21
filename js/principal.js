@@ -255,6 +255,252 @@ window.vstockCurrency = {
   }
 };
 
+window.vstockSession = {
+  getFuncionario: function () {
+    try {
+      return JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
+    } catch (erro) {
+      console.warn('Não foi possível ler o funcionário logado:', erro);
+      return null;
+    }
+  },
+
+  isAdministrador: function (funcionario) {
+    return Number(funcionario?.tipoAcesso) === 99;
+  },
+
+  isAdministradorMestre: function (funcionario) {
+    var email = String(funcionario?.funcEmail || funcionario?.email || '').trim().toLowerCase();
+    return this.isAdministrador(funcionario) && (email === 'admin@admin' || email === 'admin@admin.login');
+  }
+};
+
+window.vstockFormatters = {
+  date: function (valor) {
+    if (!valor) {
+      return '-';
+    }
+
+    if (valor instanceof Date) {
+      if (Number.isNaN(valor.getTime())) {
+        return '-';
+      }
+      return valor.toLocaleDateString('pt-BR', {
+        timeZone: 'America/Sao_Paulo'
+      });
+    }
+
+    var texto = String(valor).trim();
+    if (!texto) {
+      return '-';
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(texto)) {
+      return texto;
+    }
+
+    var apenasData = texto.split('T')[0];
+    var partes = apenasData.split('-');
+    if (partes.length === 3) {
+      return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    var data = new Date(texto);
+    if (Number.isNaN(data.getTime())) {
+      return texto;
+    }
+
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo'
+    }).format(data);
+  },
+
+  dateTime: function (valor, config) {
+    if (!valor) {
+      return '-';
+    }
+
+    var data = valor instanceof Date ? valor : new Date(valor);
+    if (Number.isNaN(data.getTime())) {
+      return config?.preserveInvalid ? String(valor) : '-';
+    }
+
+    var options = config?.options || {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+
+    return data.toLocaleString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      ...options
+    });
+  },
+
+  integer: function (valor) {
+    var numero = Number(valor || 0);
+    if (!Number.isFinite(numero)) {
+      numero = 0;
+    }
+
+    return numero.toLocaleString('pt-BR');
+  },
+
+  quantity: function (valor, singular, plural) {
+    var quantidade = Number(valor || 0);
+    if (!Number.isFinite(quantidade)) {
+      quantidade = 0;
+    }
+
+    var singularLabel = singular || 'unidade';
+    var pluralLabel = plural || 'unidades';
+    return quantidade + ' ' + (quantidade === 1 ? singularLabel : pluralLabel);
+  },
+
+  todayIso: function () {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(new Date());
+  },
+
+  nowInputLocal: function () {
+    var data = new Date();
+    var ajustada = new Date(data.getTime() - (data.getTimezoneOffset() * 60000));
+    return ajustada.toISOString().slice(0, 16);
+  }
+};
+
+window.vstockText = {
+  normalize: function (valor) {
+    return String(valor || '').trim().toLowerCase();
+  },
+
+  normalizeCode: function (valor) {
+    return String(valor || '').trim();
+  }
+};
+
+window.vstockProducts = {
+  summarizeItems: function (itens, campo) {
+    if (!Array.isArray(itens) || !itens.length) {
+      return '-';
+    }
+
+    var nomeCampo = campo || 'produto';
+    var nomes = itens
+      .map(function (item) {
+        return item?.[nomeCampo] || '-';
+      })
+      .filter(Boolean);
+
+    if (nomes.length === 1) {
+      return nomes[0];
+    }
+
+    return nomes[0] + ' + ' + (nomes.length - 1) + ' item(ns)';
+  },
+
+  findByBarcode: function (lista, codigo, campo) {
+    var codigoNormalizado = window.vstockText.normalizeCode(codigo);
+    if (!codigoNormalizado) {
+      return null;
+    }
+
+    var nomeCampo = campo || 'codigo_barras';
+    return (Array.isArray(lista) ? lista : []).find(function (item) {
+      return window.vstockText.normalizeCode(item?.[nomeCampo]) === codigoNormalizado;
+    }) || null;
+  }
+};
+
+window.vstockSales = {
+  formatStatus: function (valor) {
+    var status = String(valor || '').trim().toUpperCase();
+    var mapa = {
+      FINALIZADA: 'Finalizada',
+      ABERTA: 'Aberta',
+      CANCELADA: 'Cancelada',
+      PARCIALMENTE_DEVOLVIDA: 'Parcialmente devolvida',
+      DEVOLVIDA: 'Devolvida'
+    };
+
+    return mapa[status] || (valor || '-');
+  },
+
+  statusClass: function (valor) {
+    var status = String(valor || '').trim().toUpperCase();
+    if (status === 'PARCIALMENTE_DEVOLVIDA') {
+      return 'parcialmente-devolvida';
+    }
+
+    return (status || 'finalizada').toLowerCase();
+  }
+};
+
+window.vstockUi = {
+  createAlertHandler: function (defaultConfig) {
+    var baseConfig = defaultConfig || {};
+
+    return function (message, type) {
+      return window.vstockUi.showAlert({
+        ...baseConfig,
+        message: message,
+        type: type || baseConfig.type || 'danger'
+      });
+    };
+  },
+
+  showAlert: function (config) {
+    if (!config) {
+      return null;
+    }
+
+    var container = typeof config.container === 'string'
+      ? document.querySelector(config.container)
+      : config.container;
+
+    if (!container) {
+      return null;
+    }
+
+    if (config.clear === true) {
+      container.innerHTML = '';
+    }
+
+    var tipo = config.type || 'danger';
+    var div = document.createElement('div');
+    div.className = 'alert alert-' + tipo + ' alert-dismissible fade show';
+    div.role = 'alert';
+    div.innerHTML = '\n      ' + (config.message || '') + '\n      <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>\n    ';
+
+    container.appendChild(div);
+
+    if (config.scroll !== false) {
+      window.destacarMensagens?.(container);
+    }
+
+    var autoRemoveMs = Number(config.autoRemoveMs || 0);
+    if (autoRemoveMs > 0) {
+      window.setTimeout(function () {
+        div.remove();
+      }, autoRemoveMs);
+    }
+
+    return div;
+  },
+
+  badgeStatus: function (ativo) {
+    return ativo
+      ? '<span class="badge text-bg-success">Ativo</span>'
+      : '<span class="badge text-bg-secondary">Inativo</span>';
+  }
+};
+
 window.vstockFilterDropdown = (function () {
   var instances = [];
   var closeHandlerBound = false;
@@ -543,6 +789,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   var paginaAtual = window.vstockFrontendSecurity.paginaAtualNome();
   var LICENCA_STATUS_URL = 'http://localhost:8080/api/funcionarios/licenca/status';
   var SIDEBAR_SCROLL_KEY = 'vstockSidebarScrollTop';
+  var SIDEBAR_GROUPS_KEY = 'vstockSidebarGroupsState';
   var statusLicencaAtual = null;
 
   if (paginaAtual !== 'login.html' && !(localStorage.getItem('authToken') || '').trim()) {
@@ -842,16 +1089,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     renderizarLogo(logoContainer, obterLogoSistema(empresa));
   }
 
-  function carregarFuncionarioLogado() {
-    try {
-      return JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
-    } catch (erro) {
-      console.warn('Não foi possível ler o funcionário logado:', erro);
-      return null;
-    }
-  }
-
-  var funcionario = carregarFuncionarioLogado();
+  var funcionario = window.vstockSession.getFuncionario();
   var usuarioLogado = document.getElementById('usuario-logado');
   var usuarioCargo = document.getElementById('usuario-cargo');
   var btnSair = document.getElementById('btnSairSistema');
@@ -999,12 +1237,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     btnSair = document.getElementById('btnSairSistema');
     atualizarResumoContaNavbar(funcionario);
 
-    var dataSlot = document.getElementById('navbarLicenseStatusSlot');
-    if (dataOriginal && dataSlot) {
-      dataOriginal.classList.add('navbar-date-inline');
-      dataSlot.appendChild(dataOriginal);
-    }
-
     var toggle = document.getElementById('navbarAccountToggle');
     var dropdown = document.getElementById('navbarAccountDropdown');
     var menu = document.getElementById('navbarAccountMenu');
@@ -1102,12 +1334,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   renderizarStatusLicencaNavbar();
 
   function funcionarioEhAdmin(item) {
-    return Number(item?.tipoAcesso) === 99;
+    return window.vstockSession.isAdministrador(item);
   }
 
   function funcionarioEhAdminMestre(item) {
-    var email = String(item?.funcEmail || item?.email || '').trim().toLowerCase();
-    return funcionarioEhAdmin(item) && (email === 'admin@admin' || email === 'admin@admin.login');
+    return window.vstockSession.isAdministradorMestre(item);
   }
 
   function classeLinkSidebar(href) {
@@ -1123,7 +1354,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       return true;
     }
 
-    if (!modulos.vendas && paginaAtual === 'vendas.html') {
+    if (!modulos.vendas && ['vendas.html', 'historico-vendas.html'].includes(paginaAtual)) {
       return true;
     }
 
@@ -1149,6 +1380,56 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.warn('Não foi possível ler a posição do menu lateral:', erro);
       return 0;
     }
+  }
+
+  function lerEstadoGruposSidebar() {
+    try {
+      var bruto = sessionStorage.getItem(SIDEBAR_GROUPS_KEY);
+      return bruto ? JSON.parse(bruto) : {};
+    } catch (erro) {
+      console.warn('Não foi possível ler o estado dos grupos do menu lateral:', erro);
+      return {};
+    }
+  }
+
+  function salvarEstadoGruposSidebar(estados) {
+    try {
+      sessionStorage.setItem(SIDEBAR_GROUPS_KEY, JSON.stringify(estados || {}));
+    } catch (erro) {
+      console.warn('Não foi possível salvar o estado dos grupos do menu lateral:', erro);
+    }
+  }
+
+  function grupoSidebarEstaAberto(chave, possuiItemAtivo) {
+    var estados = lerEstadoGruposSidebar();
+    if (Object.prototype.hasOwnProperty.call(estados, chave)) {
+      return estados[chave] !== false;
+    }
+    return possuiItemAtivo || true;
+  }
+
+  function montarGrupoSidebar(config) {
+    if (!config || !config.conteudo || !config.conteudo.trim()) {
+      return '';
+    }
+
+    var aberto = grupoSidebarEstaAberto(config.chave, !!config.ativo);
+    var classeGrupo = aberto ? 'sidebar-group' : 'sidebar-group is-collapsed';
+    var ariaExpanded = aberto ? 'true' : 'false';
+    var hiddenAttr = aberto ? '' : ' hidden';
+    var icone = config.icone ? `<i class="bi ${config.icone}" aria-hidden="true"></i>` : '';
+
+    return `
+      <section class="${classeGrupo}" data-sidebar-group="${config.chave}">
+        <button class="sidebar-group-toggle" type="button" data-sidebar-group-toggle="${config.chave}" aria-expanded="${ariaExpanded}">
+          <span class="sidebar-group-label">${icone}<small>${config.titulo}</small></span>
+          <i class="bi bi-chevron-up sidebar-group-chevron" aria-hidden="true"></i>
+        </button>
+        <div class="sidebar-group-content"${hiddenAttr}>
+          ${config.conteudo}
+        </div>
+      </section>
+    `;
   }
 
   function itemAtivoEstaVisivel(sidebar, itemAtivo) {
@@ -1197,6 +1478,30 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
 
+  function registrarToggleGruposSidebar() {
+    var toggles = document.querySelectorAll('.sidebar-group-toggle');
+    for (var i = 0; i < toggles.length; i++) {
+      toggles[i].addEventListener('click', function () {
+        var chave = this.getAttribute('data-sidebar-group-toggle');
+        var grupo = this.closest('.sidebar-group');
+        var conteudo = grupo ? grupo.querySelector('.sidebar-group-content') : null;
+        if (!chave || !grupo || !conteudo) {
+          return;
+        }
+
+        var estados = lerEstadoGruposSidebar();
+        var seraFechado = !grupo.classList.contains('is-collapsed');
+
+        grupo.classList.toggle('is-collapsed', seraFechado);
+        conteudo.hidden = seraFechado;
+        this.setAttribute('aria-expanded', seraFechado ? 'false' : 'true');
+
+        estados[chave] = !seraFechado;
+        salvarEstadoGruposSidebar(estados);
+      });
+    }
+  }
+
   function registrarTransicaoSuaveEntrePaginas() {
     var conteudo = document.querySelector('.page-content');
     if (!conteudo) {
@@ -1221,12 +1526,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   function montarMenuSidebar() {
-    var linksCadastro = modulos.estoque
+    var cadastroConteudo = modulos.estoque
       ? `
-      <div class="module-divider">
-        <small><i class="bi bi-journal-text"></i> CADASTROS</small>
-      </div>
-
       <a class="${classeLinkSidebar('cadastro-fornecedor.html')}" href="cadastro-fornecedor.html">
         <i class="bi bi-truck"></i> Fornecedores
       </a>
@@ -1245,24 +1546,20 @@ document.addEventListener('DOMContentLoaded', async function () {
       `
       : '';
 
-    var linksVendas = modulos.vendas
+    var vendasConteudo = modulos.vendas
       ? `
-      <div class="module-divider">
-        <small><i class="bi bi-cart-check"></i> VENDAS</small>
-      </div>
-
       <a class="${classeLinkSidebar('vendas.html')}" href="vendas.html">
         <i class="bi bi-cart-check"></i> Vendas
+      </a>
+
+      <a class="${classeLinkSidebar('historico-vendas.html')}" href="historico-vendas.html">
+        <i class="bi bi-receipt-cutoff"></i> Histórico de Vendas
       </a>
       `
       : '';
 
-    var linksControleEstoque = (modulos.estoque || modulos.alertas)
+    var estoqueConteudo = (modulos.estoque || modulos.alertas)
       ? `
-      <div class="module-divider">
-        <small><i class="bi bi-box"></i> CONTROLE DE ESTOQUE</small>
-      </div>
-
       ${modulos.estoque ? `
       <a class="${classeLinkSidebar('entrada-compra.html')}" href="entrada-compra.html">
         <i class="bi bi-pencil-square"></i> Entrada de Estoque
@@ -1293,11 +1590,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       `
       : '';
 
-    var blocoAdmin = funcionarioEhAdmin(funcionario)
+    var adminConteudo = funcionarioEhAdmin(funcionario)
       ? `
-      <div class="module-divider">
-        <small><i class="bi bi-shield-lock"></i> ADMINISTRAÇÃO</small>
-      </div>
       <a class="${classeLinkSidebar('admin.html')}" href="admin.html">
         <i class="bi bi-sliders2-vertical"></i> Administração
       </a>
@@ -1307,9 +1601,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       `
       : '';
 
-    return `
-      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
-
+    var principalConteudo = `
       <a class="${classeLinkSidebar('index.html')}" href="index.html">
         <i class="bi bi-house-heart"></i> Dashboard
       </a>
@@ -1319,19 +1611,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         <i class="bi bi-sliders"></i> Parametrização
       </a>
       ` : ''}
+    `;
 
-      ${blocoAdmin}
-
-      ${linksCadastro}
-
-      ${linksVendas}
-
-      ${linksControleEstoque}
-
-      <div class="module-development">
-        <small><i class="bi bi-stars"></i> EVOLUÇÕES</small>
-      </div>
-
+    var evolucoesConteudo = `
       <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
         <i class="bi bi-speedometer2"></i> Dashboard Avançado
       </button>
@@ -1339,6 +1621,58 @@ document.addEventListener('DOMContentLoaded', async function () {
       <button class="nav-btn nav-btn-disabled" data-alert-message="Módulo em desenvolvimento" type="button">
         <i class="bi bi-shield-lock"></i> Perfis e Permissões
       </button>
+    `;
+
+    return `
+      <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
+
+      ${montarGrupoSidebar({
+        chave: 'principal',
+        titulo: 'Principal',
+        icone: 'bi-grid-3x3-gap',
+        conteudo: principalConteudo,
+        ativo: ['index.html', 'parametrizacao.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'administracao',
+        titulo: 'Administração',
+        icone: 'bi-shield-lock',
+        conteudo: adminConteudo,
+        ativo: ['admin.html', 'cadastro-funcionario.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'cadastros',
+        titulo: 'Cadastros',
+        icone: 'bi-journal-text',
+        conteudo: cadastroConteudo,
+        ativo: ['cadastro-fornecedor.html', 'cadastro-cliente.html', 'cadastro-categoria.html', 'cadastro-produto.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'vendas',
+        titulo: 'Vendas',
+        icone: 'bi-cart-check',
+        conteudo: vendasConteudo,
+        ativo: ['vendas.html', 'historico-vendas.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'controle-estoque',
+        titulo: 'Controle de Estoque',
+        icone: 'bi-box',
+        conteudo: estoqueConteudo,
+        ativo: ['entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html', 'alertas.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'evolucoes',
+        titulo: 'Evoluções',
+        icone: 'bi-stars',
+        conteudo: evolucoesConteudo,
+        ativo: false
+      })}
     `;
   }
 
@@ -1354,6 +1688,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     registrarPersistenciaSidebar();
+    registrarToggleGruposSidebar();
     requestAnimationFrame(restaurarScrollSidebar);
   }
 

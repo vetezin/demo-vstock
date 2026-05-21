@@ -16,7 +16,7 @@
     vendas: 'mock-data/vendas.json'
   };
 
-  const DB_KEY = 'vstock_demo_db_v1';
+  const DB_KEY = 'vstock_demo_db_v2';
   const realFetch = window.fetch ? window.fetch.bind(window) : null;
   let db = null;
   let dbPromise = null;
@@ -642,6 +642,57 @@
       return text('OK');
     }
 
+    if (path === '/api/vendas' && method === 'GET') {
+      let lista = buildVendasList();
+      lista = filterByDateRange(lista, 'dataVenda', url);
+      const cliente = url.searchParams.get('cliente');
+      const formaPagamento = url.searchParams.get('formaPagamento');
+      const status = url.searchParams.get('status');
+      const vendedor = url.searchParams.get('vendedor');
+      if (cliente) lista = lista.filter((item) => contains(item.clienteNome, cliente));
+      if (formaPagamento) lista = lista.filter((item) => contains(item.formaPagamentoNome, formaPagamento));
+      if (status) lista = lista.filter((item) => normalizarVendaStatus(item.status) === normalizarVendaStatus(status));
+      if (vendedor) lista = lista.filter((item) => contains(item.vendedorNome, vendedor));
+      return json(lista);
+    }
+
+    const vendaMatch = path.match(/^\/api\/vendas\/(\d+)$/);
+    if (vendaMatch && method === 'GET') {
+      const detalhe = buildVendaDetalhe(Number(vendaMatch[1]));
+      return detalhe ? json(detalhe) : text('Venda nao encontrada.', 404);
+    }
+
+    const vendaAprovacaoMatch = path.match(/^\/api\/vendas\/(\d+)\/cancelamento\/aprovar-admin$/);
+    if (vendaAprovacaoMatch && method === 'POST') {
+      const venda = buildVendaDetalhe(Number(vendaAprovacaoMatch[1]));
+      if (!venda) return text('Venda nao encontrada.', 404);
+      if (normalizarVendaStatus(venda.status) === 'CANCELADA') return text('Venda ja cancelada.', 400);
+      const body = parseJsonBody(init);
+      if (!String(body.motivo || '').trim()) return text('Motivo obrigatorio.', 400);
+      const administrador = localizarAdministrador(body.email, body.senha);
+      if (!administrador) return text('Administrador invalido.', 401);
+      return json({ email: administrador.funcEmail, nome: administrador.funcNome });
+    }
+
+    const vendaCancelamentoMatch = path.match(/^\/api\/vendas\/(\d+)\/cancelamento$/);
+    if (vendaCancelamentoMatch && method === 'POST') {
+      const venda = db.vendas.find((item) => Number(item.vendaId) === Number(vendaCancelamentoMatch[1]));
+      if (!venda) return text('Venda nao encontrada.', 404);
+      if (normalizarVendaStatus(venda.status) === 'CANCELADA') return text('Venda ja cancelada.', 400);
+      const body = parseJsonBody(init);
+      if (!String(body.motivo || '').trim()) return text('Motivo obrigatorio.', 400);
+      const administrador = localizarAdministrador(body.email, body.senha);
+      if (!administrador) return text('Administrador invalido.', 401);
+      venda.status = 'CANCELADA';
+      venda.dataCancelamento = nowIso();
+      venda.motivoCancelamento = String(body.motivo || '').trim();
+      venda.adminCancelamentoEmail = administrador.funcEmail;
+      removerMovimentacaoVenda(venda.saidaCod);
+      persistDb();
+      addLog('VENDA_CANCELADA', `Venda #${venda.vendaId} cancelada por ${administrador.funcEmail}.`);
+      return json(buildVendaDetalhe(venda.vendaId));
+    }
+
     if (path === '/api/vendas' && method === 'POST') {
       const body = parseJsonBody(init);
       const itens = Array.isArray(body.itens) ? body.itens : [];
@@ -659,8 +710,9 @@
       const saidaCod = nextNumericId(db.saidas, 'saida_cod');
       const venda = {
         vendaId,
+        saidaCod,
         dataVenda: body.dataVenda,
-        clienteId: body.clienteId == null ? null : Number(body.clienteId),
+        clienteId: body.clienteId == null || body.clienteId === '' ? null : Number(body.clienteId),
         formaPagamentoId: Number(body.formaPagamentoId || 0),
         valorSubtotal: Number(body.valorSubtotal || 0),
         tipoDesconto: body.tipoDesconto || 'NENHUM',
@@ -668,9 +720,12 @@
         valorTotal: Number(body.valorTotal || 0),
         valorRecebido: body.valorRecebido == null ? null : Number(body.valorRecebido || 0),
         troco: body.troco == null ? null : Number(body.troco || 0),
-        status: body.status || 'FINALIZADA',
+        status: normalizarVendaStatus(body.status),
         observacao: body.observacao || '',
         funcionarioCpf: String(body.codFuncionario || ''),
+        dataCancelamento: null,
+        motivoCancelamento: '',
+        adminCancelamentoEmail: '',
         itens: itens.map((item) => ({
           produtoCod: Number(item.produtoCod),
           quantidade: Number(item.quantidade || 0),
