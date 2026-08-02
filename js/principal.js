@@ -496,6 +496,16 @@ window.vstockUi = {
     return ativo
       ? '<span class="badge text-bg-success">Ativo</span>'
       : '<span class="badge text-bg-secondary">Inativo</span>';
+  },
+
+  toQueryString: function (pares) {
+    var params = new URLSearchParams();
+    (Array.isArray(pares) ? pares : []).forEach(function (par) {
+      if (Array.isArray(par) && par[1] !== undefined && par[1] !== null && String(par[1]).trim() !== '') {
+        params.set(String(par[0]), String(par[1]));
+      }
+    });
+    return params.toString();
   }
 };
 

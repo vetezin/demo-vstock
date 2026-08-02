@@ -36,6 +36,14 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function sanitizarCliente(cliente) {
+    return clone(cliente);
+  }
+
+  function sanitizarFormaPagamento(formaPagamento) {
+    return clone(formaPagamento);
+  }
+
   function todayIso() {
     return new Date().toISOString().slice(0, 10);
   }
