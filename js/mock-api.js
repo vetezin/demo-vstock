@@ -161,6 +161,35 @@
     };
   }
 
+  function buildVendaDetalhe(vendaId) {
+    const venda = db.vendas.find((item) => Number(item.vendaId) === Number(vendaId));
+    if (!venda) return null;
+    const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(venda.clienteId));
+    const forma = db.formasPagamento.find((item) => Number(item.formaPagamentoId) === Number(venda.formaPagamentoId));
+    const funcionario = db.funcionarios.find((item) => String(item.funcCpf) === String(venda.funcionarioCpf));
+    const itens = (venda.itens || []).map((item) => {
+      const produto = db.produtos.find((produtoAtual) => Number(produtoAtual.prodCod) === Number(item.produtoCod));
+      return { ...item, produtoNome: produto?.prodDescr || `Produto #${item.produtoCod}` };
+    });
+    return { ...clone(venda), clienteNome: cliente?.nome || 'Consumidor final', formaPagamentoNome: forma?.nome || 'Não informado', vendedorNome: funcionario?.funcNome || 'Equipe de vendas', itens };
+  }
+
+  function buildVendasList() {
+    return sortByDateDesc(db.vendas.map((venda) => buildVendaDetalhe(venda.vendaId)), 'dataVenda');
+  }
+
+  function normalizarVendaStatus(status) {
+    return String(status || 'FINALIZADA').trim().toUpperCase();
+  }
+
+  function localizarAdministrador(email, senha) {
+    return db.funcionarios.find((item) => Number(item.tipoAcesso) === 99 && (String(item.funcEmail).toLowerCase() === String(email || '').toLowerCase() || (String(email || '').toLowerCase() === 'admin@admin' && String(item.funcEmail).toLowerCase() === 'admin@admin.login')) && String(item.funcSenha) === String(senha || ''));
+  }
+
+  function removerMovimentacaoVenda(saidaCod) {
+    db.caixaMovimentos = (db.caixaMovimentos || []).filter((item) => Number(item.saidaCod) !== Number(saidaCod));
+  }
+
   function buildEstoqueConsulta() {
     const movimentos = [];
 
