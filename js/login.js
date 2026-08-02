@@ -79,7 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById("email")?.value?.trim() ?? "";
+    const email = (
+      document.getElementById("email")?.value
+      ?? document.getElementById("acesso")?.value
+      ?? ""
+    ).trim();
     const senha = document.getElementById("senha")?.value ?? "";
     const licenca = licencaInput?.value?.trim() ?? "";
 
