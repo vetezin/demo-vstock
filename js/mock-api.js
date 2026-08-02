@@ -56,6 +56,7 @@
       if (persisted) {
         try {
           db = JSON.parse(persisted);
+          garantirDadosCaixa();
           return db;
         } catch (_) {
           localStorage.removeItem(DB_KEY);
@@ -63,6 +64,7 @@
       }
 
       db = await loadSeed();
+      garantirDadosCaixa();
       persistDb();
       return db;
     })();
@@ -72,6 +74,37 @@
 
   function persistDb() {
     localStorage.setItem(DB_KEY, JSON.stringify(db));
+  }
+
+  function garantirDadosCaixa() {
+    if (Array.isArray(db.caixaSessoes) && Array.isArray(db.caixaMovimentos)) return;
+    const hoje = new Date();
+    const iso = (dias, horas, minutos) => {
+      const data = new Date(hoje);
+      data.setDate(data.getDate() - dias);
+      data.setHours(horas, minutos, 0, 0);
+      return data.toISOString();
+    };
+    db.caixaSessoes = [
+      { caixaSessaoId: 1001, status: true, dataAbertura: iso(0, 8, 0), dataFechamento: null, usuarioAberturaNome: 'Administrador Mestre', usuarioFechamentoNome: null, saldoInicial: 350, valorContado: null, diferencaValor: null, observacaoAbertura: 'Fundo inicial para atendimento do dia.', observacaoFechamento: null },
+      { caixaSessaoId: 1000, status: false, dataAbertura: iso(1, 8, 5), dataFechamento: iso(1, 18, 12), usuarioAberturaNome: 'Juliana Operadora', usuarioFechamentoNome: 'Juliana Operadora', saldoInicial: 300, valorContado: 1248.5, diferencaValor: 0, observacaoAbertura: 'Abertura da loja.', observacaoFechamento: 'Conferência realizada sem divergências.' }
+    ];
+    db.caixaMovimentos = [
+      { movimentoId: 1, caixaSessaoId: 1001, tipo: 'VENDA', valor: 189.9, vendaId: 1008, dataMovimento: iso(0, 9, 15), usuarioNome: 'Administrador Mestre', motivo: 'Venda registrada' },
+      { movimentoId: 2, caixaSessaoId: 1001, tipo: 'ENTRADA', valor: 100, dataMovimento: iso(0, 10, 30), usuarioNome: 'Administrador Mestre', motivo: 'Reforço de troco' },
+      { movimentoId: 3, caixaSessaoId: 1001, tipo: 'VENDA', valor: 74.5, vendaId: 1009, dataMovimento: iso(0, 11, 5), usuarioNome: 'Administrador Mestre', motivo: 'Venda registrada' },
+      { movimentoId: 4, caixaSessaoId: 1000, tipo: 'VENDA', valor: 948.5, vendaId: 1007, dataMovimento: iso(1, 14, 20), usuarioNome: 'Juliana Operadora', motivo: 'Venda registrada' }
+    ];
+    persistDb();
+  }
+
+  function resumoCaixa(sessao) {
+    const movimentos = db.caixaMovimentos.filter((item) => Number(item.caixaSessaoId) === Number(sessao.caixaSessaoId));
+    const soma = (tipo) => movimentos.filter((item) => item.tipo === tipo).reduce((total, item) => total + Number(item.valor || 0), 0);
+    const vendasLiquidas = soma('VENDA');
+    const entradas = soma('ENTRADA');
+    const sangrias = soma('SANGRIA');
+    return { saldoInicial: Number(sessao.saldoInicial || 0), vendasLiquidas, entradas, sangrias, saldoEsperado: Number(sessao.saldoInicial || 0) + vendasLiquidas + entradas - sangrias, formasPagamento: [{ nome: 'Pix', valorLiquido: vendasLiquidas * 0.62 }, { nome: 'Cartão', valorLiquido: vendasLiquidas * 0.28 }, { nome: 'Dinheiro', valorLiquido: vendasLiquidas * 0.1 }] };
   }
 
   function parseJsonBody(init) {
@@ -896,6 +929,55 @@
       persistDb();
       addLog('SAIDA_UPDATE', `Saída #${id} atualizada.`);
       return text('OK');
+    }
+
+    if (path === '/api/caixa/sessao/aberta' && method === 'GET') {
+      const sessao = db.caixaSessoes.find((item) => item.status);
+      return sessao ? json(sessao) : new Response(null, { status: 204 });
+    }
+    if (path === '/api/caixa/sessao/historico' && method === 'GET') {
+      let lista = sortByDateDesc(db.caixaSessoes, 'dataAbertura');
+      const operador = url.searchParams.get('operador');
+      const status = url.searchParams.get('situacao');
+      if (operador) lista = lista.filter((item) => contains(item.usuarioAberturaNome, operador));
+      if (status === 'aberta') lista = lista.filter((item) => item.status);
+      if (status === 'fechada') lista = lista.filter((item) => !item.status);
+      return json(lista);
+    }
+    const sessaoCaixaMatch = path.match(/^\/api\/caixa\/sessao\/(\d+)$/);
+    if (sessaoCaixaMatch && method === 'GET') {
+      const sessao = db.caixaSessoes.find((item) => Number(item.caixaSessaoId) === Number(sessaoCaixaMatch[1]));
+      if (!sessao) return text('Sessão de caixa não encontrada.', 404);
+      return json({ sessao, resumo: resumoCaixa(sessao), movimentos: db.caixaMovimentos.filter((item) => Number(item.caixaSessaoId) === Number(sessao.caixaSessaoId)) });
+    }
+    if (path === '/api/caixa/sessao/abertura' && method === 'POST') {
+      if (db.caixaSessoes.some((item) => item.status)) return text('Já existe um caixa aberto.', 409);
+      const body = parseJsonBody(init);
+      const funcionario = getFuncionarioAtual();
+      const sessao = { caixaSessaoId: nextNumericId(db.caixaSessoes, 'caixaSessaoId'), status: true, dataAbertura: nowIso(), dataFechamento: null, usuarioAberturaNome: funcionario?.funcNome || 'Administrador Mestre', usuarioFechamentoNome: null, saldoInicial: Number(body.saldoInicial || 0), valorContado: null, diferencaValor: null, observacaoAbertura: body.observacaoAbertura || null, observacaoFechamento: null };
+      db.caixaSessoes.unshift(sessao); persistDb(); addLog('CAIXA_ABERTO', `Caixa #${sessao.caixaSessaoId} aberto.`); return json(sessao);
+    }
+    if (path === '/api/caixa/movimentos' && method === 'GET') {
+      const sessao = db.caixaSessoes.find((item) => item.status);
+      return json(sessao ? db.caixaMovimentos.filter((item) => Number(item.caixaSessaoId) === Number(sessao.caixaSessaoId)) : []);
+    }
+    if (path === '/api/caixa/movimentos' && method === 'POST') {
+      const sessao = db.caixaSessoes.find((item) => item.status);
+      if (!sessao) return text('Abra o caixa antes de registrar movimentos.', 409);
+      const body = parseJsonBody(init); const funcionario = getFuncionarioAtual();
+      const movimento = { movimentoId: nextNumericId(db.caixaMovimentos, 'movimentoId'), caixaSessaoId: sessao.caixaSessaoId, tipo: body.tipo || 'ENTRADA', valor: Number(body.valor || 0), vendaId: null, dataMovimento: nowIso(), usuarioNome: funcionario?.funcNome || 'Administrador Mestre', motivo: body.motivo || '', observacao: body.observacao || null };
+      db.caixaMovimentos.unshift(movimento); persistDb(); addLog('CAIXA_MOVIMENTO', `Movimento de caixa registrado: ${movimento.tipo}.`); return json(movimento);
+    }
+    if (path === '/api/caixa/resumo' && method === 'GET') {
+      const sessao = db.caixaSessoes.find((item) => item.status);
+      return json(sessao ? resumoCaixa(sessao) : { saldoInicial: 0, vendasLiquidas: 0, entradas: 0, sangrias: 0, saldoEsperado: 0, formasPagamento: [] });
+    }
+    if (path === '/api/caixa/sessao/fechamento' && method === 'POST') {
+      const sessao = db.caixaSessoes.find((item) => item.status);
+      if (!sessao) return text('Nenhum caixa aberto.', 409);
+      const body = parseJsonBody(init); const resumo = resumoCaixa(sessao); const contado = Number(body.valorContado || 0); const funcionario = getFuncionarioAtual();
+      Object.assign(sessao, { status: false, dataFechamento: nowIso(), usuarioFechamentoNome: funcionario?.funcNome || 'Administrador Mestre', valorContado: contado, diferencaValor: contado - resumo.saldoEsperado, observacaoFechamento: body.observacaoFechamento || null });
+      persistDb(); addLog('CAIXA_FECHADO', `Caixa #${sessao.caixaSessaoId} fechado.`); return json(sessao);
     }
 
     if (path === '/api/admin/logs' && method === 'GET') {
