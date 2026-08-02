@@ -1555,6 +1555,14 @@ document.addEventListener('DOMContentLoaded', async function () {
       <a class="${classeLinkSidebar('historico-vendas.html')}" href="historico-vendas.html">
         <i class="bi bi-receipt-cutoff"></i> Histórico de Vendas
       </a>
+
+      <a class="${classeLinkSidebar('caixa.html')}" href="caixa.html">
+        <i class="bi bi-cash-register"></i> Caixa
+      </a>
+
+      <a class="${classeLinkSidebar('historico-caixa.html')}" href="historico-caixa.html">
+        <i class="bi bi-wallet2"></i> Histórico de Caixa
+      </a>
       `
       : '';
 
@@ -1655,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         titulo: 'Vendas',
         icone: 'bi-cart-check',
         conteudo: vendasConteudo,
-        ativo: ['vendas.html', 'historico-vendas.html'].includes(paginaAtual)
+        ativo: ['vendas.html', 'historico-vendas.html', 'caixa.html', 'historico-caixa.html'].includes(paginaAtual)
       })}
 
       ${montarGrupoSidebar({
