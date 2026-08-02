@@ -17,6 +17,17 @@
   };
 
   const DB_KEY = 'vstock_demo_db_v2';
+  if (!localStorage.getItem('funcionarioLogado')) {
+    localStorage.setItem('funcionarioLogado', JSON.stringify({
+      funcCpf: '11111111111',
+      funcNome: 'Administrador Mestre',
+      funcEmail: 'admin@admin.login',
+      username: 'adminmaster',
+      cargo: 'Administrador Geral',
+      tipoAcesso: 99,
+      dataDemissao: null
+    }));
+  }
   const realFetch = window.fetch ? window.fetch.bind(window) : null;
   let db = null;
   let dbPromise = null;

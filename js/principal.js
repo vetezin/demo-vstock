@@ -59,21 +59,10 @@
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    if (!token && !publicApiPaths.has(path) && !paginaEhPublica()) {
-      limparSessao();
-      window.location.href = 'login.html';
-      throw new Error('Sessao expirada.');
-    }
-
     const response = await originalFetch(input, {
       ...init,
       headers
     });
-
-    if (response.status === 401 && !publicApiPaths.has(path) && !paginaEhPublica()) {
-      limparSessao();
-      window.location.href = 'login.html';
-    }
 
     return response;
   };
@@ -258,7 +247,16 @@ window.vstockCurrency = {
 window.vstockSession = {
   getFuncionario: function () {
     try {
-      return JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
+      var salvo = JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
+      return salvo || {
+        funcCpf: '11111111111',
+        funcNome: 'Administrador Mestre',
+        funcEmail: 'admin@admin.login',
+        username: 'adminmaster',
+        cargo: 'Administrador Geral',
+        tipoAcesso: 99,
+        dataDemissao: null
+      };
     } catch (erro) {
       console.warn('Não foi possível ler o funcionário logado:', erro);
       return null;
@@ -792,8 +790,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   var SIDEBAR_GROUPS_KEY = 'vstockSidebarGroupsState';
   var statusLicencaAtual = null;
 
-  if (paginaAtual !== 'login.html' && !(localStorage.getItem('authToken') || '').trim()) {
-    window.location.href = 'login.html';
+  if (paginaAtual === 'login.html') {
+    window.location.href = 'index.html';
     return;
   }
 
@@ -1318,7 +1316,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   function fazerLogout() {
     window.vstockFrontendSecurity.limparSessao();
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   }
 
   if (paginaAtual !== 'login.html') {
