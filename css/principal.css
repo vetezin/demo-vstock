@@ -69,6 +69,60 @@ header {
   display: inline-flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.navbar-cash-session-status {
+  min-width: 164px;
+  padding: 0.52rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgba(22, 121, 75, 0.2);
+  border-radius: 14px;
+  background: #edf9f2;
+  color: #16794b;
+}
+
+.navbar-cash-session-status.is-closed {
+  border-color: rgba(180, 35, 24, 0.18);
+  background: #fff4f2;
+  color: #b42318;
+}
+
+.navbar-cash-session-copy,
+.navbar-cash-session-copy small,
+.navbar-cash-session-copy strong {
+  display: block;
+}
+
+.navbar-cash-session-copy small {
+  color: #64706b;
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.navbar-cash-session-copy strong {
+  margin-top: 0.15rem;
+  color: currentColor;
+  font-size: 0.88rem;
+  line-height: 1.1;
+}
+
+.navbar-cash-session-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border: 2px solid #bce5cd;
+  border-radius: 50%;
+  background: #16794b;
+  box-shadow: 0 0 0 3px rgba(22, 121, 75, 0.08);
+}
+
+.navbar-cash-session-status.is-closed .navbar-cash-session-dot {
+  border-color: #f4c8c3;
+  background: #b42318;
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
 }
 
 .navbar .container-fluid,
@@ -96,13 +150,14 @@ header {
   border-bottom: 1px solid #e6e1d8;
   box-shadow: 0 10px 28px rgba(38, 50, 56, 0.06);
   backdrop-filter: blur(10px);
+  transition: grid-template-columns 0.2s ease;
 }
 
 .brand-navbar .navbar-brand {
   width: 100%;
   min-height: 100%;
   margin: 0;
-  padding: 0 1.45rem;
+  padding: 0 4rem 0 1.45rem;
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
@@ -134,6 +189,12 @@ header {
   font-size: 1.22rem;
   font-weight: 800;
   line-height: 1.15;
+}
+
+.brand-navbar .app-topbar-title i {
+  margin-right: 0.3rem;
+  color: #006b68;
+  font-size: 0.9em;
 }
 
 .brand-navbar .app-topbar-subtitle {
@@ -514,6 +575,7 @@ header {
   border-radius: 0;
   background: linear-gradient(180deg, #004c4a 0%, #006b68 100%);
   box-shadow: none;
+  transition: width 0.2s ease, min-width 0.2s ease, padding 0.2s ease;
 }
 
 .app-shell .sidebar {
@@ -535,6 +597,40 @@ header {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
+}
+
+.sidebar-collapse-toggle {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.sidebar-collapse-toggle:hover,
+.sidebar-collapse-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #ffffff;
+}
+
+.sidebar-collapse-toggle:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.sidebar-collapse-toggle-topbar {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--app-sidebar-width) - 3rem);
+  z-index: 3;
+  transform: translateY(-50%);
 }
 
 .content {
@@ -561,6 +657,7 @@ header {
   border-radius: 0;
   box-shadow: none;
   animation: pageFadeIn 120ms ease-out;
+  transition: margin-left 0.2s ease;
 }
 
 .app-shell .page-content.is-loading {
@@ -570,6 +667,7 @@ header {
 
 .app-shell .footer-info {
   margin-left: var(--app-sidebar-width);
+  transition: margin-left 0.2s ease;
 }
 
 @keyframes pageFadeIn {
@@ -690,6 +788,12 @@ nav li ul {
   width: 1rem;
   text-align: center;
   flex-shrink: 0;
+}
+
+.nav-btn-cash i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-btn.nav-btn-disabled {
@@ -925,24 +1029,100 @@ input[type="text"] {
 }
 
 @media (max-width: 992px) {
+  body {
+    --app-sidebar-width: 240px;
+  }
+
   .main-container {
     gap: 1rem;
     padding: 1rem;
   }
 
   .brand-navbar .container-fluid {
-    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
   }
 
   .sidebar {
-    width: 240px;
-    min-width: 240px;
+    width: var(--app-sidebar-width);
+    min-width: var(--app-sidebar-width);
   }
 
-  .app-shell .sidebar,
   .app-shell .content.page-content,
   .app-shell .footer-info {
-    margin-left: 240px;
+    margin-left: var(--app-sidebar-width);
+  }
+}
+
+@media (min-width: 769px) {
+  body.sidebar-collapsed {
+    --app-sidebar-width: 84px;
+  }
+
+  body.sidebar-collapsed .brand-navbar .navbar-brand {
+    justify-content: center;
+    padding-inline: 0.65rem;
+    overflow: hidden;
+  }
+
+  body.sidebar-collapsed .navbar-brand-minimal img.logo {
+    width: 52px;
+    max-width: 52px;
+    object-fit: contain;
+  }
+
+  body.sidebar-collapsed .sidebar {
+    padding-inline: 0.65rem;
+  }
+
+  body.sidebar-collapsed .sidebar h5 {
+    padding-inline: 0;
+    text-align: center;
+    font-size: 0;
+  }
+
+  body.sidebar-collapsed .sidebar h5 i {
+    font-size: 0.9rem;
+  }
+
+  body.sidebar-collapsed .sidebar-group-toggle {
+    justify-content: center;
+    padding-inline: 0;
+    pointer-events: none;
+  }
+
+  body.sidebar-collapsed .sidebar-group-label {
+    justify-content: center;
+    gap: 0;
+  }
+
+  body.sidebar-collapsed .sidebar-group-label i {
+    font-size: 1rem;
+  }
+
+  body.sidebar-collapsed .sidebar-group-label small,
+  body.sidebar-collapsed .sidebar-group-chevron {
+    display: none;
+  }
+
+  body.sidebar-collapsed .nav-btn {
+    justify-content: center;
+    gap: 0;
+    padding-inline: 0.75rem;
+    font-size: 0;
+  }
+
+  body.sidebar-collapsed .nav-btn i {
+    width: auto;
+    font-size: 1rem;
+  }
+
+  body.sidebar-collapsed .navbar-brand-minimal img.logo {
+    opacity: 0;
+  }
+
+  body.sidebar-collapsed .sidebar-collapse-toggle-topbar {
+    left: calc(var(--app-sidebar-width) / 2);
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -1009,6 +1189,10 @@ input[type="text"] {
     padding: 1rem;
   }
 
+  .sidebar-collapse-toggle-topbar {
+    display: none;
+  }
+
   .navbar-license-status {
     margin-bottom: 0.25rem;
     font-size: 0.7rem;
@@ -1016,6 +1200,19 @@ input[type="text"] {
 
   .navbar-system-meta {
     gap: 0.3rem;
+  }
+
+  .navbar-cash-session-status {
+    min-width: 0;
+    padding: 0.45rem 0.55rem;
+  }
+
+  .navbar-cash-session-copy small {
+    display: none;
+  }
+
+  .navbar-cash-session-copy strong {
+    font-size: 0.82rem;
   }
 
   .navbar-system-row {

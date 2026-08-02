@@ -149,6 +149,22 @@
   flex-shrink: 0;
 }
 
+.pdv-custom-select-toggle:hover {
+  border-color: rgba(0, 107, 104, 0.22);
+  background: rgba(0, 107, 104, 0.06);
+  color: #1f2937;
+  transform: none;
+}
+
+.pdv-custom-select-toggle:focus-visible {
+  border-color: rgba(0, 107, 104, 0.35);
+  background: rgba(0, 107, 104, 0.06);
+  color: #1f2937;
+  outline: 3px solid rgba(0, 107, 104, 0.12);
+  outline-offset: 2px;
+  transform: none;
+}
+
 .pdv-custom-select.is-open .pdv-custom-select-toggle i {
   transform: rotate(180deg);
 }
@@ -190,6 +206,8 @@
 
 .pdv-custom-select-option:hover {
   background: #f7f3ec;
+  color: #1f2937;
+  transform: none;
 }
 
 .pdv-custom-select-option.is-active {
@@ -419,12 +437,34 @@
 .pdv-clear-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
-  border: 0;
-  background: transparent;
-  color: #ef4444;
+  width: 100%;
+  min-height: 42px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 12px;
+  background: rgba(254, 226, 226, 0.72);
+  color: #b42318;
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: none;
+}
+
+.pdv-clear-btn:hover {
+  border-color: rgba(220, 38, 38, 0.3);
+  background: #fee2e2;
+  color: #991b1b;
+  transform: none;
+}
+
+.pdv-clear-btn:focus-visible {
+  border-color: rgba(220, 38, 38, 0.42);
+  background: #fee2e2;
+  color: #991b1b;
+  outline: 3px solid rgba(220, 38, 38, 0.13);
+  outline-offset: 2px;
+  transform: none;
 }
 
 .pdv-cart-items {
@@ -548,6 +588,7 @@
 }
 
 .pdv-inline-select {
+  height: 46px;
   min-height: 46px;
   border: 1px solid rgba(224, 218, 209, 0.96);
   border-radius: 14px;
@@ -556,6 +597,27 @@
   font-size: 0.95rem;
   font-weight: 600;
   box-shadow: none;
+}
+
+.pdv-select-shell {
+  position: relative;
+}
+
+.pdv-select-shell .pdv-inline-select {
+  width: 100%;
+  padding-right: 2.5rem;
+  appearance: none;
+  background-image: none;
+}
+
+.pdv-select-shell > i {
+  position: absolute;
+  top: 50%;
+  right: 0.9rem;
+  color: #64748b;
+  font-size: 0.82rem;
+  pointer-events: none;
+  transform: translateY(-50%);
 }
 
 .pdv-inline-select:focus {
@@ -567,6 +629,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 46px;
   min-height: 46px;
   max-width: 132px;
   padding: 0 0.8rem;
@@ -582,6 +645,7 @@
 }
 
 .pdv-discount-box .form-control {
+  height: 44px;
   min-height: 44px;
   font-size: 0.95rem;
 }
@@ -684,6 +748,46 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.8rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(0, 107, 104, 0.18);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 107, 104, 0.07), rgba(0, 107, 104, 0.025));
+}
+
+.pdv-cash-fields .pdv-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #315f5d;
+  font-weight: 700;
+}
+
+.pdv-cash-fields .pdv-field-label i {
+  color: #007d78;
+  font-size: 0.95rem;
+}
+
+.pdv-cash-fields .form-control {
+  min-height: 50px;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(0, 107, 104, 0.18);
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.pdv-cash-fields .form-control:focus {
+  border-color: rgba(0, 107, 104, 0.42);
+  box-shadow: 0 0 0 3px rgba(0, 107, 104, 0.1);
+}
+
+.pdv-cash-field--change .form-control:disabled {
+  border-color: rgba(0, 107, 104, 0.24);
+  background: rgba(0, 107, 104, 0.1);
+  color: #006b68;
+  opacity: 1;
 }
 
 .pdv-submit-btn {

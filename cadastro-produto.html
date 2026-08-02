@@ -185,6 +185,18 @@
               <label class="form-label" for="filtroNomeProduto">Filtrar por nome</label>
               <input type="text" id="filtroNomeProduto" class="form-control" placeholder="Buscar produto pelo nome" />
             </div>
+            <div class="cadastro-filtro">
+              <label class="form-label" for="filtroCategoriaProduto">Filtrar por categoria</label>
+              <input type="text" id="filtroCategoriaProduto" class="form-control" placeholder="Selecione ou digite uma categoria" autocomplete="off" />
+            </div>
+            <div class="cadastro-filtro">
+              <label class="form-label" for="filtroStatusProduto">Status</label>
+              <select id="filtroStatusProduto" class="form-select">
+                <option value="">Todos</option>
+                <option value="ativo">Ativos</option>
+                <option value="inativo">Inativos</option>
+              </select>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -221,6 +233,4 @@
   <script src="js/cadastro-produto.js"></script>
 </body>
 </html>
-
-
 

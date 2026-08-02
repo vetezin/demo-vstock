@@ -1,4 +1,4 @@
-﻿/* Layout geral da página */
+/* Layout geral da página */
 body {
   background-color: transparent;
   min-height: 100vh;
@@ -135,14 +135,6 @@ body {
 }
 
 /* Footer fixo visualmente */
-.footer-info {
-  text-align: center;
-  font-size: 0.85rem;
-  color: #5f6662;
-  padding: 1rem 0;
-  border-top: 1px solid rgba(229, 217, 207, 0.8);
-  background-color: rgba(255, 253, 249, 0.68);
-}
 
 /* Subtítulo abaixo do título principal da página */
 .page-subtitle {
@@ -161,12 +153,12 @@ body {
   }
 }
 
-/* �o. NOVO: garante espaço para a barra de ações */
+/* ✅ NOVO: garante espaço para a barra de ações */
 .page-wrapper {
   padding-bottom: 6.5rem;
 }
 
-/* �o. NOVO: barra de ações sempre visível */
+/* ✅ NOVO: barra de ações sempre visível */
 .actions-bar {
   position: sticky;
   bottom: 0;
@@ -279,25 +271,6 @@ body {
   white-space: nowrap;
 }
 
-.paginacao-listagem {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-.paginacao-listagem-resumo {
-  color: #5f6662;
-  font-size: 0.92rem;
-}
-
-.paginacao-listagem-botoes {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
 
 .form-control,
 .form-select {
@@ -593,4 +566,3 @@ textarea.form-control:focus {
     align-items: stretch;
   }
 }
-

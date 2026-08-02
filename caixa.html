@@ -1,0 +1,356 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Caixa | Plataforma de GestÃ£o</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <link href="css/style.css" rel="stylesheet"/>
+  <link href="css/app.css" rel="stylesheet"/>
+  <link href="css/principal.css?v=20260730-caixa" rel="stylesheet"/>
+  <link href="css/caixa.css?v=20260730-movimentos" rel="stylesheet"/>
+</head>
+<body class="app-shell cash-page">
+  <nav class="navbar brand-navbar app-topbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="assets/branding/logo-sistema-vstock-original.png"/>
+      </a>
+      <div class="text-white topbar-account-slot"></div>
+    </div>
+  </nav>
+
+  <div class="main-container app-layout">
+    <aside class="sidebar" aria-label="NavegaÃ§Ã£o principal"></aside>
+
+    <div class="content page-content">
+      <main class="page-wrapper cash-page-wrapper">
+        <section class="cash-page-header">
+          <div>
+            <span class="cash-eyebrow">
+              <i class="bi bi-cash-register"></i>
+              SessÃ£o financeira
+            </span>
+            <h1>Caixa</h1>
+            <p>Abra o caixa antes de iniciar as operaÃ§Ãµes e confira o saldo ao encerrar a sessÃ£o.</p>
+          </div>
+
+        </section>
+
+        <div id="mensagens" aria-live="polite"></div>
+
+        <section class="cash-card cash-loading-state" id="cashLoadingState">
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span>Consultando a situaÃ§Ã£o do caixa...</span>
+        </section>
+
+        <section class="cash-card" id="cashOpeningSection" hidden>
+          <div class="cash-card-header">
+            <div class="cash-card-title">
+              <span><i class="bi bi-unlock"></i></span>
+              <div>
+                <h2>Abertura do caixa</h2>
+                <p>Informe o fundo disponÃ­vel para iniciar a sessÃ£o.</p>
+              </div>
+            </div>
+            <span class="cash-section-state is-warning">Caixa fechado</span>
+          </div>
+
+          <form class="cash-card-body" id="cashOpeningForm">
+            <div class="cash-form-grid">
+              <div>
+                <label class="form-label" for="cashOpeningOperator">Operador</label>
+                <input class="form-control" id="cashOpeningOperator" readonly/>
+                <div class="form-text">Definido pelo usuÃ¡rio autenticado.</div>
+              </div>
+
+              <div>
+                <label class="form-label" for="cashOpeningDate">Data e hora</label>
+                <input class="form-control" id="cashOpeningDate" readonly/>
+              </div>
+
+              <div>
+                <label class="form-label" for="cashOpeningAmount">Saldo inicial</label>
+                <div class="cash-money-input">
+                  <span>R$</span>
+                  <input class="form-control" id="cashOpeningAmount" placeholder="0,00" required/>
+                </div>
+                <div class="form-text">Valor fÃ­sico disponÃ­vel no inÃ­cio da sessÃ£o.</div>
+              </div>
+
+              <div class="cash-form-span-full">
+                <label class="form-label" for="cashOpeningNote">ObservaÃ§Ã£o da abertura</label>
+                <textarea class="form-control" id="cashOpeningNote" maxlength="1000" rows="3" placeholder="InformaÃ§Ã£o opcional"></textarea>
+              </div>
+            </div>
+
+            <div class="cash-card-actions">
+              <button class="btn cash-primary-button" id="cashOpenButton" type="submit">
+                <i class="bi bi-unlock"></i>
+                Abrir caixa
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <div id="cashCurrentSession" hidden>
+          <section class="cash-session-grid" aria-label="Resumo da sessÃ£o atual">
+            <article class="cash-session-card">
+              <span class="cash-session-icon"><i class="bi bi-person-badge"></i></span>
+              <div>
+                <small>Operador <span id="cashSessionId">Caixa #-</span></small>
+                <strong id="cashSessionOperator">-</strong>
+                <span>Registrado pela autenticaÃ§Ã£o</span>
+              </div>
+            </article>
+
+            <article class="cash-session-card">
+              <span class="cash-session-icon"><i class="bi bi-calendar-check"></i></span>
+              <div>
+                <small>Abertura</small>
+                <strong id="cashSessionOpenedAt">-</strong>
+                <span id="cashSessionDuration">-</span>
+              </div>
+            </article>
+          </section>
+
+          <section class="cash-metrics-grid" aria-label="Valores da sessÃ£o">
+            <article class="cash-metric-card">
+              <small>Saldo inicial</small>
+              <strong id="cashInitialBalance">R$ 0,00</strong>
+              <span>Fundo informado na abertura</span>
+            </article>
+
+            <article class="cash-metric-card">
+              <small>Vendas lÃ­quidas</small>
+              <strong id="cashNetSales">R$ 0,00</strong>
+              <span>Todas as formas de pagamento</span>
+            </article>
+
+            <article class="cash-metric-card">
+              <small>Entradas</small>
+              <strong id="cashEntries">R$ 0,00</strong>
+              <span>ReforÃ§os manuais no caixa</span>
+            </article>
+
+            <article class="cash-metric-card">
+              <small>Sangrias</small>
+              <strong id="cashWithdrawals">R$ 0,00</strong>
+              <span>Retiradas realizadas</span>
+            </article>
+
+            <article class="cash-metric-card cash-metric-card-highlight">
+              <small>Saldo em caixa</small>
+              <strong id="cashExpectedBalance">R$ 0,00</strong>
+              <span>NumerÃ¡rio fÃ­sico esperado</span>
+            </article>
+          </section>
+
+          <div class="cash-workspace-grid">
+            <section class="cash-card">
+              <div class="cash-card-header">
+                <div class="cash-card-title">
+                  <span><i class="bi bi-arrow-left-right"></i></span>
+                  <div>
+                    <h2>Movimentar caixa</h2>
+                    <p>Registre uma entrada ou uma sangria na sessÃ£o atual.</p>
+                  </div>
+                </div>
+                <span class="cash-section-state">LanÃ§amento manual</span>
+              </div>
+
+              <form class="cash-card-body" id="cashMovementForm">
+                <div class="cash-segmented" aria-label="Tipo de movimento">
+                  <button class="is-active" data-movement-type="ENTRADA" type="button">
+                    <i class="bi bi-plus-circle"></i>
+                    Entrada
+                  </button>
+                  <button data-movement-type="SANGRIA" type="button">
+                    <i class="bi bi-dash-circle"></i>
+                    Sangria
+                  </button>
+                </div>
+
+                <div class="cash-form-grid">
+                  <div>
+                    <label class="form-label" for="cashMovementAmount">Valor</label>
+                    <div class="cash-money-input">
+                      <span>R$</span>
+                      <input class="form-control" id="cashMovementAmount" placeholder="0,00" required/>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="form-label" for="cashMovementReason">Motivo</label>
+                    <input class="form-control" id="cashMovementReason" maxlength="500" placeholder="Ex.: reforÃ§o de troco" required/>
+                  </div>
+
+                  <div class="cash-form-span-full">
+                    <label class="form-label" for="cashMovementNote">ObservaÃ§Ã£o</label>
+                    <textarea class="form-control" id="cashMovementNote" maxlength="1000" rows="2" placeholder="InformaÃ§Ã£o opcional"></textarea>
+                  </div>
+                </div>
+
+                <div class="cash-card-actions">
+                  <button class="btn cash-primary-button" id="cashMovementButton" type="submit">
+                    <i class="bi bi-check2-circle"></i>
+                    Registrar entrada
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="cash-card">
+              <div class="cash-card-header">
+                <div class="cash-card-title">
+                  <span><i class="bi bi-wallet2"></i></span>
+                  <div>
+                    <h2>Formas de pagamento</h2>
+                    <p>Valores lÃ­quidos das vendas e dos estornos da sessÃ£o.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cash-payment-list">
+                <div id="cashPaymentList">
+                  <div class="cash-empty-state">Nenhuma venda registrada nesta sessÃ£o.</div>
+                </div>
+                <div class="cash-payment-total">
+                  <span>Total lÃ­quido em vendas</span>
+                  <strong id="cashPaymentTotal">R$ 0,00</strong>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <section class="cash-card cash-movement-list">
+            <div class="cash-card-header">
+              <div class="cash-card-title">
+                <span><i class="bi bi-list-ul"></i></span>
+                <div>
+                  <h2>Movimentos da sessÃ£o</h2>
+                  <p>Vendas, entradas, sangrias e estornos registrados no caixa.</p>
+                </div>
+              </div>
+              <span class="cash-section-state" id="cashMovementCount">0 movimentos</span>
+            </div>
+
+            <div class="cash-table-wrapper">
+              <table class="table cash-table align-middle">
+                <thead>
+                  <tr>
+                    <th>Data e hora</th>
+                    <th>Tipo</th>
+                    <th>Origem</th>
+                    <th>ResponsÃ¡vel</th>
+                    <th>Motivo</th>
+                    <th class="text-end">Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="cashMovementTableBody">
+                  <tr>
+                    <td class="cash-table-empty" colspan="6">Nenhum movimento registrado nesta sessÃ£o.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <div class="cash-session-workspace">
+            <section class="cash-card">
+              <div class="cash-card-header">
+                <div class="cash-card-title">
+                  <span><i class="bi bi-info-circle"></i></span>
+                  <div>
+                    <h2>Dados da abertura</h2>
+                    <p>InformaÃ§Ãµes preservadas durante toda a sessÃ£o.</p>
+                  </div>
+                </div>
+                <span class="cash-section-state">SessÃ£o aberta</span>
+              </div>
+
+              <div class="cash-card-body">
+                <dl class="cash-details-list">
+                  <div>
+                    <dt>Operador</dt>
+                    <dd id="cashOpeningOperatorSummary">-</dd>
+                  </div>
+                  <div>
+                    <dt>Data e hora</dt>
+                    <dd id="cashOpeningDateSummary">-</dd>
+                  </div>
+                  <div>
+                    <dt>Saldo inicial</dt>
+                    <dd id="cashOpeningAmountSummary">-</dd>
+                  </div>
+                  <div class="cash-details-full">
+                    <dt>ObservaÃ§Ã£o</dt>
+                    <dd id="cashOpeningNoteSummary">Sem observaÃ§Ã£o.</dd>
+                  </div>
+                </dl>
+              </div>
+            </section>
+
+            <section class="cash-card">
+              <div class="cash-card-header">
+                <div class="cash-card-title">
+                  <span><i class="bi bi-lock"></i></span>
+                  <div>
+                    <h2>Fechamento do caixa</h2>
+                    <p>Confira o valor fÃ­sico antes de encerrar.</p>
+                  </div>
+                </div>
+              </div>
+
+              <form class="cash-card-body" id="cashClosingForm">
+                <div class="cash-closing-summary">
+                  <div>
+                    <span>Saldo esperado</span>
+                    <strong id="cashClosingExpected">R$ 0,00</strong>
+                  </div>
+                  <div>
+                    <span>DiferenÃ§a</span>
+                    <strong id="cashClosingDifference">R$ 0,00</strong>
+                  </div>
+                </div>
+
+                <div class="cash-form-grid">
+                  <div class="cash-form-span-full">
+                    <label class="form-label" for="cashClosingAmount">Valor contado</label>
+                    <div class="cash-money-input">
+                      <span>R$</span>
+                      <input class="form-control" id="cashClosingAmount" placeholder="0,00" required/>
+                    </div>
+                  </div>
+
+                  <div class="cash-form-span-full">
+                    <label class="form-label" for="cashClosingNote">ObservaÃ§Ã£o do fechamento</label>
+                    <textarea class="form-control" id="cashClosingNote" maxlength="1000" rows="3" placeholder="Informe uma justificativa quando houver diferenÃ§a"></textarea>
+                  </div>
+                </div>
+
+                <div class="cash-card-actions">
+                  <button class="btn cash-danger-button" id="cashCloseButton" type="submit">
+                    <i class="bi bi-lock"></i>
+                    Fechar caixa
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js"></script>
+  <script src="js/principal.js?v=20260730-caixa"></script>
+  <script src="js/caixa.js?v=20260730-movimentos"></script>
+</body>
+</html>
+

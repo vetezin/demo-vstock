@@ -707,7 +707,7 @@
 
 #btnSalvarVenda,
 #btnConfirmarVendaModal {
-  background: linear-gradient(180deg, #3d8750, #2f6f40);
+  background: linear-gradient(180deg, #006b68 , #006b68 );
   border: 0;
   box-shadow: 0 12px 24px rgba(47, 111, 64, 0.16);
 }
@@ -716,7 +716,7 @@
 #btnSalvarVenda:focus,
 #btnConfirmarVendaModal:hover,
 #btnConfirmarVendaModal:focus {
-  background: linear-gradient(180deg, #337446, #285d37);
+  background: linear-gradient(180deg, #006b68  , #006b68  );
 }
 
 #btnLimparVenda {

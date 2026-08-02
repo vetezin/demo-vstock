@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Histórico de Vendas | Plataforma de Gestão</title>
+  <title>HistÃ³rico de Vendas | Plataforma de GestÃ£o</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
@@ -17,7 +17,7 @@
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png"/>
+        <img alt="Logo da plataforma" class="logo" src="assets/branding/logo-sistema-vstock-original.png"/>
       </a>
 
       <div class="text-white topbar-account-slot"></div>
@@ -35,10 +35,10 @@
           <div class="sales-history-header-copy">
             <span class="sales-history-badge">
               <i class="bi bi-receipt-cutoff"></i>
-              Pós-venda
+              PÃ³s-venda
             </span>
-            <h1>Histórico de Vendas</h1>
-            <p>Consulte as vendas já registradas, acompanhe totais e prepare a base para ações futuras de detalhe, cancelamento e devolução.</p>
+            <h1>HistÃ³rico de Vendas</h1>
+            <p>Consulte as vendas jÃ¡ registradas, acompanhe totais e prepare a base para aÃ§Ãµes futuras de detalhe, cancelamento e devoluÃ§Ã£o.</p>
           </div>
         </section>
 
@@ -113,7 +113,7 @@
           <div class="sales-list-header">
             <div>
               <h2>Vendas realizadas</h2>
-              <p>Primeira etapa focada em consulta e conferência das vendas registradas.</p>
+              <p>Primeira etapa focada em consulta e conferÃªncia das vendas registradas.</p>
             </div>
           </div>
 
@@ -129,7 +129,7 @@
                   <th>Vendedor</th>
                   <th class="text-end">Itens</th>
                   <th class="text-end">Total</th>
-                  <th class="text-center">Ações</th>
+                  <th class="text-center">AÃ§Ãµes</th>
                 </tr>
               </thead>
               <tbody id="tabelaHistoricoVendasBody"></tbody>
@@ -206,7 +206,7 @@
                 </div>
 
                 <section class="sales-detail-inline-note d-none" id="detalheVendaObservacaoBloco">
-                  <small>Observação</small>
+                  <small>ObservaÃ§Ã£o</small>
                   <p id="detalheVendaObservacao">-</p>
                 </section>
               </section>
@@ -262,7 +262,7 @@
           </div>
         </div>
         <div class="modal-footer sales-detail-modal-footer">
-          <span class="sales-detail-footer-note">Layout compacto para consulta rápida da venda.</span>
+          <span class="sales-detail-footer-note">Layout compacto para consulta rÃ¡pida da venda.</span>
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
         </div>
       </div>
@@ -280,12 +280,12 @@
           <div id="mensagensModalCancelarVenda"></div>
 
           <div id="cancelamentoVendaEtapaAprovacao">
-            <p class="mb-3">Informe o login e a senha de um administrador para liberar o cancelamento da venda.</p>
+            <p class="mb-3">Informe o usuÃ¡rio ou e-mail e a senha de um administrador para liberar o cancelamento da venda.</p>
 
             <div class="sales-cancel-form">
               <div>
-                <label class="form-label" for="cancelamentoAdminEmail">E-mail do administrador</label>
-                <input type="email" id="cancelamentoAdminEmail" class="form-control" autocomplete="username"/>
+                <label class="form-label" for="cancelamentoAdminEmail">UsuÃ¡rio ou e-mail do administrador</label>
+                <input type="text" id="cancelamentoAdminEmail" class="form-control" autocomplete="username"/>
               </div>
               <div>
                 <label class="form-label" for="cancelamentoAdminSenha">Senha</label>
@@ -321,3 +321,4 @@
   <script src="js/historico-vendas.js"></script>
 </body>
 </html>
+

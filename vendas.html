@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Vendas | Plataforma de Gestão</title>
+  <title>Vendas | Plataforma de GestÃ£o</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
@@ -66,7 +66,7 @@
               <div class="pdv-toolbar">
                 <label class="pdv-search-box" for="buscaProdutoVenda">
                   <i class="bi bi-search"></i>
-                  <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto por nome ou código..." autocomplete="off"/>
+                  <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto por nome ou cÃ³digo..." autocomplete="off"/>
                 </label>
 
                 <select id="filtroCategoriaVenda" class="form-select pdv-native-select">
@@ -84,7 +84,7 @@
               <div class="pdv-section-header">
                 <div class="pdv-section-title">
                   <i class="bi bi-box-seam"></i>
-                  <h2>Produtos Disponíveis</h2>
+                  <h2>Produtos DisponÃ­veis</h2>
                 </div>
                 <span class="pdv-count-pill" id="pdvProductCount">0 itens</span>
               </div>
@@ -103,13 +103,14 @@
                   <h2>Carrinho</h2>
                   <span class="pdv-cart-badge" id="pdvCartCount">0</span>
                 </div>
-                <button id="btnLimparVenda" class="pdv-clear-btn" type="button">
-                  <i class="bi bi-x-lg"></i>
-                  Limpar
-                </button>
               </div>
 
               <div id="pdvCartItems" class="pdv-cart-items"></div>
+
+              <button id="btnLimparVenda" class="pdv-clear-btn" type="button">
+                <i class="bi bi-x-lg"></i>
+                Limpar carrinho
+              </button>
 
               <div class="pdv-cart-divider"></div>
 
@@ -118,11 +119,11 @@
                 <div class="pdv-inline-input">
                   <i class="bi bi-person"></i>
                   <select id="clienteVenda" class="form-select pdv-native-select">
-                    <option value="">Cliente Balcão</option>
+                    <option value="">Cliente BalcÃ£o</option>
                   </select>
                   <div class="pdv-custom-select pdv-custom-select-inline" data-custom-select="clienteVenda">
                     <button type="button" class="pdv-custom-select-toggle" data-custom-select-toggle="clienteVenda" aria-expanded="false">
-                      <span data-custom-select-label="clienteVenda">Cliente Balcão</span>
+                      <span data-custom-select-label="clienteVenda">Cliente BalcÃ£o</span>
                       <i class="bi bi-chevron-down"></i>
                     </button>
                     <div class="pdv-custom-select-menu" data-custom-select-menu="clienteVenda"></div>
@@ -133,11 +134,14 @@
               <div class="pdv-field-row">
                 <div class="pdv-field-group">
                   <label class="pdv-field-label" for="tipoDescontoVenda">Tipo de desconto</label>
-                  <select id="tipoDescontoVenda" class="form-select pdv-inline-select">
-                    <option value="NENHUM" selected>Sem desconto</option>
-                    <option value="VALOR">Valor</option>
-                    <option value="PERCENTUAL">Percentual</option>
-                  </select>
+                  <div class="pdv-select-shell">
+                    <select id="tipoDescontoVenda" class="form-select pdv-inline-select">
+                      <option value="NENHUM" selected>Sem desconto</option>
+                      <option value="VALOR">Valor</option>
+                      <option value="PERCENTUAL">Percentual</option>
+                    </select>
+                    <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                  </div>
                 </div>
 
                 <div class="pdv-field-group">
@@ -168,12 +172,18 @@
 
               <div class="pdv-cash-fields">
                 <div class="pdv-field-group d-none" id="blocoValorRecebidoVenda">
-                  <label class="pdv-field-label" for="valorRecebidoVendaTela">Valor Recebido</label>
+                  <label class="pdv-field-label" for="valorRecebidoVendaTela">
+                    <i class="bi bi-cash-stack" aria-hidden="true"></i>
+                    Valor Recebido
+                  </label>
                   <input type="text" id="valorRecebidoVendaTela" class="form-control" placeholder="0,00"/>
                 </div>
 
-                <div class="pdv-field-group d-none" id="blocoTrocoVenda">
-                  <label class="pdv-field-label" for="trocoVendaTela">Troco</label>
+                <div class="pdv-field-group pdv-cash-field--change d-none" id="blocoTrocoVenda">
+                  <label class="pdv-field-label" for="trocoVendaTela">
+                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                    Troco
+                  </label>
                   <input type="text" id="trocoVendaTela" class="form-control" disabled placeholder="0,00"/>
                 </div>
               </div>
@@ -216,7 +226,7 @@
                   <th class="text-end">Qtd</th>
                   <th class="text-end">Valor Unit.</th>
                   <th class="text-end">Subtotal</th>
-                  <th class="text-center">Ações</th>
+                  <th class="text-center">AÃ§Ãµes</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -244,7 +254,7 @@
             <input type="hidden" id="formaPagamentoIdEdicao"/>
             <div class="col-md-8">
               <label class="form-label required">Nome</label>
-              <input type="text" id="formaPagamentoNome" class="form-control" placeholder="Ex.: Convênio" required maxlength="60"/>
+              <input type="text" id="formaPagamentoNome" class="form-control" placeholder="Ex.: ConvÃªnio" required maxlength="60"/>
             </div>
             <div class="col-md-4 d-flex align-items-end gap-2">
               <button type="submit" class="btn btn-success flex-fill">
@@ -262,7 +272,7 @@
                 <tr>
                   <th>Nome</th>
                   <th>Status</th>
-                  <th class="text-center">Ações</th>
+                  <th class="text-center">AÃ§Ãµes</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -298,7 +308,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">Observação</label>
+              <label class="form-label">ObservaÃ§Ã£o</label>
               <textarea id="clienteVendaObservacao" class="form-control" rows="3" maxlength="500"></textarea>
             </div>
 
@@ -372,7 +382,7 @@
 
           <div class="saida-info-banner mt-3">
             <i class="bi bi-info-circle"></i>
-            <span>Ao confirmar, o estoque será atualizado e a venda será registrada.</span>
+            <span>Ao confirmar, o estoque serÃ¡ atualizado e a venda serÃ¡ registrada.</span>
           </div>
         </div>
         <div class="modal-footer">
@@ -393,3 +403,4 @@
   <script src="js/vendas.js"></script>
 </body>
 </html>
+
