@@ -1352,10 +1352,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       return true;
     }
 
-    if (!modulos.vendas && ['vendas.html', 'historico-vendas.html'].includes(paginaAtual)) {
-      return true;
-    }
-
     return false;
   }
 
@@ -1545,7 +1541,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       : '';
 
     var vendasConteudo = `
-      ${modulos.vendas ? `
       <a class="${classeLinkSidebar('vendas.html')}" href="vendas.html">
         <i class="bi bi-cart-check"></i> Vendas
       </a>
@@ -1553,8 +1548,6 @@ document.addEventListener('DOMContentLoaded', async function () {
       <a class="${classeLinkSidebar('historico-vendas.html')}" href="historico-vendas.html">
         <i class="bi bi-receipt-cutoff"></i> Histórico de Vendas
       </a>
-      ` : ''}
-
       <a class="${classeLinkSidebar('caixa.html')}" href="caixa.html">
         <i class="bi bi-cash-register"></i> Caixa
       </a>
