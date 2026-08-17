@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // pega nÃ­vel de acesso e email do funcionÃ¡rio logado da querystring
+  // pega nível de acesso e email do funcionário logado da querystring
   const urlParams = new URLSearchParams(window.location.search);
   const nivel = urlParams.get('nivel');
   const funcEmail = urlParams.get('funcEmail');
@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoContainer = document.getElementById('logoEmpresa');
   const dadosContainer = document.getElementById('dadosEmpresa');
 
-  // guarda empresa carregada pra usar nos botÃµes
+  // guarda empresa carregada pra usar nos botões
   let empresaAtual = null;
 
-  // Monta endereÃ§o humano com base nos campos da parametrizaÃ§Ã£o
+  // Monta endereço humano com base nos campos da parametrização
   function montarEndereco(emp) {
     const rua    = emp.rua    || '';
     const bairro = emp.bairro || '';
@@ -36,21 +36,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (cep) partes.push(`CEP ${cep}`);
 
-    if (partes.length === 0) return 'NÃ£o informado';
+    if (partes.length === 0) return 'Não informado';
     return partes.join(', ');
   }
 
-  // Renderiza o resultado quando a empresa Ã‰ encontrada
-  // Agora recebe tambÃ©m o email digitado pelo usuÃ¡rio no form,
-  // pra corrigir caso o backend nÃ£o mande um email vÃ¡lido.
+  // Renderiza o resultado quando a empresa É encontrada
+  // Agora recebe também o email digitado pelo usuário no form,
+  // pra corrigir caso o backend não mande um email válido.
   function renderEmpresaEncontrada(emp, emailBuscadoPeloUsuario) {
-    empresaAtual = emp; // guarda pra navegaÃ§Ã£o futura
+    empresaAtual = emp; // guarda pra navegação futura
 
     msgEl.textContent = '';
     errorEl.textContent = '';
     resultadoCard.style.display = 'block';
 
-    // limpa Ã¡reas
+    // limpa áreas
     logoContainer.innerHTML = '';
     dadosContainer.innerHTML = '';
 
@@ -81,19 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let emailRaw        = emp.email        || '';
     const enderecoStr   = montarEndereco(emp); // usa rua/bairro/etc
 
-    // --- CorreÃ§Ã£o de inconsistÃªncia backend ---
-    // Se razaoSocial veio vazio e emailRaw NÃƒO parece e-mail (sem "@"),
-    // Ã© muito provÃ¡vel que esse "emailRaw" seja na verdade a razÃ£o social.
+    // --- Correção de inconsistência backend ---
+    // Se razaoSocial veio vazio e emailRaw NÃO parece e-mail (sem "@"),
+    // é muito provável que esse "emailRaw" seja na verdade a razão social.
     if (!razaoSocialRaw && emailRaw && !emailRaw.includes('@')) {
       razaoSocialRaw = emailRaw;
-      // NÃƒO apagamos emailRaw aqui ainda; vamos corrigir ele abaixo.
+      // NÃO apagamos emailRaw aqui ainda; vamos corrigir ele abaixo.
     }
 
-    // --- CorreÃ§Ã£o de e-mail de exibiÃ§Ã£o ---
-    // Vamos garantir que vamos mostrar um e-mail vÃ¡lido.
+    // --- Correção de e-mail de exibição ---
+    // Vamos garantir que vamos mostrar um e-mail válido.
     // 1. Se o backend mandou algo com "@", beleza.
-    // 2. Se o backend NÃƒO mandou e-mail vÃ¡lido,
-    //    usamos o que o usuÃ¡rio digitou no formulÃ¡rio.
+    // 2. Se o backend NÃO mandou e-mail válido,
+    //    usamos o que o usuário digitou no formulário.
     const pareceEmailBackend = emailRaw && emailRaw.includes('@');
     const pareceEmailBusca   = emailBuscadoPeloUsuario && emailBuscadoPeloUsuario.includes('@');
 
@@ -101,38 +101,38 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pareceEmailBusca) {
         emailRaw = emailBuscadoPeloUsuario;
       } else {
-        // nenhum e-mail confiÃ¡vel
+        // nenhum e-mail confiável
         emailRaw = '';
       }
     }
 
-    // aplica fallback de exibiÃ§Ã£o
-    const razaoSocial  = razaoSocialRaw  || 'NÃ£o informado';
-    const nomeFantasia = nomeFantasiaRaw || 'NÃ£o informado';
-    const telefone     = telefoneRaw     || 'NÃ£o informado';
-    const emailFinal   = emailRaw        || 'NÃ£o informado';
-    const endereco     = enderecoStr     || 'NÃ£o informado';
+    // aplica fallback de exibição
+    const razaoSocial  = razaoSocialRaw  || 'Não informado';
+    const nomeFantasia = nomeFantasiaRaw || 'Não informado';
+    const telefone     = telefoneRaw     || 'Não informado';
+    const emailFinal   = emailRaw        || 'Não informado';
+    const endereco     = enderecoStr     || 'Não informado';
 
-    // atualiza empresaAtual.email com a versÃ£o corrigida,
-    // pra usar nos botÃµes/redirects depois
+    // atualiza empresaAtual.email com a versão corrigida,
+    // pra usar nos botões/redirects depois
     empresaAtual.email = emailRaw;
 
-    // monta bloco de dados + botÃµes
+    // monta bloco de dados + botões
     dadosContainer.innerHTML = `
       <strong>Empresa encontrada:</strong><br>
       <b>Nome Fantasia:</b> ${nomeFantasia}<br>
-      <b>RazÃ£o Social:</b> ${razaoSocial}<br>
-      <b>EndereÃ§o:</b> ${endereco}<br>
+      <b>Razão Social:</b> ${razaoSocial}<br>
+      <b>Endereço:</b> ${endereco}<br>
       <b>Telefone:</b> ${telefone}<br>
       <b>E-mail:</b> ${emailFinal}<br><br>
 
       <div class="d-flex gap-3 justify-content-center mt-3">
         <button id="btnIrSistema" class="btn btn-success">Ir para o Sistema</button>
-        <button id="btnIrParam" class="btn btn-secondary">Ir para ParametrizaÃ§Ã£o</button>
+        <button id="btnIrParam" class="btn btn-secondary">Ir para Parametrização</button>
       </div>
     `;
 
-    // agora que os botÃµes existem no DOM, conectar os eventos
+    // agora que os botões existem no DOM, conectar os eventos
     const btnIrSistema = document.getElementById('btnIrSistema');
     const btnIrParam = document.getElementById('btnIrParam');
 
@@ -155,9 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
     form.style.display = 'none';
   }
 
-  // Caso NÃƒO encontre a empresa
+  // Caso NÃO encontre a empresa
   async function tratarEmpresaNaoEncontrada(emailBuscado) {
-    // pergunta: jÃ¡ existe alguma empresa cadastrada no sistema?
+    // pergunta: já existe alguma empresa cadastrada no sistema?
     const existeResp = await fetch('http://localhost:8080/api/parametrizacao/existeEmpresa', {
       method: 'GET',
       headers: { 'Accept': 'application/json' }
@@ -166,12 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const existeEmpresa = await existeResp.json();
 
     if (existeEmpresa) {
-      // jÃ¡ tem empresa cadastrada, entÃ£o bloquear criaÃ§Ã£o de outra
-      errorEl.textContent = 'JÃ¡ existe uma empresa cadastrada. VocÃª nÃ£o pode cadastrar outra.';
+      // já tem empresa cadastrada, então bloquear criação de outra
+      errorEl.textContent = 'Já existe uma empresa cadastrada. Você não pode cadastrar outra.';
       return;
     }
 
-    // nÃ£o existe empresa ainda -> esse usuÃ¡rio vai cadastrar a primeira
+    // não existe empresa ainda -> esse usuário vai cadastrar a primeira
     window.location.href = `parametrizacao.html?emailEmpresa=${encodeURIComponent(emailBuscado)}&nivel=${nivel}`;
   }
 
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
       if (resp.status === 404) {
-        // empresa nÃ£o existe com esse email
+        // empresa não existe com esse email
         await tratarEmpresaNaoEncontrada(emailEmpresa);
         return;
       }
@@ -220,5 +220,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-

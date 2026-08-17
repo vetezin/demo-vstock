@@ -478,7 +478,7 @@
     const method = String(init?.method || 'GET').toUpperCase();
     const path = url.pathname;
 
-    if (path === '/api/funcionarios/licenca/status' && method === 'GET') return json({ licencaAtiva: true, chaveObrigatoria: false, motivo: 'Demo est?tica sem valida??o de licen?a.', expiraEm: '2027-12-31' });
+    if (path === '/api/funcionarios/licenca/status' && method === 'GET') return json({ licencaAtiva: true, chaveObrigatoria: false, motivo: 'Demonstração estática sem validação de licença.', expiraEm: '2027-12-31' });
 
     if (path === '/api/funcionarios/login' && method === 'POST') {
       const body = parseFormBody(init);
@@ -488,9 +488,9 @@
         const email = String(item.funcEmail || '').toLowerCase();
         return email === emailInformado || (emailInformado === 'admin@admin' && email === 'admin@admin.login');
       });
-      if (!funcionario) return text('Funcionario nao encontrado.', 404);
+      if (!funcionario) return text('Funcionário não encontrado.', 404);
       if (funcionario.funcSenha !== senha) return text('Senha incorreta.', 401);
-      if (!funcionarioAtivo(funcionario)) return text('Funcionario inativo na demonstracao.', 403);
+      if (!funcionarioAtivo(funcionario)) return text('Funcionário inativo na demonstração.', 403);
       addLog('LOGIN', `Acesso de demonstração para ${funcionario.funcNome}.`);
       return json({ token: `mock-token-${funcionario.funcCpf}`, funcionario: sanitizarFuncionario(funcionario) });
     }
@@ -500,7 +500,7 @@
     if (path === '/api/funcionarios/buscaEmail' && method === 'GET') {
       const email = String(url.searchParams.get('email') || '').toLowerCase();
       const funcionario = db.funcionarios.find((item) => String(item.funcEmail || '').toLowerCase() === email);
-      return funcionario ? json(sanitizarFuncionario(funcionario)) : text('Nao encontrado', 404);
+      return funcionario ? json(sanitizarFuncionario(funcionario)) : text('Não encontrado', 404);
     }
 
     const funcionarioStatusMatch = path.match(/^\/api\/funcionarios\/([^\/]+)\/status$/);
@@ -508,7 +508,7 @@
       const cpf = decodeURIComponent(funcionarioStatusMatch[1]);
       const ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       const funcionario = db.funcionarios.find((item) => String(item.funcCpf) === String(cpf));
-      if (!funcionario) return text('Funcionario nao encontrado.', 404);
+      if (!funcionario) return text('Funcionário não encontrado.', 404);
       funcionario.dataDemissao = ativo ? null : todayIso();
       persistDb();
       addLog('FUNCIONARIO_STATUS', `Funcionário ${funcionario.funcNome} ${ativo ? 'reativado' : 'inativado'}.`);
@@ -519,7 +519,7 @@
     if (funcionarioMatch && method === 'PUT') {
       const cpf = decodeURIComponent(funcionarioMatch[1]);
       const funcionario = db.funcionarios.find((item) => String(item.funcCpf) === String(cpf));
-      if (!funcionario) return text('Funcionario nao encontrado.', 404);
+      if (!funcionario) return text('Funcionário não encontrado.', 404);
       const body = parseJsonBody(init);
       Object.assign(funcionario, {
         funcNome: body.funcNome,
@@ -555,12 +555,12 @@
     }
 
     if (path === '/api/parametrizacao/existeEmpresa' && method === 'GET') return json(!!db.parametrizacao?.email);
-    if (path === '/api/parametrizacao/unica' && method === 'GET') return db.parametrizacao ? json(db.parametrizacao) : text('Nao encontrada', 404);
+    if (path === '/api/parametrizacao/unica' && method === 'GET') return db.parametrizacao ? json(db.parametrizacao) : text('Não encontrada', 404);
     if (path === '/api/parametrizacao' && method === 'GET') {
       const email = String(url.searchParams.get('email') || '').toLowerCase();
-      if (!db.parametrizacao) return text('Nao encontrada', 404);
+      if (!db.parametrizacao) return text('Não encontrada', 404);
       if (!email || String(db.parametrizacao.email || '').toLowerCase() === email) return json(db.parametrizacao);
-      return text('Nao encontrada', 404);
+      return text('Não encontrada', 404);
     }
     if (path === '/api/parametrizacao' && method === 'POST') {
       db.parametrizacao = parseJsonBody(init);
@@ -602,7 +602,7 @@
     const categoriaMatch = path.match(/^\/api\/categorias-produto\/(\d+)(?:\/status)?$/);
     if (categoriaMatch && !path.endsWith('/status') && method === 'PUT') {
       const categoria = db.categorias.find((item) => Number(item.catCod) === Number(categoriaMatch[1]));
-      if (!categoria) return text('Categoria nao encontrada.', 404);
+      if (!categoria) return text('Categoria não encontrada.', 404);
       categoria.catDescr = parseJsonBody(init).catDescr;
       persistDb();
       addLog('CATEGORIA_UPDATE', `Categoria ${categoria.catDescr} atualizada.`);
@@ -610,7 +610,7 @@
     }
     if (categoriaMatch && path.endsWith('/status') && method === 'PATCH') {
       const categoria = db.categorias.find((item) => Number(item.catCod) === Number(categoriaMatch[1]));
-      if (!categoria) return text('Categoria nao encontrada.', 404);
+      if (!categoria) return text('Categoria não encontrada.', 404);
       categoria.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       persistDb();
       addLog('CATEGORIA_STATUS', `Categoria ${categoria.catDescr} ${categoria.ativo ? 'reativada' : 'inativada'}.`);
@@ -643,7 +643,7 @@
     const fornecedorMatch = path.match(/^\/api\/fornecedor\/(\d+)(?:\/status)?$/);
     if (fornecedorMatch && !path.endsWith('/status') && method === 'PUT') {
       const fornecedor = db.fornecedores.find((item) => Number(item.idFornecedor) === Number(fornecedorMatch[1]));
-      if (!fornecedor) return text('Fornecedor nao encontrado.', 404);
+      if (!fornecedor) return text('Fornecedor não encontrado.', 404);
       Object.assign(fornecedor, parseJsonBody(init));
       persistDb();
       addLog('FORNECEDOR_UPDATE', `Fornecedor ${fornecedor.nome} atualizado.`);
@@ -651,7 +651,7 @@
     }
     if (fornecedorMatch && path.endsWith('/status') && method === 'PATCH') {
       const fornecedor = db.fornecedores.find((item) => Number(item.idFornecedor) === Number(fornecedorMatch[1]));
-      if (!fornecedor) return text('Fornecedor nao encontrado.', 404);
+      if (!fornecedor) return text('Fornecedor não encontrado.', 404);
       fornecedor.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       persistDb();
       addLog('FORNECEDOR_STATUS', `Fornecedor ${fornecedor.nome} ${fornecedor.ativo ? 'reativado' : 'inativado'}.`);
@@ -683,7 +683,7 @@
     const produtoMatch = path.match(/^\/api\/produtos\/(\d+)(?:\/status)?$/);
     if (produtoMatch && !path.endsWith('/status') && method === 'PUT') {
       const produto = db.produtos.find((item) => Number(item.prodCod) === Number(produtoMatch[1]));
-      if (!produto) return text('Produto nao encontrado.', 404);
+      if (!produto) return text('Produto não encontrado.', 404);
       const body = parseJsonBody(init);
       Object.assign(produto, {
         prodDescr: body.prodDescr,
@@ -698,7 +698,7 @@
     }
     if (produtoMatch && path.endsWith('/status') && method === 'PATCH') {
       const produto = db.produtos.find((item) => Number(item.prodCod) === Number(produtoMatch[1]));
-      if (!produto) return text('Produto nao encontrado.', 404);
+      if (!produto) return text('Produto não encontrado.', 404);
       produto.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       persistDb();
       addLog('PRODUTO_STATUS', `Produto ${produto.prodDescr} ${produto.ativo ? 'reativado' : 'inativado'}.`);
@@ -731,7 +731,7 @@
     const clienteMatch = path.match(/^\/api\/cliente\/(\d+)(?:\/status)?$/);
     if (clienteMatch && !path.endsWith('/status') && method === 'PUT') {
       const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(clienteMatch[1]));
-      if (!cliente) return text('Cliente nao encontrado.', 404);
+      if (!cliente) return text('Cliente não encontrado.', 404);
       const body = parseJsonBody(init);
       Object.assign(cliente, {
         nome: body.nome,
@@ -745,7 +745,7 @@
     }
     if (clienteMatch && path.endsWith('/status') && method === 'PATCH') {
       const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(clienteMatch[1]));
-      if (!cliente) return text('Cliente nao encontrado.', 404);
+      if (!cliente) return text('Cliente não encontrado.', 404);
       cliente.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       persistDb();
       addLog('CLIENTE_STATUS', `Cliente ${cliente.nome} ${cliente.ativo ? 'reativado' : 'inativado'}.`);
@@ -774,7 +774,7 @@
     const formaPagamentoMatch = path.match(/^\/api\/forma-pagamento\/(\d+)(?:\/status)?$/);
     if (formaPagamentoMatch && !path.endsWith('/status') && method === 'PUT') {
       const formaPagamento = db.formasPagamento.find((item) => Number(item.formaPagamentoId) === Number(formaPagamentoMatch[1]));
-      if (!formaPagamento) return text('Forma de pagamento nao encontrada.', 404);
+      if (!formaPagamento) return text('Forma de pagamento não encontrada.', 404);
       formaPagamento.nome = parseJsonBody(init).nome;
       persistDb();
       addLog('FORMA_PAGAMENTO_UPDATE', `Forma de pagamento ${formaPagamento.nome} atualizada.`);
@@ -782,7 +782,7 @@
     }
     if (formaPagamentoMatch && path.endsWith('/status') && method === 'PATCH') {
       const formaPagamento = db.formasPagamento.find((item) => Number(item.formaPagamentoId) === Number(formaPagamentoMatch[1]));
-      if (!formaPagamento) return text('Forma de pagamento nao encontrada.', 404);
+      if (!formaPagamento) return text('Forma de pagamento não encontrada.', 404);
       formaPagamento.ativo = String(url.searchParams.get('ativo')).toLowerCase() === 'true';
       persistDb();
       addLog('FORMA_PAGAMENTO_STATUS', `Forma de pagamento ${formaPagamento.nome} ${formaPagamento.ativo ? 'reativada' : 'inativada'}.`);
@@ -806,13 +806,13 @@
     const vendaMatch = path.match(/^\/api\/vendas\/(\d+)$/);
     if (vendaMatch && method === 'GET') {
       const detalhe = buildVendaDetalhe(Number(vendaMatch[1]));
-      return detalhe ? json(detalhe) : text('Venda nao encontrada.', 404);
+      return detalhe ? json(detalhe) : text('Venda não encontrada.', 404);
     }
 
     const vendaAprovacaoMatch = path.match(/^\/api\/vendas\/(\d+)\/cancelamento\/aprovar-admin$/);
     if (vendaAprovacaoMatch && method === 'POST') {
       const venda = buildVendaDetalhe(Number(vendaAprovacaoMatch[1]));
-      if (!venda) return text('Venda nao encontrada.', 404);
+      if (!venda) return text('Venda não encontrada.', 404);
       if (normalizarVendaStatus(venda.status) === 'CANCELADA') return text('Venda ja cancelada.', 400);
       const body = parseJsonBody(init);
       if (!String(body.motivo || '').trim()) return text('Motivo obrigatorio.', 400);
@@ -824,7 +824,7 @@
     const vendaCancelamentoMatch = path.match(/^\/api\/vendas\/(\d+)\/cancelamento$/);
     if (vendaCancelamentoMatch && method === 'POST') {
       const venda = db.vendas.find((item) => Number(item.vendaId) === Number(vendaCancelamentoMatch[1]));
-      if (!venda) return text('Venda nao encontrada.', 404);
+      if (!venda) return text('Venda não encontrada.', 404);
       if (normalizarVendaStatus(venda.status) === 'CANCELADA') return text('Venda ja cancelada.', 400);
       const body = parseJsonBody(init);
       if (!String(body.motivo || '').trim()) return text('Motivo obrigatorio.', 400);
@@ -977,7 +977,7 @@
       const id = Number(compraMatch[1]);
       const body = parseJsonBody(init);
       const compra = db.compras.find((item) => Number(item.compra_cod) === id);
-      if (!compra) return text('Entrada nao encontrada.', 404);
+      if (!compra) return text('Entrada não encontrada.', 404);
       Object.assign(compra, {
         data_compra: body.dataCompra,
         fornecedor_id: Number(body.fornecedorId || 0),
@@ -1033,7 +1033,7 @@
       const id = Number(saidaMatch[1]);
       const body = parseJsonBody(init);
       const saida = db.saidas.find((item) => Number(item.saida_cod) === id);
-      if (!saida) return text('Saida nao encontrada.', 404);
+      if (!saida) return text('Saída não encontrada.', 404);
       Object.assign(saida, {
         data_saida: body.dataSaida,
         funcionario_func_cpf: String(body.funcionarioFuncCpf || '')

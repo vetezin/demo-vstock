@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     preencherFormularioModulos(campos, modulosExistentes);
   } catch (erro) {
-    exibirErro(mensagemErro, erro.message || "Nao foi possivel carregar a configuracao atual.");
+    exibirErro(mensagemErro, erro.message || "Não foi possível carregar a configuração atual.");
   }
 
   form.addEventListener("submit", async (event) => {
@@ -98,20 +98,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const textoEmpresa = await respostaEmpresa.text();
       if (!respostaEmpresa.ok) {
-        throw new Error(textoEmpresa || "Nao foi possivel salvar a parametrizacao.");
+        throw new Error(textoEmpresa || "Não foi possível salvar a parametrização.");
       }
 
       const textoModulos = await respostaModulos.text();
       if (!respostaModulos.ok) {
-        throw new Error(textoModulos || "Nao foi possivel salvar os modulos.");
+        throw new Error(textoModulos || "Não foi possível salvar os módulos.");
       }
 
-      exibirSucesso(mensagemSucesso, textoEmpresa || textoModulos || "Configuracao salva com sucesso.");
+      exibirSucesso(mensagemSucesso, textoEmpresa || textoModulos || "Configuração salva com sucesso.");
       setTimeout(() => {
         window.location.href = "index.html";
       }, 700);
     } catch (erro) {
-      exibirErro(mensagemErro, erro.message || "Nao foi possivel salvar a configuracao.");
+      exibirErro(mensagemErro, erro.message || "Não foi possível salvar a configuração.");
     }
   });
 });
@@ -156,7 +156,7 @@ async function carregarEmpresaUnica() {
   }
 
   if (!response.ok) {
-    throw new Error("Falha ao consultar a parametrizacao.");
+    throw new Error("Falha ao consultar a parametrização.");
   }
 
   return await response.json();
@@ -289,4 +289,3 @@ function exibirErro(err, texto) {
     err.textContent = texto;
   }
 }
-

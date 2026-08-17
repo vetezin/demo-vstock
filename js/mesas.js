@@ -445,7 +445,7 @@ const API_MESAS = {
       if (saldo <= 0) throw new Error("Este produto está sem estoque.");
       const precoUnitario = Number(itemExistente?.precoUnitario ?? produto?.valor_unitario);
       const novaQuantidade = Number(itemExistente?.quantidade || 0) + quantidade;
-      if (!Number.isFinite(precoUnitario)) throw new Error("Produto invÃ¡lido.");
+      if (!Number.isFinite(precoUnitario)) throw new Error("Produto inválido.");
       if (novaQuantidade > saldo) throw new Error("A quantidade informada ultrapassa o saldo disponível.");
       const novoSubtotal = Number((precoUnitario * novaQuantidade).toFixed(2));
       if (itemExistente) {
@@ -623,7 +623,7 @@ const API_MESAS = {
       await carregar();
       alertar("Mesa movida para a reserva.", "success");
     } catch (erro) {
-      alertar(formatarErro(erro, "NÃ£o foi possÃ­vel ocultar a mesa."), "danger");
+      alertar(formatarErro(erro, "Não foi possível ocultar a mesa."), "danger");
     }
   }
 

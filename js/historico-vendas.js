@@ -103,7 +103,7 @@ function validarPeriodoHistoricoVendas() {
   const dataFim = $historicoVendas("#filtroVendaDataFim")?.value || "";
 
   if (dataInicio && dataFim && dataInicio > dataFim) {
-    throw new Error("A data inicial nao pode ser maior que a data final.");
+    throw new Error("A data inicial não pode ser maior que a data final.");
   }
 }
 
@@ -483,4 +483,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   $historicoVendas("#btnAprovarCancelamentoVenda")?.addEventListener("click", aprovarCancelamentoVenda);
   $historicoVendas("#btnConfirmarCancelamentoVenda")?.addEventListener("click", confirmarCancelamentoVenda);
 });
-

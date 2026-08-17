@@ -76,7 +76,7 @@ async function carregarLogs() {
     renderizarLogs(logs);
   } catch (erro) {
     console.error(erro);
-    msgAdmin(erro.message || "Nao foi possivel carregar os logs do sistema.", "danger");
+    msgAdmin(erro.message || "Não foi possível carregar os logs do sistema.", "danger");
   }
 }
 
@@ -93,7 +93,7 @@ async function gerarBackupAdmin() {
     await carregarLogs();
   } catch (erro) {
     console.error(erro);
-    msgAdmin(erro.message || "Nao foi possivel gerar o backup local do banco.", "danger");
+    msgAdmin(erro.message || "Não foi possível gerar o backup local do banco.", "danger");
   }
 }
 
@@ -121,7 +121,7 @@ async function exportarLogsCsv() {
     msgAdmin("Exportacao de logs concluida com sucesso.", "success");
   } catch (erro) {
     console.error(erro);
-    msgAdmin(erro.message || "Nao foi possivel exportar os logs do sistema.", "danger");
+    msgAdmin(erro.message || "Não foi possível exportar os logs do sistema.", "danger");
   }
 }
 
@@ -147,4 +147,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $admin("#filtroLogLimite")?.addEventListener("change", carregarLogs);
 });
-

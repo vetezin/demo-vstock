@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const licencaHelper = document.getElementById("licencaHelper");
 
   if (!form) {
-    console.error('Form "#loginForm" nao encontrado no DOM.');
+    console.error('Form "#loginForm" não encontrado no DOM.');
     return;
   }
 
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!response.ok) {
-        throw new Error("Nao foi possivel verificar o status da licenca.");
+        throw new Error("Não foi possível verificar o status da licença.");
       }
 
       const status = await response.json();
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (error) {
       atualizarCampoLicenca({
         obrigatoria: true,
-        mensagem: error.message || "Nao foi possivel verificar a licenca."
+        mensagem: error.message || "Não foi possível verificar a licença."
       });
     }
   }
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (loginResponse.status === 404) {
-        if (err) err.textContent = "Usuario ou e-mail nao encontrado.";
+        if (err) err.textContent = "Usuário ou e-mail não encontrado.";
         return;
       }
 
@@ -132,4 +132,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-
