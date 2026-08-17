@@ -1,6 +1,7 @@
 const API_HISTORICO_CAIXA = {
   LISTA: "http://localhost:8080/api/caixa/sessao/historico",
-  DETALHE: (id) => `http://localhost:8080/api/caixa/sessao/${id}`
+  DETALHE: (id) => `http://localhost:8080/api/caixa/sessao/${id}`,
+  VENDA_DETALHE: (id) => `http://localhost:8080/api/vendas/${id}`
 };
 
 const $historicoCaixa = (seletor) => document.querySelector(seletor);
@@ -8,6 +9,7 @@ const mensagemHistoricoCaixa = window.vstockUi.createAlertHandler({ container: "
 const ITENS_POR_PAGINA = 12;
 let sessoes = [];
 let modalDetalhe = null;
+let detalheSessaoAtual = null;
 
 function escaparHtml(valor) {
   const elemento = document.createElement("span");
@@ -123,9 +125,42 @@ async function carregarHistorico() {
   }
 }
 
-function tipoMovimento(tipo) {
+function tipoMovimento(movimento) {
+  const tipo = movimento?.tipo;
+  if (tipo === "VENDA") {
+    const mesaNumero = Number(movimento?.mesaNumero);
+    if (movimento?.vendaTipo === "MESA" && Number.isInteger(mesaNumero)) {
+      return ["is-sale", `Mesa ${mesaNumero}`];
+    }
+    return ["is-sale", "Venda rápida"];
+  }
   const mapa = { VENDA: ["is-sale", "Venda"], ENTRADA: ["is-entry", "Entrada"], SANGRIA: ["is-withdrawal", "Sangria"], ESTORNO: ["is-refund", "Estorno"], AJUSTE: ["is-adjustment", "Ajuste"] };
   return mapa[tipo] || ["is-adjustment", tipo || "Movimento"];
+}
+
+async function complementarOrigemDasVendas(movimentos) {
+  const vendasSemOrigem = [...new Set(movimentos
+    .filter((movimento) => movimento?.tipo === "VENDA" && movimento?.vendaId && !movimento?.vendaTipo)
+    .map((movimento) => movimento.vendaId))];
+
+  if (!vendasSemOrigem.length) return;
+
+  const origens = await Promise.all(vendasSemOrigem.map(async (vendaId) => {
+    try {
+      const resposta = await fetch(API_HISTORICO_CAIXA.VENDA_DETALHE(vendaId), { headers: { Accept: "application/json" } });
+      if (!resposta.ok) return [vendaId, null];
+      const venda = await resposta.json();
+      return [vendaId, { vendaTipo: venda.tipo, mesaNumero: venda.mesaNumero }];
+    } catch {
+      return [vendaId, null];
+    }
+  }));
+
+  const origemPorVenda = new Map(origens);
+  movimentos.forEach((movimento) => {
+    const origem = origemPorVenda.get(movimento.vendaId);
+    if (origem) Object.assign(movimento, origem);
+  });
 }
 
 function preencherDetalhe(detalhe) {
@@ -150,10 +185,18 @@ function preencherDetalhe(detalhe) {
   $historicoCaixa("#cashDetailClosingOperator").textContent = sessao.usuarioFechamentoNome || "-";
   $historicoCaixa("#cashDetailOpeningNote").textContent = textoObservacao(sessao.observacaoAbertura);
   $historicoCaixa("#cashDetailClosingNote").textContent = textoObservacao(sessao.observacaoFechamento);
+  $historicoCaixa("#cashHistoryPrintReceipt").disabled = Boolean(sessao.status);
 
   $historicoCaixa("#cashDetailPaymentList").innerHTML = pagamentos.length ? pagamentos.map((pagamento) => `<div class="cash-payment-row"><span class="cash-payment-icon"><i class="bi bi-credit-card"></i></span><div><strong>${escaparHtml(pagamento.nome || "Não informado")}</strong><small>Valor líquido da sessão</small></div><strong>${dinheiro(pagamento.valorLiquido)}</strong></div>`).join("") : '<div class="cash-empty-state">Nenhuma venda registrada nesta sessão.</div>';
+  const pagamentosComTaxa = pagamentos.filter((pagamento) => numero(pagamento.valorLiquido) > numero(pagamento.valorLiquidoReceber));
+  $historicoCaixa("#cashDetailTaxaBloco").classList.toggle("d-none", !pagamentosComTaxa.length);
+  $historicoCaixa("#cashDetailTaxaList").innerHTML = pagamentosComTaxa.map((pagamento) => {
+    const bruto = numero(pagamento.valorLiquido);
+    const liquido = numero(pagamento.valorLiquidoReceber);
+    return `<div class="cash-payment-row"><span class="cash-payment-icon"><i class="bi bi-credit-card"></i></span><div><strong>${escaparHtml(pagamento.nome || "Não informado")}</strong><small>Bruto ${dinheiro(bruto)} · Taxa ${dinheiro(bruto - liquido)}</small></div><strong>${dinheiro(liquido)}</strong></div>`;
+  }).join("");
   $historicoCaixa("#cashDetailMovementBody").innerHTML = movimentos.length ? movimentos.map((movimento) => {
-    const [classe, texto] = tipoMovimento(movimento.tipo);
+    const [classe, texto] = tipoMovimento(movimento);
     const negativo = movimento.tipo === "SANGRIA" || movimento.tipo === "ESTORNO";
     const origem = movimento.vendaId ? `Venda #${movimento.vendaId}` : "Lançamento manual";
     const motivo = movimento.motivo || movimento.observacao || "-";
@@ -165,7 +208,9 @@ async function abrirDetalhe(sessaoId) {
   try {
     const resposta = await fetch(API_HISTORICO_CAIXA.DETALHE(sessaoId), { headers: { Accept: "application/json" } });
     if (!resposta.ok) throw new Error(await resposta.text());
-    preencherDetalhe(await resposta.json());
+    detalheSessaoAtual = await resposta.json();
+    await complementarOrigemDasVendas(detalheSessaoAtual.movimentos || []);
+    preencherDetalhe(detalheSessaoAtual);
     modalDetalhe.show();
   } catch (erro) {
     console.error(erro);
@@ -185,8 +230,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   await carregarHistorico();
   $historicoCaixa("#cashHistorySearch").addEventListener("click", carregarHistorico);
   $historicoCaixa("#cashHistoryClear").addEventListener("click", () => { limparFiltros(); carregarHistorico(); });
+  $historicoCaixa("#cashHistoryPrintReceipt").addEventListener("click", () => {
+    if (!detalheSessaoAtual || detalheSessaoAtual.sessao?.status) return;
+    window.vstockCashReceipt.imprimir({
+      sessao: detalheSessaoAtual.sessao,
+      resumo: detalheSessaoAtual.resumo
+    });
+  });
   $historicoCaixa("#cashHistoryTableBody").addEventListener("click", (evento) => {
     const botao = evento.target.closest("button[data-sessao-id]");
     if (botao) abrirDetalhe(Number(botao.dataset.sessaoId));
   });
 });
+

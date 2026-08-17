@@ -7,8 +7,9 @@ const API_VENDAS = {
   FORMA_PAGAMENTO_NOVO: "http://localhost:8080/api/forma-pagamento",
   FORMA_PAGAMENTO_ATUALIZAR: (id) => `http://localhost:8080/api/forma-pagamento/${id}`,
   FORMA_PAGAMENTO_STATUS: (id, ativo) => `http://localhost:8080/api/forma-pagamento/${id}/status?ativo=${ativo}`,
-  VENDAS: "http://localhost:8080/api/vendas"
-};
+  VENDAS: "http://localhost:8080/api/vendas",
+  VENDA_DIVIDIDA: "http://localhost:8080/api/vendas/dividida"
+  };
 
 const $venda = (selector) => document.querySelector(selector);
 const msgVenda = window.vstockUi.createAlertHandler({ container: "#mensagens", clear: true, autoRemoveMs: 4500 });
@@ -21,11 +22,33 @@ let debounceBuscaProdutoVenda = null;
 let produtosVisiveisVenda = [];
 let modalFormaPagamento = null;
 let modalClienteVenda = null;
+let aoCadastrarCliente = null;
 let modalConfirmarVenda = null;
 let formaPagamentoEditandoId = null;
+let pagamentosDivididosVenda = [];
 let paginaAtualProdutos = 1;
 
 const PRODUTOS_POR_PAGINA = 12;
+const NOME_CLIENTE_NAO_IDENTIFICADO = "Consumidor não identificado";
+
+function alternarModoVendas(modo) {
+  const vendaRapida = document.getElementById("visaoVendaRapida");
+  const mesas = document.getElementById("visaoMesas");
+  const botoes = [document.getElementById("btnModoVendaRapida"), document.getElementById("btnModoMesas")];
+  const mesasAtivas = modo === "mesas";
+
+  vendaRapida?.classList.toggle("d-none", mesasAtivas);
+  mesas?.classList.toggle("d-none", !mesasAtivas);
+  botoes.forEach((botao, indice) => {
+    const ativo = mesasAtivas ? indice === 1 : indice === 0;
+    botao?.classList.toggle("is-active", ativo);
+    botao?.setAttribute("aria-selected", String(ativo));
+  });
+
+  if (mesasAtivas) {
+    window.vstockMesas?.carregar().catch((erro) => msgVenda(erro.message, "danger"));
+  }
+}
 
 function fecharTodosCustomSelects(excetoId = "") {
   document.querySelectorAll(".pdv-custom-select").forEach((wrapper) => {
@@ -50,6 +73,10 @@ function sincronizarCustomSelect(selectId) {
   const opcaoAtual = select.selectedOptions?.[0];
   label.textContent = opcaoAtual?.textContent?.trim() || "Selecionar";
 
+  if (selectId === "clienteVenda" && renderizarOpcoesClienteVenda(select, menu, valorAtual)) {
+    return;
+  }
+
   menu.innerHTML = Array.from(select.options).map((option) => {
     const ativo = String(option.value || "") === valorAtual ? " is-active" : "";
     return `
@@ -59,6 +86,63 @@ function sincronizarCustomSelect(selectId) {
       </button>
     `;
   }).join("");
+}
+
+function normalizarTextoBusca(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR");
+}
+
+function obterClientePadraoVenda() {
+  const nomePadrao = normalizarTextoBusca(NOME_CLIENTE_NAO_IDENTIFICADO);
+  return clientesVendaCache.find((cliente) => normalizarTextoBusca(cliente.nome) === nomePadrao) || null;
+}
+
+function selecionarClientePadraoVenda() {
+  const select = $venda("#clienteVenda");
+  const clientePadrao = obterClientePadraoVenda();
+  if (!select || !clientePadrao) return false;
+
+  select.value = String(clientePadrao.clienteId ?? clientePadrao.cliente_id);
+  sincronizarCustomSelect("clienteVenda");
+  return true;
+}
+
+function renderizarOpcoesClienteVenda(select, menu, valorAtual) {
+  const container = menu.querySelector('[data-custom-select-options="clienteVenda"]');
+  if (!container) return false;
+
+  const busca = normalizarTextoBusca(menu.querySelector("#buscaClienteVenda")?.value);
+  const opcoes = Array.from(select.options).filter((option) =>
+    normalizarTextoBusca(option.textContent).includes(busca)
+  );
+  container.replaceChildren();
+
+  if (!opcoes.length) {
+    const vazio = document.createElement("p");
+    vazio.className = "pdv-client-select-empty";
+    vazio.textContent = "Nenhum cliente encontrado.";
+    container.appendChild(vazio);
+    return true;
+  }
+
+  opcoes.forEach((option) => {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = `pdv-custom-select-option${String(option.value || "") === valorAtual ? " is-active" : ""}`;
+    botao.dataset.customOption = "clienteVenda";
+    botao.dataset.value = option.value;
+
+    const nome = document.createElement("span");
+    nome.textContent = option.textContent || "Cliente";
+    const icone = document.createElement("i");
+    icone.className = "bi bi-check-lg pdv-custom-select-option-check";
+    botao.append(nome, icone);
+    container.appendChild(botao);
+  });
+  return true;
 }
 
 function registrarCustomSelect(selectId) {
@@ -76,6 +160,9 @@ function registrarCustomSelect(selectId) {
     fecharTodosCustomSelects(vaiAbrir ? selectId : "");
     wrapper.classList.toggle("is-open", vaiAbrir);
     toggle.setAttribute("aria-expanded", vaiAbrir ? "true" : "false");
+    if (vaiAbrir && selectId === "clienteVenda") {
+      window.setTimeout(() => menu.querySelector("#buscaClienteVenda")?.focus(), 0);
+    }
   });
 
   menu.addEventListener("click", (event) => {
@@ -84,6 +171,10 @@ function registrarCustomSelect(selectId) {
 
     select.value = String(option.dataset.value || "");
     select.dispatchEvent(new Event("change", { bubbles: true }));
+    if (selectId === "clienteVenda") {
+      const busca = menu.querySelector("#buscaClienteVenda");
+      if (busca) busca.value = "";
+    }
     sincronizarCustomSelect(selectId);
     fecharTodosCustomSelects();
   });
@@ -91,6 +182,12 @@ function registrarCustomSelect(selectId) {
   select.addEventListener("change", () => {
     sincronizarCustomSelect(selectId);
   });
+
+  if (selectId === "clienteVenda") {
+    menu.querySelector("#buscaClienteVenda")?.addEventListener("input", () => {
+      sincronizarCustomSelect(selectId);
+    });
+  }
 
   sincronizarCustomSelect(selectId);
 }
@@ -210,6 +307,7 @@ function limparFormularioFormaPagamento() {
   formaPagamentoEditandoId = null;
   $venda("#formaPagamentoIdEdicao").value = "";
   $venda("#formaPagamentoNome").value = "";
+  $venda("#formaPagamentoTaxa").value = "0";
   atualizarModoEdicaoFormaPagamento();
 }
 
@@ -217,6 +315,7 @@ function preencherFormularioFormaPagamento(item) {
   formaPagamentoEditandoId = item.formaPagamentoId ?? item.forma_pagamento_id;
   $venda("#formaPagamentoIdEdicao").value = String(formaPagamentoEditandoId);
   $venda("#formaPagamentoNome").value = item.nome ?? "";
+  $venda("#formaPagamentoTaxa").value = Number(item.taxaPercentual ?? item.taxa_percentual ?? 0).toFixed(2);
   atualizarModoEdicaoFormaPagamento();
   $venda("#formaPagamentoNome")?.focus();
 }
@@ -228,9 +327,11 @@ function renderizarTabelaFormasPagamento() {
   tbody.innerHTML = formasPagamentoCache.map((item) => {
     const id = item.formaPagamentoId ?? item.forma_pagamento_id;
     const ativo = item.ativo !== false;
+    const taxa = Number(item.taxaPercentual ?? item.taxa_percentual ?? 0);
     return `
       <tr>
         <td>${item.nome ?? "-"}</td>
+        <td>${taxa.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%</td>
         <td>${ativo ? '<span class="badge text-bg-success">Ativa</span>' : '<span class="badge text-bg-secondary">Inativa</span>'}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -261,30 +362,8 @@ function renderizarOpcoesPagamentoPdv() {
   if (!container || !select) return;
 
   const valorAtual = String(select.value || "");
-  const preferidos = [
-    { rotulo: "Dinheiro", icone: "bi-cash", chaves: ["dinheiro"] },
-    { rotulo: "Cartão", icone: "bi-credit-card", chaves: ["cartão", "cartao"] },
-    { rotulo: "PIX", icone: "bi-qr-code", chaves: ["pix"] }
-  ];
-
-  const opcoes = preferidos.map((preferido) => {
-    return formasPagamentoCache.find((item) => {
-      if (item.ativo === false) return false;
-      const nome = String(item.nome || "").trim().toLowerCase();
-      return preferido.chaves.some((chave) => nome === chave || nome.includes(chave));
-    }) || null;
-  });
-
-  container.innerHTML = opcoes.map((item, indice) => {
-    if (!item) {
-      return `
-        <button type="button" class="pdv-payment-option" disabled>
-          <i class="bi ${preferidos[indice].icone}"></i>
-          <span>${preferidos[indice].rotulo}</span>
-        </button>
-      `;
-    }
-
+  const opcoes = formasPagamentoCache.filter((item) => item.ativo !== false);
+  container.innerHTML = opcoes.map((item) => {
     const id = String(item.formaPagamentoId ?? item.forma_pagamento_id);
     const ativo = id === valorAtual ? " is-active" : "";
     return `
@@ -339,8 +418,13 @@ async function salvarFormaPagamento(event) {
   event.preventDefault();
 
   const nome = $venda("#formaPagamentoNome")?.value?.trim() || "";
+  const taxaPercentual = Number($venda("#formaPagamentoTaxa")?.value ?? 0);
   if (!nome) {
     msgVenda("Informe o nome da forma de pagamento.", "danger");
+    return;
+  }
+  if (!Number.isFinite(taxaPercentual) || taxaPercentual < 0 || taxaPercentual > 100) {
+    msgVenda("Informe uma taxa entre 0 e 100%.", "danger");
     return;
   }
 
@@ -353,7 +437,7 @@ async function salvarFormaPagamento(event) {
     const resp = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome })
+      body: JSON.stringify({ nome, taxaPercentual: Number(taxaPercentual.toFixed(2)) })
     });
 
     if (!resp.ok) {
@@ -402,14 +486,27 @@ async function carregarClientes() {
     const select = $venda("#clienteVenda");
     if (!select) return;
 
-    select.innerHTML = `<option value="">Cliente Balcão</option>`;
-    clientesVendaCache.forEach((cliente) => {
+    const clientePadrao = obterClientePadraoVenda();
+    if (!clientePadrao) throw new Error("Cliente padrão 'Consumidor não identificado' não encontrado.");
+
+    const valorSelecionado = String(select.value || "");
+    const clientesOrdenados = [
+      clientePadrao,
+      ...clientesVendaCache.filter((cliente) =>
+        String(cliente.clienteId ?? cliente.cliente_id) !== String(clientePadrao.clienteId ?? clientePadrao.cliente_id)
+      )
+    ];
+    select.replaceChildren();
+    clientesOrdenados.forEach((cliente) => {
       const option = document.createElement("option");
       option.value = String(cliente.clienteId ?? cliente.cliente_id);
       option.textContent = cliente.nome ?? "Cliente";
       select.appendChild(option);
     });
 
+    select.value = Array.from(select.options).some((option) => option.value === valorSelecionado)
+      ? valorSelecionado
+      : String(clientePadrao.clienteId ?? clientePadrao.cliente_id);
     sincronizarCustomSelect("clienteVenda");
   } catch (erro) {
     console.error(erro);
@@ -453,6 +550,7 @@ async function salvarClienteVenda(event) {
     if (idCliente) {
       $venda("#clienteVenda").value = idCliente;
       sincronizarCustomSelect("clienteVenda");
+      aoCadastrarCliente?.(clienteSalvo);
     }
 
     limparFormularioClienteVenda();
@@ -710,16 +808,23 @@ function adicionarProdutoAoCarrinho(produto, quantidade) {
   }
 
   const valorUnitario = obterValorUnitarioProduto(produto);
-  const valorSubtotal = Number((valorUnitario * qtd).toFixed(2));
+  const itemExistente = itensDaVenda.find((item) => Number(item.prodCod) === Number(produto.prod_cod));
 
-  itensDaVenda.push({
-    prodCod: Number(produto.prod_cod),
-    descrProduto: produto.prod_descr || "",
-    saldo,
-    qtd,
-    valorUnitario,
-    valorSubtotal
-  });
+  if (itemExistente) {
+    itemExistente.qtd += qtd;
+    itemExistente.valorSubtotal = Number((Number(itemExistente.valorUnitario || valorUnitario) * itemExistente.qtd).toFixed(2));
+  } else {
+    const valorSubtotal = Number((valorUnitario * qtd).toFixed(2));
+
+    itensDaVenda.push({
+      prodCod: Number(produto.prod_cod),
+      descrProduto: produto.prod_descr || "",
+      saldo,
+      qtd,
+      valorUnitario,
+      valorSubtotal
+    });
+  }
 
   limparFormularioItem();
   renderizarItensVenda();
@@ -747,16 +852,23 @@ function adicionarItemVenda() {
   }
 
   const valorUnitario = obterValorUnitarioProduto(produto);
-  const valorSubtotal = Number((valorUnitario * quantidade).toFixed(2));
+  const itemExistente = itensDaVenda.find((item) => Number(item.prodCod) === Number(produto.prod_cod));
 
-  itensDaVenda.push({
-    prodCod: Number(produto.prod_cod),
-    descrProduto: produto.prod_descr || "",
-    saldo,
-    qtd: quantidade,
-    valorUnitario,
-    valorSubtotal
-  });
+  if (itemExistente) {
+    itemExistente.qtd += quantidade;
+    itemExistente.valorSubtotal = Number((Number(itemExistente.valorUnitario || valorUnitario) * itemExistente.qtd).toFixed(2));
+  } else {
+    const valorSubtotal = Number((valorUnitario * quantidade).toFixed(2));
+
+    itensDaVenda.push({
+      prodCod: Number(produto.prod_cod),
+      descrProduto: produto.prod_descr || "",
+      saldo,
+      qtd: quantidade,
+      valorUnitario,
+      valorSubtotal
+    });
+  }
 
   limparFormularioItem();
   renderizarItensVenda();
@@ -807,7 +919,7 @@ function renderizarCarrinhoPdv() {
   const badge = $venda("#pdvCartCount");
   if (!lista || !badge) return;
 
-  badge.textContent = String(itensDaVenda.length);
+  badge.textContent = String(itensDaVenda.reduce((total, item) => total + Number(item.qtd || 0), 0));
 
   if (!itensDaVenda.length) {
     lista.innerHTML = `
@@ -982,6 +1094,108 @@ function obterTotalVenda() {
   return Math.max(subtotal - desconto, 0);
 }
 
+function vendaDivididaEstaAtiva() {
+  return Boolean($venda("#vendaDivididaAtiva")?.checked);
+}
+
+function nomeFormaPagamentoPorId(id) {
+  return formasPagamentoCache.find((item) => String(item.formaPagamentoId ?? item.forma_pagamento_id) === String(id))?.nome || "";
+}
+
+function formaPagamentoEhDinheiroPorId(id) {
+  return nomeFormaPagamentoPorId(id).trim().toLowerCase() === "dinheiro";
+}
+
+function distribuirPagamentosIgualmente() {
+  if (!vendaDivididaEstaAtiva()) return;
+  const quantidade = Math.max(2, Math.min(20, Number($venda("#quantidadePagadoresVenda")?.value || 2)));
+  const totalCentavos = Math.round(obterTotalVenda() * 100);
+  const valorBase = Math.floor(totalCentavos / quantidade);
+  const resto = totalCentavos - (valorBase * quantidade);
+
+  pagamentosDivididosVenda = Array.from({ length: quantidade }, (_, indice) => ({
+    formaPagamentoId: pagamentosDivididosVenda[indice]?.formaPagamentoId || "",
+    valor: (valorBase + (indice === 0 ? resto : 0)) / 100,
+    valorRecebido: formaPagamentoEhDinheiroPorId(pagamentosDivididosVenda[indice]?.formaPagamentoId)
+      ? Math.max(Number(pagamentosDivididosVenda[indice]?.valorRecebido || 0), (valorBase + (indice === 0 ? resto : 0)) / 100)
+      : null
+  }));
+  renderizarPagamentosDivididos();
+}
+
+function opcoesFormaPagamentoDividida(selecionado) {
+  return `<option value="">Selecione...</option>` + formasPagamentoCache
+    .filter((item) => item.ativo !== false)
+    .map((item) => {
+      const id = String(item.formaPagamentoId ?? item.forma_pagamento_id);
+      return `<option value="${id}" ${id === String(selecionado || "") ? "selected" : ""}>${item.nome || "-"}</option>`;
+    }).join("");
+}
+
+function obterSaldoPagamentosDivididos() {
+  const informado = pagamentosDivididosVenda.reduce((total, pagamento) => total + Number(pagamento.valor || 0), 0);
+  return Number((obterTotalVenda() - informado).toFixed(2));
+}
+
+function atualizarSaldoPagamentosDivididos() {
+  const elemento = $venda("#saldoPagamentosDivididos");
+  if (!elemento) return;
+  const saldo = obterSaldoPagamentosDivididos();
+  elemento.classList.toggle("is-complete", saldo === 0);
+  elemento.classList.toggle("is-invalid", saldo < 0);
+  elemento.querySelector("span").textContent = saldo < 0 ? "Valor excedente" : saldo === 0 ? "Total distribuído" : "Falta distribuir";
+  elemento.querySelector("strong").textContent = window.vstockCurrency.formatMoney(Math.abs(saldo));
+}
+
+function renderizarPagamentosDivididos() {
+  const container = $venda("#pagamentosDivididosVenda");
+  if (!container) return;
+
+  container.innerHTML = pagamentosDivididosVenda.map((pagamento, indice) => {
+    const dinheiro = formaPagamentoEhDinheiroPorId(pagamento.formaPagamentoId);
+    const troco = dinheiro ? Math.max(Number(pagamento.valorRecebido || 0) - Number(pagamento.valor || 0), 0) : 0;
+    return `
+      <div class="pdv-split-payment" data-pagamento-indice="${indice}">
+        <div class="pdv-split-payment-header"><strong>Pessoa ${indice + 1}</strong><span>${window.vstockCurrency.formatMoney(pagamento.valor)}</span></div>
+        <div class="pdv-split-payment-fields">
+          <div class="pdv-field-group">
+            <label class="pdv-field-label" for="formaPagamentoDiv-${indice}">Forma de pagamento</label>
+            <select id="formaPagamentoDiv-${indice}" class="form-select" data-campo="forma">${opcoesFormaPagamentoDividida(pagamento.formaPagamentoId)}</select>
+          </div>
+          <div class="pdv-field-group">
+            <label class="pdv-field-label" for="valorPagamentoDiv-${indice}">Valor</label>
+            <input id="valorPagamentoDiv-${indice}" class="form-control" data-campo="valor" inputmode="decimal" value="${window.vstockCurrency.formatNumber(pagamento.valor)}"/>
+          </div>
+          <div class="pdv-split-cash-fields ${dinheiro ? "" : "d-none"}">
+            <div class="pdv-field-group">
+              <label class="pdv-field-label" for="recebidoPagamentoDiv-${indice}">Valor recebido</label>
+              <input id="recebidoPagamentoDiv-${indice}" class="form-control" data-campo="recebido" inputmode="decimal" value="${window.vstockCurrency.formatNumber(pagamento.valorRecebido ?? pagamento.valor)}"/>
+            </div>
+            <div class="pdv-field-group">
+              <label class="pdv-field-label">Troco</label>
+              <input class="form-control" value="${window.vstockCurrency.formatNumber(troco)}" disabled/>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join("");
+  atualizarSaldoPagamentosDivididos();
+}
+
+function alternarVendaDividida() {
+  const ativa = vendaDivididaEstaAtiva();
+  $venda(".pdv-split-toggle")?.classList.toggle("is-active", ativa);
+  $venda("#blocoVendaDividida")?.classList.toggle("d-none", !ativa);
+  $venda("#pdvPaymentOptions")?.classList.toggle("d-none", ativa);
+  $venda("#blocoValorRecebidoVenda")?.classList.add("d-none");
+  $venda("#blocoTrocoVenda")?.classList.add("d-none");
+  if (ativa) distribuirPagamentosIgualmente();
+  else {
+    pagamentosDivididosVenda = [];
+    atualizarVisibilidadePagamentoDinheiro();
+  }
+}
+
 function obterValorRecebidoAtual() {
   return parseMoeda($venda("#valorRecebidoVendaTela")?.value || "");
 }
@@ -996,24 +1210,30 @@ function obterTrocoAtual() {
 
 function validarVendaAntesDeConfirmar() {
   const dataVenda = $venda("#dataVenda")?.value || "";
-  const codFuncionario = $venda("#funcionarioCpfVenda")?.value || "";
   const formaPagamentoId = $venda("#formaPagamentoVenda")?.value || "";
   const valorRecebido = obterValorRecebidoAtual();
 
   if (!dataVenda) {
     throw new Error("Informe a data da venda.");
   }
-  if (!codFuncionario) {
-    throw new Error("Funcionário responsável não identificado.");
-  }
   if (!itensDaVenda.length) {
     throw new Error("Adicione pelo menos um item à venda.");
   }
-  if (!formaPagamentoId) {
+  if (!vendaDivididaEstaAtiva() && !formaPagamentoId) {
     throw new Error("Selecione a forma de pagamento.");
   }
-  if (formaPagamentoSelecionadaEhDinheiro() && valorRecebido < obterTotalVenda()) {
+  if (!vendaDivididaEstaAtiva() && formaPagamentoSelecionadaEhDinheiro() && valorRecebido < obterTotalVenda()) {
     throw new Error("O valor recebido deve ser maior ou igual ao total da venda.");
+  }
+  if (vendaDivididaEstaAtiva()) {
+    if (pagamentosDivididosVenda.length < 2) throw new Error("Informe pelo menos duas pessoas para dividir a venda.");
+    if (pagamentosDivididosVenda.some((pagamento) => !pagamento.formaPagamentoId || Number(pagamento.valor || 0) <= 0)) {
+      throw new Error("Preencha a forma e o valor de todos os pagamentos.");
+    }
+    if (obterSaldoPagamentosDivididos() !== 0) throw new Error("A soma dos pagamentos deve ser igual ao total da venda.");
+    if (pagamentosDivididosVenda.some((pagamento) => formaPagamentoEhDinheiroPorId(pagamento.formaPagamentoId) && Number(pagamento.valorRecebido || 0) < Number(pagamento.valor || 0))) {
+      throw new Error("O valor recebido em dinheiro deve cobrir a parte informada.");
+    }
   }
 }
 
@@ -1030,54 +1250,6 @@ function obterTrocoAtual() {
   return Number(troco.toFixed(2));
 }
 
-function obterPayloadVenda() {
-  const dataVenda = $venda("#dataVenda")?.value || "";
-  const codFuncionario = $venda("#funcionarioCpfVenda")?.value || "";
-  const clienteId = $venda("#clienteVenda")?.value || "";
-  const formaPagamentoId = $venda("#formaPagamentoVenda")?.value || "";
-  const tipoDesconto = $venda("#tipoDescontoVenda")?.value || "NENHUM";
-  const valorDesconto = calcularDescontoAtual();
-  const valorRecebido = obterValorRecebidoAtual();
-  const total = obterTotalVenda();
-
-  if (!dataVenda) {
-    throw new Error("Informe a data da venda.");
-  }
-  if (!codFuncionario) {
-    throw new Error("Funcionário responsável não identificado.");
-  }
-  if (!itensDaVenda.length) {
-    throw new Error("Adicione pelo menos um item à venda.");
-  }
-  if (!formaPagamentoId) {
-    throw new Error("Selecione a forma de pagamento.");
-  }
-  if (formaPagamentoSelecionadaEhDinheiro() && valorRecebido < total) {
-    throw new Error("O valor recebido deve ser maior ou igual ao total da venda.");
-  }
-
-  return {
-    dataVenda,
-    codFuncionario,
-    clienteId: clienteId ? Number(clienteId) : null,
-    valorSubtotal: Number(obterSubtotalVenda().toFixed(2)),
-    tipoDesconto,
-    valorDesconto: Number(valorDesconto.toFixed(2)),
-    valorTotal: Number(total.toFixed(2)),
-    formaPagamentoId: Number(formaPagamentoId),
-    valorRecebido: formaPagamentoSelecionadaEhDinheiro() ? Number(valorRecebido.toFixed(2)) : null,
-    troco: obterTrocoAtual(),
-    status: $venda("#statusVenda")?.value || "FINALIZADA",
-    observacao: $venda("#observacaoVenda")?.value?.trim() || "",
-    itens: itensDaVenda.map((item) => ({
-      produtoCod: Number(item.prodCod),
-      quantidade: Number(item.qtd),
-      valorUnitario: Number(item.valorUnitario.toFixed(2)),
-      valorSubtotal: Number(item.valorSubtotal.toFixed(2))
-    }))
-  };
-}
-
 function formaPagamentoSelecionadaEhDinheiro() {
   const select = $venda("#formaPagamentoVenda");
   const nome = select?.selectedOptions?.[0]?.dataset?.nome || "";
@@ -1089,7 +1261,7 @@ function atualizarVisibilidadePagamentoDinheiro() {
   const blocoTroco = $venda("#blocoTrocoVenda");
   const valorRecebidoInput = $venda("#valorRecebidoVendaTela");
   const trocoInput = $venda("#trocoVendaTela");
-  const deveExibir = formaPagamentoSelecionadaEhDinheiro();
+  const deveExibir = !vendaDivididaEstaAtiva() && formaPagamentoSelecionadaEhDinheiro();
 
   blocoValorRecebido?.classList.toggle("d-none", !deveExibir);
   blocoTroco?.classList.toggle("d-none", !deveExibir);
@@ -1136,12 +1308,13 @@ function atualizarResumoVenda() {
   if (subtotalEl) subtotalEl.textContent = window.vstockCurrency.formatMoney(subtotal);
   if (descontoEl) descontoEl.textContent = window.vstockCurrency.formatMoney(desconto);
   if (totalEl) totalEl.textContent = window.vstockCurrency.formatMoney(total);
+  if (vendaDivididaEstaAtiva()) distribuirPagamentosIgualmente();
 }
 
 function limparVendaCompleta() {
   itensDaVenda = [];
   $venda("#dataVenda").value = window.vstockFormatters.nowInputLocal();
-  $venda("#clienteVenda").value = "";
+  selecionarClientePadraoVenda();
   $venda("#statusVenda").value = "FINALIZADA";
   $venda("#tipoDescontoVenda").value = "NENHUM";
   $venda("#valorDescontoVenda").value = "";
@@ -1150,6 +1323,10 @@ function limparVendaCompleta() {
   $venda("#formaPagamentoVenda").value = "";
   $venda("#valorRecebidoVendaTela").value = "";
   $venda("#trocoVendaTela").value = window.vstockCurrency.formatNumber(0);
+  $venda("#vendaDivididaAtiva").checked = false;
+  $venda("#quantidadePagadoresVenda").value = "2";
+  pagamentosDivididosVenda = [];
+  alternarVendaDividida();
   limparFormularioItem();
   renderizarItensVenda();
   atualizarVisibilidadePagamentoDinheiro();
@@ -1166,7 +1343,9 @@ function preencherModalConfirmacaoVenda() {
   const formaPagamentoNome = $venda("#formaPagamentoVenda")?.selectedOptions?.[0]?.dataset?.nome || "-";
   const linhaRecebido = $venda("#resumoConfirmacaoVendaLinhaRecebido");
   const linhaTroco = $venda("#resumoConfirmacaoVendaLinhaTroco");
-  const exibeRecebido = formaPagamentoSelecionadaEhDinheiro();
+  const dividida = vendaDivididaEstaAtiva();
+  const exibeRecebido = !dividida && formaPagamentoSelecionadaEhDinheiro();
+  const listaDividida = $venda("#resumoConfirmacaoVendaPagamentosDivididos");
 
   if (tbody) {
     tbody.innerHTML = itensDaVenda.map((item) => `
@@ -1182,7 +1361,7 @@ function preencherModalConfirmacaoVenda() {
   $venda("#resumoConfirmacaoVendaSubtotal").textContent = window.vstockCurrency.formatMoney(subtotal);
   $venda("#resumoConfirmacaoVendaDesconto").textContent = window.vstockCurrency.formatMoney(desconto);
   $venda("#resumoConfirmacaoVendaTotal").textContent = window.vstockCurrency.formatMoney(total);
-  $venda("#resumoConfirmacaoVendaFormaPagamento").textContent = formaPagamentoNome;
+  $venda("#resumoConfirmacaoVendaFormaPagamento").textContent = dividida ? "Pagamento dividido" : formaPagamentoNome;
 
   linhaRecebido?.classList.toggle("d-none", !exibeRecebido);
   linhaTroco?.classList.toggle("d-none", !exibeRecebido);
@@ -1190,6 +1369,14 @@ function preencherModalConfirmacaoVenda() {
   if (exibeRecebido) {
     $venda("#resumoConfirmacaoVendaRecebido").textContent = window.vstockCurrency.formatMoney(valorRecebido);
     $venda("#resumoConfirmacaoVendaTroco").textContent = window.vstockCurrency.formatMoney(troco);
+  }
+  listaDividida?.classList.toggle("d-none", !dividida);
+  if (dividida && listaDividida) {
+    listaDividida.innerHTML = `<div class="venda-split-confirmation-list">${pagamentosDivididosVenda.map((pagamento, indice) => `
+      <div class="venda-split-confirmation-item">
+        <span>Pessoa ${indice + 1} · ${nomeFormaPagamentoPorId(pagamento.formaPagamentoId)}</span>
+        <strong>${window.vstockCurrency.formatMoney(pagamento.valor)}</strong>
+      </div>`).join("")}</div>`;
   }
 }
 
@@ -1205,7 +1392,6 @@ function abrirConfirmacaoVenda() {
 
 async function salvarVenda() {
   const dataVenda = $venda("#dataVenda")?.value || "";
-  const codFuncionario = $venda("#funcionarioCpfVenda")?.value || "";
   const clienteId = $venda("#clienteVenda")?.value || "";
   const formaPagamentoId = $venda("#formaPagamentoVenda")?.value || "";
   const tipoDesconto = $venda("#tipoDescontoVenda")?.value || "NENHUM";
@@ -1216,34 +1402,30 @@ async function salvarVenda() {
     msgVenda("Informe a data da venda.", "danger");
     return;
   }
-  if (!codFuncionario) {
-    msgVenda("Funcionário responsável não identificado.", "danger");
-    return;
-  }
   if (!itensDaVenda.length) {
     msgVenda("Adicione pelo menos um item à venda.", "danger");
     return;
   }
-  if (!formaPagamentoId) {
+  if (!vendaDivididaEstaAtiva() && !formaPagamentoId) {
     msgVenda("Selecione a forma de pagamento.", "danger");
     return;
   }
-  if (formaPagamentoSelecionadaEhDinheiro() && valorRecebido < obterTotalVenda()) {
+  if (!vendaDivididaEstaAtiva() && formaPagamentoSelecionadaEhDinheiro() && valorRecebido < obterTotalVenda()) {
     msgVenda("O valor recebido deve ser maior ou igual ao total da venda.", "danger");
     return;
   }
 
+  const dividida = vendaDivididaEstaAtiva();
   const body = {
     dataVenda,
-    codFuncionario,
     clienteId: clienteId ? Number(clienteId) : null,
     valorSubtotal: Number(obterSubtotalVenda().toFixed(2)),
     tipoDesconto,
     valorDesconto: Number(valorDesconto.toFixed ? valorDesconto.toFixed(2) : valorDesconto),
     valorTotal: Number(obterTotalVenda().toFixed(2)),
-    formaPagamentoId: Number(formaPagamentoId),
-    valorRecebido: formaPagamentoSelecionadaEhDinheiro() ? Number(valorRecebido.toFixed(2)) : null,
-    troco: formaPagamentoSelecionadaEhDinheiro() ? Number(Math.max(valorRecebido - obterTotalVenda(), 0).toFixed(2)) : null,
+    formaPagamentoId: dividida ? null : Number(formaPagamentoId),
+    valorRecebido: !dividida && formaPagamentoSelecionadaEhDinheiro() ? Number(valorRecebido.toFixed(2)) : null,
+    troco: !dividida && formaPagamentoSelecionadaEhDinheiro() ? Number(Math.max(valorRecebido - obterTotalVenda(), 0).toFixed(2)) : null,
     status: $venda("#statusVenda")?.value || "FINALIZADA",
     observacao: $venda("#observacaoVenda")?.value?.trim() || "",
     itens: itensDaVenda.map((item) => ({
@@ -1251,11 +1433,21 @@ async function salvarVenda() {
       quantidade: Number(item.qtd),
       valorUnitario: Number(item.valorUnitario.toFixed(2)),
       valorSubtotal: Number(item.valorSubtotal.toFixed(2))
-    }))
+    })),
+    pagamentos: dividida ? pagamentosDivididosVenda.map((pagamento) => ({
+      formaPagamentoId: Number(pagamento.formaPagamentoId),
+      valor: Number(Number(pagamento.valor).toFixed(2)),
+      valorRecebido: formaPagamentoEhDinheiroPorId(pagamento.formaPagamentoId)
+        ? Number(Number(pagamento.valorRecebido).toFixed(2))
+        : null,
+      troco: formaPagamentoEhDinheiroPorId(pagamento.formaPagamentoId)
+        ? Number(Math.max(Number(pagamento.valorRecebido) - Number(pagamento.valor), 0).toFixed(2))
+        : null
+    })) : undefined
   };
 
   try {
-    const resp = await fetch(API_VENDAS.VENDAS, {
+    const resp = await fetch(dividida ? API_VENDAS.VENDA_DIVIDIDA : API_VENDAS.VENDAS, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -1283,11 +1475,13 @@ function preencherFuncionarioVenda() {
     return;
   }
 
-  $venda("#funcionarioCpfVenda").value = funcionario.funcCpf || funcionario.cpf || "";
   $venda("#funcionarioNomeVenda").value = funcionario.funcNome || funcionario.nome || "";
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  $venda("#btnModoVendaRapida")?.addEventListener("click", () => alternarModoVendas("rapida"));
+  $venda("#btnModoMesas")?.addEventListener("click", () => alternarModoVendas("mesas"));
+  alternarModoVendas("rapida");
   $venda("#dataVenda").value = window.vstockFormatters.nowInputLocal();
   preencherFuncionarioVenda();
   registrarCustomSelect("filtroCategoriaVenda");
@@ -1304,7 +1498,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     carregarFormasPagamento(false)
   ]);
 
+  window.vstockMesas?.inicializar({
+    obterProdutos: () => produtosVendaCache,
+    obterFormasPagamento: () => formasPagamentoCache,
+    obterClientes: () => clientesVendaCache,
+    abrirCadastroCliente: (callback) => {
+      aoCadastrarCliente = callback;
+      limparFormularioClienteVenda();
+      modalClienteVenda.show();
+    },
+    alertar: msgVenda
+  });
+
   $venda("#btnAbrirModalClienteVenda")?.addEventListener("click", () => {
+    aoCadastrarCliente = null;
     limparFormularioClienteVenda();
     modalClienteVenda.show();
   });
@@ -1320,6 +1527,36 @@ document.addEventListener("DOMContentLoaded", async () => {
   $venda("#btnSalvarVenda")?.addEventListener("click", abrirConfirmacaoVenda);
   $venda("#btnConfirmarVendaModal")?.addEventListener("click", salvarVenda);
   $venda("#btnLimparVenda")?.addEventListener("click", limparVendaCompleta);
+  $venda("#vendaDivididaAtiva")?.addEventListener("change", alternarVendaDividida);
+  $venda("#quantidadePagadoresVenda")?.addEventListener("input", distribuirPagamentosIgualmente);
+  $venda("#pagamentosDivididosVenda")?.addEventListener("change", (event) => {
+    const linha = event.target.closest("[data-pagamento-indice]");
+    if (!linha) return;
+    const indice = Number(linha.dataset.pagamentoIndice);
+    if (event.target.dataset.campo === "forma") {
+      pagamentosDivididosVenda[indice].formaPagamentoId = event.target.value;
+      pagamentosDivididosVenda[indice].valorRecebido = formaPagamentoEhDinheiroPorId(event.target.value)
+        ? pagamentosDivididosVenda[indice].valor
+        : null;
+      renderizarPagamentosDivididos();
+    }
+  });
+  $venda("#pagamentosDivididosVenda")?.addEventListener("input", (event) => {
+    const linha = event.target.closest("[data-pagamento-indice]");
+    if (!linha) return;
+    const indice = Number(linha.dataset.pagamentoIndice);
+    if (event.target.dataset.campo === "valor") pagamentosDivididosVenda[indice].valor = parseMoeda(event.target.value);
+    if (event.target.dataset.campo === "recebido") pagamentosDivididosVenda[indice].valorRecebido = parseMoeda(event.target.value);
+    const pagamento = pagamentosDivididosVenda[indice];
+    const valorResumo = linha.querySelector(".pdv-split-payment-header span");
+    if (valorResumo) valorResumo.textContent = window.vstockCurrency.formatMoney(pagamento.valor);
+    if (formaPagamentoEhDinheiroPorId(pagamento.formaPagamentoId)) {
+      const campoTroco = linha.querySelector(".pdv-split-cash-fields input[disabled]");
+      const troco = Math.max(Number(pagamento.valorRecebido || 0) - Number(pagamento.valor || 0), 0);
+      if (campoTroco) campoTroco.value = window.vstockCurrency.formatNumber(troco);
+    }
+    atualizarSaldoPagamentosDivididos();
+  });
   $venda("#listaProdutosVenda")?.addEventListener("change", atualizarProdutoSelecionado);
   $venda("#quantidadeVenda")?.addEventListener("input", atualizarSubtotalItemAtual);
   $venda("#buscaProdutoVenda")?.addEventListener("input", agendarFiltroProdutos);
@@ -1477,3 +1714,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderizarCarrinhoPdv();
   atualizarResumoVenda();
 });
+

@@ -1,27 +1,20 @@
-﻿const API_FUNCIONARIO = {
+const API_FUNCIONARIO = {
   LISTA: "http://localhost:8080/api/funcionarios/all",
   NOVO: "http://localhost:8080/api/funcionarios",
-  ATUALIZAR: (cpf) => `http://localhost:8080/api/funcionarios/${cpf}`,
-  STATUS: (cpf, ativo) => `http://localhost:8080/api/funcionarios/${cpf}/status?ativo=${ativo}`
+  ATUALIZAR: (id) => `http://localhost:8080/api/funcionarios/${id}`,
+  STATUS: (id, ativo) => `http://localhost:8080/api/funcionarios/${id}/status?ativo=${ativo}`
 };
 
 const $funcionario = (sel) => document.querySelector(sel);
+const msgFuncionario = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
-let cpfEditando = null;
+let funcionarioIdEditando = null;
 let funcionariosCache = [];
 let paginaAtualFuncionarios = 1;
 const ITENS_POR_PAGINA_FUNCIONARIOS = 10;
 
 function formFuncionario() {
   return $funcionario("#funcionarioForm");
-}
-
-function lerFuncionarioLogado() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch (_) {
-    return null;
-  }
 }
 
 function headersAdminJson() {
@@ -40,8 +33,8 @@ function headersAdminSimples() {
 }
 
 function garantirAcessoAdmin() {
-  const funcionario = lerFuncionarioLogado();
-  if (!funcionario || Number(funcionario.tipoAcesso) !== 99) {
+  const funcionario = window.vstockSession.getFuncionario();
+  if (!window.vstockSession.isAdministrador(funcionario)) {
     window.location.href = funcionario ? "index.html" : "login.html";
     return false;
   }
@@ -50,29 +43,6 @@ function garantirAcessoAdmin() {
 
 function limparCpf(valor) {
   return window.vstockMasks.onlyDigits(valor, 11);
-}
-
-function msgFuncionario(texto, tipo = "danger") {
-  const box = $funcionario("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
-function badgeStatus(ativo) {
-  return ativo
-    ? `<span class="badge text-bg-success">Ativo</span>`
-    : `<span class="badge text-bg-secondary">Inativo</span>`;
 }
 
 function labelPerfil(tipoAcesso) {
@@ -92,11 +62,11 @@ function atualizarModoFormulario() {
   const campoSenha = $funcionario("#funcSenha");
   const labelSenha = $funcionario("#labelSenhaFuncionario");
 
-  if (cpfEditando) {
+  if (funcionarioIdEditando) {
     titulo.innerHTML = `<i class="bi bi-pencil-square"></i> Editar Funcionário`;
     botaoSalvar.innerHTML = `<i class="bi bi-check2-circle"></i> Salvar alterações`;
     botaoCancelar.classList.remove("d-none");
-    campoCpf.setAttribute("readonly", "readonly");
+    campoCpf.removeAttribute("readonly");
     campoSenha?.removeAttribute("required");
     labelSenha?.classList.remove("required");
     return;
@@ -111,7 +81,8 @@ function atualizarModoFormulario() {
 }
 
 function limparFormularioFuncionario() {
-  cpfEditando = null;
+  funcionarioIdEditando = null;
+  window.vstockEditModal?.close();
   $funcionario("#funcCpf").value = "";
   $funcionario("#funcNome").value = "";
   $funcionario("#funcTelefone").value = "";
@@ -125,7 +96,7 @@ function limparFormularioFuncionario() {
 }
 
 function preencherFormularioFuncionario(funcionario) {
-  cpfEditando = funcionario.funcCpf;
+  funcionarioIdEditando = funcionario.funcionarioId;
   $funcionario("#funcCpf").value = window.vstockMasks.cpf(funcionario.funcCpf);
   $funcionario("#funcNome").value = funcionario.funcNome ?? "";
   $funcionario("#funcTelefone").value = window.vstockMasks.phone(funcionario.funcTelefone ?? "");
@@ -145,45 +116,6 @@ function obterFuncionariosFiltrados() {
   return funcionariosCache.filter((funcionario) =>
     String(funcionario.funcNome ?? "").toLowerCase().includes(filtro)
   );
-}
-
-function renderizarPaginacaoFuncionarios(totalItens) {
-  const box = $funcionario("#paginacaoFuncionarios");
-  if (!box) return;
-
-  const totalPaginas = Math.max(1, Math.ceil(totalItens / ITENS_POR_PAGINA_FUNCIONARIOS));
-  paginaAtualFuncionarios = Math.min(paginaAtualFuncionarios, totalPaginas);
-  const inicio = totalItens === 0 ? 0 : ((paginaAtualFuncionarios - 1) * ITENS_POR_PAGINA_FUNCIONARIOS) + 1;
-  const fim = Math.min(paginaAtualFuncionarios * ITENS_POR_PAGINA_FUNCIONARIOS, totalItens);
-
-  box.innerHTML = `
-    <div class="paginacao-cadastro-resumo">
-      Exibindo ${inicio}-${fim} de ${totalItens} funcionários
-    </div>
-    <div class="paginacao-cadastro-botoes">
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaAnteriorFuncionario" ${paginaAtualFuncionarios === 1 ? "disabled" : ""}>
-        <i class="bi bi-chevron-left"></i> Anterior
-      </button>
-      <span class="paginacao-cadastro-resumo">Página ${paginaAtualFuncionarios} de ${totalPaginas}</span>
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaProximaFuncionario" ${paginaAtualFuncionarios === totalPaginas || totalItens === 0 ? "disabled" : ""}>
-        Próxima <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-  `;
-
-  $funcionario("#btnPaginaAnteriorFuncionario")?.addEventListener("click", () => {
-    if (paginaAtualFuncionarios > 1) {
-      paginaAtualFuncionarios -= 1;
-      renderizarFuncionarios();
-    }
-  });
-
-  $funcionario("#btnPaginaProximaFuncionario")?.addEventListener("click", () => {
-    if (paginaAtualFuncionarios < totalPaginas) {
-      paginaAtualFuncionarios += 1;
-      renderizarFuncionarios();
-    }
-  });
 }
 
 function renderizarFuncionarios() {
@@ -208,19 +140,20 @@ function renderizarFuncionarios() {
     tr.innerHTML = `
       <td>${funcionario.funcNome ?? "-"}</td>
       <td>${funcionario.funcEmail ?? "-"}</td>
+      <td>${funcionario.username ?? "-"}</td>
       <td>${funcionario.funcTelefone ?? "-"}</td>
       <td>${funcionario.cargo ?? "-"}</td>
       <td>${labelPerfil(funcionario.tipoAcesso)}</td>
-      <td>${badgeStatus(ativo)}</td>
+      <td>${window.vstockUi.badgeStatus(ativo)}</td>
       <td class="text-center">
         ${adminProtegido
           ? '<span class="text-muted small">Administrador principal ativo</span>'
           : `
             <div class="d-flex gap-2 justify-content-center flex-wrap">
-              <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar" data-cpf="${funcionario.funcCpf}">
+              <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar" data-id="${funcionario.funcionarioId}">
                 <i class="bi bi-pencil-square"></i> Editar
               </button>
-              <button type="button" class="btn btn-sm ${ativo ? "btn-outline-warning" : "btn-outline-success"}" data-acao="status" data-cpf="${funcionario.funcCpf}" data-ativo="${ativo}">
+              <button type="button" class="btn btn-sm ${ativo ? "btn-outline-warning" : "btn-outline-success"}" data-acao="status" data-id="${funcionario.funcionarioId}" data-ativo="${ativo}">
                 <i class="bi ${ativo ? "bi-pause-circle" : "bi-arrow-clockwise"}"></i> ${ativo ? "Inativar" : "Reativar"}
               </button>
             </div>
@@ -287,15 +220,15 @@ async function salvarFuncionario(event) {
     return;
   }
 
-  if (!cpfEditando && !body.funcSenha.trim()) {
+  if (!funcionarioIdEditando && !body.funcSenha.trim()) {
     msgFuncionario("Informe a senha inicial do funcionário.", "danger");
     return;
   }
 
   try {
-    const url = cpfEditando ? API_FUNCIONARIO.ATUALIZAR(cpfEditando) : API_FUNCIONARIO.NOVO;
-    const method = cpfEditando ? "PUT" : "POST";
-    const estavaEditando = Boolean(cpfEditando);
+    const url = funcionarioIdEditando ? API_FUNCIONARIO.ATUALIZAR(funcionarioIdEditando) : API_FUNCIONARIO.NOVO;
+    const method = funcionarioIdEditando ? "PUT" : "POST";
+    const estavaEditando = Boolean(funcionarioIdEditando);
 
     const resp = await fetch(url, {
       method,
@@ -317,18 +250,18 @@ async function salvarFuncionario(event) {
   }
 }
 
-async function alternarStatusFuncionario(cpf, ativoAtual) {
+async function alternarStatusFuncionario(funcionarioId, ativoAtual) {
   const acao = ativoAtual ? "inativar" : "reativar";
   if (!window.confirm(`Deseja ${acao} este funcionário?`)) return;
 
   try {
-    const resp = await fetch(API_FUNCIONARIO.STATUS(cpf, !ativoAtual), {
+    const resp = await fetch(API_FUNCIONARIO.STATUS(funcionarioId, !ativoAtual), {
       method: "PATCH",
       headers: headersAdminSimples()
     });
     if (!resp.ok) throw new Error("Falha ao atualizar status do funcionário.");
 
-    if (cpfEditando === cpf && ativoAtual) {
+    if (funcionarioIdEditando === funcionarioId && ativoAtual) {
       limparFormularioFuncionario();
     }
 
@@ -367,20 +300,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const btn = e.target.closest("button");
     if (!btn) return;
 
-    const cpf = btn.dataset.cpf;
-    const funcionario = funcionariosCache.find((item) => item.funcCpf === cpf);
+    const funcionarioId = Number(btn.dataset.id);
+    const funcionario = funcionariosCache.find((item) => item.funcionarioId === funcionarioId);
     if (!funcionario) return;
     if (ehAdministradorProtegido(funcionario)) return;
 
     if (btn.dataset.acao === "editar") {
       preencherFormularioFuncionario(funcionario);
+      window.vstockEditModal?.open({ title: "Editar Funcionário", form: formFuncionario() });
     }
 
     if (btn.dataset.acao === "status") {
-      alternarStatusFuncionario(cpf, btn.dataset.ativo === "true");
+      alternarStatusFuncionario(funcionarioId, btn.dataset.ativo === "true");
     }
   });
 });
+
 
 
 

@@ -1,4 +1,4 @@
-﻿document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("paramForm");
   const mensagemSucesso = document.getElementById("msg");
   const mensagemErro = document.getElementById("error");
@@ -12,8 +12,10 @@
     return;
   }
 
-  const funcionarioLogado = lerFuncionarioLogado();
-  if (!funcionarioEhAdminMestre(funcionarioLogado)) {
+  const ativarAbaParametrizacao = inicializarAbasParametrizacao();
+
+  const funcionarioLogado = window.vstockSession.getFuncionario();
+  if (!window.vstockSession.isAdministradorMestre(funcionarioLogado)) {
     window.location.href = "index.html";
     return;
   }
@@ -21,6 +23,7 @@
   const campos = {
     razaoSocial: document.getElementById("razao_social"),
     nomeFantasia: document.getElementById("nome_fantasia"),
+    cnpj: document.getElementById("cnpj"),
     telefone: document.getElementById("telefone"),
     email: document.getElementById("email"),
     site: document.getElementById("site"),
@@ -29,10 +32,7 @@
     cidade: document.getElementById("cidade"),
     uf: document.getElementById("uf"),
     cep: document.getElementById("cep"),
-    logotipoSmall: document.getElementById("logotipo_small"),
-    logotipoBig: document.getElementById("logotipo_big"),
-    previewSmall: document.getElementById("logoPreviewSmall"),
-    previewBig: document.getElementById("logoPreviewBig"),
+    horasLimiteCancelamentoVenda: document.getElementById("horas_limite_cancelamento_venda"),
     moduloEstoque: document.getElementById("modulo_estoque"),
     moduloAlertas: document.getElementById("modulo_alertas"),
     moduloVendas: document.getElementById("modulo_vendas"),
@@ -43,6 +43,7 @@
   };
 
   if (window.IMask) {
+    IMask(campos.cnpj, { mask: "00.000.000/0000-00" });
     IMask(campos.telefone, { mask: "(00) 00000-0000" });
     IMask(campos.cep, { mask: "00000-000" });
   }
@@ -51,63 +52,97 @@
     campos.uf.value = String(campos.uf.value || "").toUpperCase();
   });
 
-  campos.logotipoSmall?.addEventListener("change", () => previewFile(campos.logotipoSmall, campos.previewSmall));
-  campos.logotipoBig?.addEventListener("change", () => previewFile(campos.logotipoBig, campos.previewBig));
-
   let empresaExistente = null;
+  let modulosExistentes = null;
 
   try {
-    empresaExistente = await carregarEmpresaUnica();
+    [empresaExistente, modulosExistentes] = await Promise.all([
+      carregarEmpresaUnica(),
+      carregarModulos()
+    ]);
+
     if (empresaExistente) {
-      preencherFormulario(campos, empresaExistente);
+      preencherFormularioEmpresa(campos, empresaExistente);
     }
+
+    preencherFormularioModulos(campos, modulosExistentes);
   } catch (erro) {
-    exibirErro(mensagemErro, erro.message || "Não foi possível carregar a parametrização atual.");
+    exibirErro(mensagemErro, erro.message || "Nao foi possivel carregar a configuracao atual.");
   }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     limparMensagens(mensagemSucesso, mensagemErro);
 
-    if (!validarFormulario(form, empresaExistente)) {
+    if (!validarFormulario(form, ativarAbaParametrizacao)) {
       exibirErro(mensagemErro, "Corrija os campos destacados.");
       return;
     }
 
     try {
-      const payload = await montarPayload(campos, empresaExistente);
-      const response = await fetch("http://localhost:8080/api/parametrizacao", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+      const payloadEmpresa = montarPayloadEmpresa(campos);
+      const payloadModulos = montarPayloadModulos(campos);
 
-      const texto = await response.text();
-      if (!response.ok) {
-        throw new Error(texto || "Não foi possível salvar a parametrização.");
+      const [respostaEmpresa, respostaModulos] = await Promise.all([
+        fetch("http://localhost:8080/api/parametrizacao", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadEmpresa)
+        }),
+        fetch("http://localhost:8080/api/modulos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadModulos)
+        })
+      ]);
+
+      const textoEmpresa = await respostaEmpresa.text();
+      if (!respostaEmpresa.ok) {
+        throw new Error(textoEmpresa || "Nao foi possivel salvar a parametrizacao.");
       }
 
-      exibirSucesso(mensagemSucesso, texto || "Parametrização salva com sucesso.");
+      const textoModulos = await respostaModulos.text();
+      if (!respostaModulos.ok) {
+        throw new Error(textoModulos || "Nao foi possivel salvar os modulos.");
+      }
+
+      exibirSucesso(mensagemSucesso, textoEmpresa || textoModulos || "Configuracao salva com sucesso.");
       setTimeout(() => {
         window.location.href = "index.html";
       }, 700);
     } catch (erro) {
-      exibirErro(mensagemErro, erro.message || "Não foi possível salvar a parametrização.");
+      exibirErro(mensagemErro, erro.message || "Nao foi possivel salvar a configuracao.");
     }
   });
 });
 
-function lerFuncionarioLogado() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch {
+function inicializarAbasParametrizacao() {
+  const tabs = Array.from(document.querySelectorAll("[data-param-tab]"));
+  const panels = Array.from(document.querySelectorAll("[data-param-panel]"));
+  if (!tabs.length || !panels.length) {
     return null;
   }
-}
 
-function funcionarioEhAdminMestre(funcionario) {
-  const email = String(funcionario?.funcEmail || funcionario?.email || "").trim().toLowerCase();
-  return Number(funcionario?.tipoAcesso) === 99 && (email === "admin@admin" || email === "admin@admin.login");
+  const ativarAba = (tabId) => {
+    tabs.forEach((tab) => {
+      const ativa = tab.dataset.paramTab === tabId;
+      tab.classList.toggle("is-active", ativa);
+      tab.setAttribute("aria-selected", ativa ? "true" : "false");
+    });
+
+    panels.forEach((panel) => {
+      const ativa = panel.dataset.paramPanel === tabId;
+      panel.classList.toggle("is-active", ativa);
+      panel.hidden = !ativa;
+    });
+  };
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => ativarAba(tab.dataset.paramTab));
+  });
+
+  ativarAba("empresa");
+  return ativarAba;
 }
 
 async function carregarEmpresaUnica() {
@@ -121,15 +156,33 @@ async function carregarEmpresaUnica() {
   }
 
   if (!response.ok) {
-    throw new Error("Falha ao consultar a parametrização.");
+    throw new Error("Falha ao consultar a parametrizacao.");
   }
 
   return await response.json();
 }
 
-function preencherFormulario(campos, empresa) {
+async function carregarModulos() {
+  const response = await fetch("http://localhost:8080/api/modulos/unica", {
+    method: "GET",
+    headers: { Accept: "application/json" }
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Falha ao consultar os modulos.");
+  }
+
+  return await response.json();
+}
+
+function preencherFormularioEmpresa(campos, empresa) {
   campos.razaoSocial.value = empresa.razaoSocial || "";
   campos.nomeFantasia.value = empresa.nomeFantasia || "";
+  campos.cnpj.value = empresa.cnpj || "";
   campos.telefone.value = empresa.telefone || "";
   campos.email.value = empresa.email || "";
   campos.site.value = empresa.site || "";
@@ -138,24 +191,24 @@ function preencherFormulario(campos, empresa) {
   campos.cidade.value = empresa.cidade || "";
   campos.uf.value = String(empresa.uf || "").toUpperCase();
   campos.cep.value = empresa.cep || "";
-  campos.moduloEstoque.checked = empresa.moduloEstoque !== false;
-  campos.moduloAlertas.checked = empresa.moduloAlertas !== false;
-  campos.moduloVendas.checked = empresa.moduloVendas === true;
-  campos.moduloFinanceiro.checked = empresa.moduloFinanceiro === true;
-  campos.moduloContasPagar.checked = empresa.moduloContasPagar === true;
-  campos.moduloContasReceber.checked = empresa.moduloContasReceber === true;
-  campos.moduloRelatorios.checked = empresa.moduloRelatorios === true;
-
-  if (empresa.logotipoSmall) {
-    campos.previewSmall.src = empresa.logotipoSmall;
-  }
-
-  if (empresa.logotipoBig) {
-    campos.previewBig.src = empresa.logotipoBig;
+  if (campos.horasLimiteCancelamentoVenda) {
+    campos.horasLimiteCancelamentoVenda.value = normalizarHorasLimiteCancelamento(
+      empresa.horasLimiteCancelamentoVenda
+    );
   }
 }
 
-function validarFormulario(form, empresaExistente) {
+function preencherFormularioModulos(campos, modulos) {
+  campos.moduloEstoque.checked = modulos ? modulos.moduloEstoque !== false : true;
+  campos.moduloAlertas.checked = modulos ? modulos.moduloAlertas !== false : true;
+  campos.moduloVendas.checked = modulos ? modulos.moduloVendas === true : false;
+  campos.moduloFinanceiro.checked = modulos ? modulos.moduloFinanceiro === true : false;
+  campos.moduloContasPagar.checked = modulos ? modulos.moduloContasPagar === true : false;
+  campos.moduloContasReceber.checked = modulos ? modulos.moduloContasReceber === true : false;
+  campos.moduloRelatorios.checked = modulos ? modulos.moduloRelatorios === true : false;
+}
+
+function validarFormulario(form, ativarAba) {
   let primeiroInvalido = null;
 
   Array.from(form.elements).forEach((elemento) => {
@@ -163,9 +216,9 @@ function validarFormulario(form, empresaExistente) {
       return;
     }
 
-    const valido = elemento.type === "file" ? true : elemento.checkValidity();
+    const valido = elemento.checkValidity();
     elemento.classList.toggle("is-invalid", !valido);
-    elemento.classList.toggle("is-valid", valido && !!(elemento.value || elemento.files?.length || elemento.checked));
+    elemento.classList.toggle("is-valid", valido && !!(elemento.value || elemento.checked));
 
     if (!valido && !primeiroInvalido) {
       primeiroInvalido = elemento;
@@ -173,17 +226,24 @@ function validarFormulario(form, empresaExistente) {
   });
 
   if (primeiroInvalido) {
+    const painelComErro = primeiroInvalido.closest("[data-param-panel]");
+    if (painelComErro && typeof ativarAba === "function") {
+      ativarAba(painelComErro.dataset.paramPanel);
+    }
+
     primeiroInvalido.focus();
+    primeiroInvalido.scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
 
   return true;
 }
 
-async function montarPayload(campos, empresaExistente) {
+function montarPayloadEmpresa(campos) {
   return {
     razaoSocial: campos.razaoSocial.value.trim(),
     nomeFantasia: campos.nomeFantasia.value.trim(),
+    cnpj: campos.cnpj.value.trim(),
     telefone: campos.telefone.value.trim(),
     email: campos.email.value.trim(),
     site: campos.site.value.trim(),
@@ -192,12 +252,17 @@ async function montarPayload(campos, empresaExistente) {
     cidade: campos.cidade.value.trim(),
     uf: campos.uf.value.trim().toUpperCase(),
     cep: campos.cep.value.trim(),
-    logotipoSmall: campos.logotipoSmall.files[0]
-      ? await toDataURL(campos.logotipoSmall.files[0])
-      : (empresaExistente?.logotipoSmall ?? null),
-    logotipoBig: campos.logotipoBig.files[0]
-      ? await toDataURL(campos.logotipoBig.files[0])
-      : (empresaExistente?.logotipoBig ?? null),
+    horasLimiteCancelamentoVenda: normalizarHorasLimiteCancelamento(campos.horasLimiteCancelamentoVenda?.value)
+  };
+}
+
+function normalizarHorasLimiteCancelamento(valor) {
+  const numero = Number.parseInt(String(valor ?? "").trim(), 10);
+  return Number.isInteger(numero) && numero > 0 ? numero : 12;
+}
+
+function montarPayloadModulos(campos) {
+  return {
     moduloEstoque: !!campos.moduloEstoque.checked,
     moduloAlertas: !!campos.moduloAlertas.checked,
     moduloVendas: !!campos.moduloVendas.checked,
@@ -206,33 +271,6 @@ async function montarPayload(campos, empresaExistente) {
     moduloContasReceber: !!campos.moduloContasReceber.checked,
     moduloRelatorios: !!campos.moduloRelatorios.checked
   };
-}
-
-function previewFile(input, imgEl) {
-  const file = input?.files?.[0];
-  if (!file || !imgEl) {
-    return;
-  }
-
-  const fr = new FileReader();
-  fr.onload = (event) => {
-    imgEl.src = event.target?.result || "";
-  };
-  fr.readAsDataURL(file);
-}
-
-function toDataURL(file) {
-  return new Promise((resolve) => {
-    if (!file) {
-      resolve(null);
-      return;
-    }
-
-    const fr = new FileReader();
-    fr.onload = () => resolve(fr.result);
-    fr.onerror = () => resolve(null);
-    fr.readAsDataURL(file);
-  });
 }
 
 function limparMensagens(msg, err) {

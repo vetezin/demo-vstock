@@ -1,4 +1,4 @@
-﻿const API = {
+const API = {
   PRODUTOS: "http://localhost:8080/api/produtos/lista?ativosOnly=true",
   PRODUTO_NOVO: "http://localhost:8080/api/produtos",
   CATEGORIAS: "http://localhost:8080/api/categorias-produto?ativosOnly=true",
@@ -9,10 +9,12 @@
   COMPRA_ITENS: "http://localhost:8080/api/compra/itens",
   COMPRA_LISTA: "http://localhost:8080/api/compra/listar",
   COMPRA_ATUALIZAR: (id) => `http://localhost:8080/api/compra/${id}`,
+  COMPRA_NOTA_FISCAL: (id) => `http://localhost:8080/api/compra/${id}/nota-fiscal`,
   COMPRA_ITENS_POR_ID: (id) => `http://localhost:8080/api/compra/${id}/itens`
 };
 
 const el = (sel) => document.querySelector(sel);
+const msg = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let itensDaEntrada = [];
 let indiceEditando = null;
@@ -30,75 +32,13 @@ let totalPaginasCompras = 1;
 let totalCompras = 0;
 const ITENS_POR_PAGINA_COMPRAS = 10;
 
-function hojeISO() {
-  const agora = new Date();
-  const saoPaulo = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(agora);
-  return saoPaulo;
-}
-
-function msg(texto, tipo = "danger") {
-  const box = el("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
 function fmt(valor) {
   return window.vstockCurrency.formatNumber(valor || 0);
 }
 
-function formatarDataBr(valor) {
-  if (!valor) return "-";
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return valor;
-
-  const apenasData = String(valor).split("T")[0];
-  const partes = apenasData.split("-");
-  if (partes.length === 3) {
-    const [ano, mes, dia] = partes;
-    return `${dia}/${mes}/${ano}`;
-  }
-
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return valor;
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  }).format(data);
-}
-
-function normalizarTexto(valor) {
-  return String(valor || "").trim().toLowerCase();
-}
-
-function normalizarCodigoBarras(valor) {
-  return String(valor || "").trim();
-}
-
-function resumirProdutos(itens) {
-  if (!Array.isArray(itens) || !itens.length) return "-";
-  const nomes = itens.map((item) => item.produto || "-").filter(Boolean);
-  if (nomes.length === 1) return nomes[0];
-  return `${nomes[0]} + ${nomes.length - 1} item(ns)`;
-}
-
 function dataVencidaOuHoje(valor) {
   if (!valor) return false;
-  return String(valor) <= hojeISO();
+  return String(valor) <= window.vstockFormatters.todayIso();
 }
 
 async function carregarProdutos() {
@@ -202,19 +142,14 @@ function focarLeituraCodigoBarras() {
 }
 
 function localizarProdutoPorCodigoBarras(codigoBarras) {
-  const codigoNormalizado = normalizarCodigoBarras(codigoBarras);
-  if (!codigoNormalizado) return null;
-
-  return cacheProdutos.find((produto) =>
-    normalizarCodigoBarras(produto.codigoBarras) === codigoNormalizado
-  ) || null;
+  return window.vstockProducts.findByBarcode(cacheProdutos, codigoBarras, "codigoBarras");
 }
 
 function processarLeituraCodigoBarras() {
   const inputCodigo = el("#codigoBarrasCompra");
   const select = el("#listaProdutos");
   const inputQuantidade = el("#quantidade");
-  const codigo = normalizarCodigoBarras(inputCodigo?.value);
+  const codigo = window.vstockText.normalizeCode(inputCodigo?.value);
 
   if (!inputCodigo || !select || !inputQuantidade || !codigo) {
     return;
@@ -312,11 +247,7 @@ function desenharSelectFornecedores(fornecedorSelecionado = null) {
 }
 
 function carregarFuncionarioLogado() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch {
-    return null;
-  }
+  return window.vstockSession.getFuncionario();
 }
 
 async function complementarFuncionarioPorEmail(funcionario) {
@@ -343,7 +274,7 @@ async function preencherFuncionarioLogado() {
     return null;
   }
 
-  if (!(funcionario.funcCpf || funcionario.cpf)) {
+  if (!funcionario.funcionarioId) {
     try {
       funcionario = await complementarFuncionarioPorEmail(funcionario);
     } catch (erro) {
@@ -351,29 +282,13 @@ async function preencherFuncionarioLogado() {
     }
   }
 
-  el("#funcionarioCpf").value = funcionario.funcCpf || funcionario.cpf || "";
+  el("#funcionarioId").value = funcionario.funcionarioId;
   el("#funcionarioNome").value = funcionario.funcNome || funcionario.nome || "";
   return funcionario;
 }
 
-function obterSaldoProdutoSelecionado(produto) {
-  return Number(
-    produto?.saldo
-    ?? produto?.saldoAtual
-    ?? produto?.estoqueAtual
-    ?? produto?.quantidadeEstoque
-    ?? 0
-  );
-}
-
 function formatarMoedaCompleta(valor) {
   return `R$ ${fmt(valor)}`;
-}
-
-function localizarProdutoSelecionado() {
-  const select = el("#listaProdutos");
-  if (!select?.value) return null;
-  return cacheProdutos.find((produto) => String(produto.prodCod) === String(select.value)) || null;
 }
 
 function atualizarResumoFormularioEntrada() {
@@ -574,8 +489,8 @@ function limparTudo() {
   indiceEditando = null;
   const funcionario = carregarFuncionarioLogado();
 
-  el("#dataCompra").value = hojeISO();
-  el("#funcionarioCpf").value = funcionario?.funcCpf || funcionario?.cpf || "";
+  el("#dataCompra").value = window.vstockFormatters.todayIso();
+  el("#funcionarioId").value = funcionario?.funcionarioId || "";
   el("#funcionarioNome").value = funcionario?.funcNome || funcionario?.nome || "";
   el("#fornecedorDireto").value = "";
   el("#buscaProdutoCompra").value = "";
@@ -585,6 +500,7 @@ function limparTudo() {
   el("#valorTotalItem").value = "";
   el("#validade").value = "";
   el("#codigoBarrasCompra").value = "";
+  if (el("#notaFiscalPdf")) el("#notaFiscalPdf").value = "";
   atualizarResumoFormularioEntrada();
 
   redesenharTabela();
@@ -592,7 +508,7 @@ function limparTudo() {
 
 async function salvarEntrada() {
   const dataCompra = el("#dataCompra")?.value || "";
-  const funcionarioCpf = el("#funcionarioCpf")?.value || "";
+  const funcionarioId = Number(el("#funcionarioId")?.value || 0);
   const fornecedorId = Number(el("#fornecedorDireto")?.value || 0);
 
   if (!dataCompra) {
@@ -600,7 +516,7 @@ async function salvarEntrada() {
     return;
   }
 
-  if (!funcionarioCpf) {
+  if (!funcionarioId) {
     msg("Informe o funcionário responsável.", "danger");
     return;
   }
@@ -615,12 +531,15 @@ async function salvarEntrada() {
     return;
   }
 
+  const notaFiscal = el("#notaFiscalPdf")?.files?.[0] || null;
+  if (notaFiscal && !validarNotaFiscalSelecionada(notaFiscal)) return;
+
   const total = itensDaEntrada.reduce((acc, item) => acc + item.valorTotal, 0);
   const body = {
     dataCompra,
     compraValorTt: Number(total.toFixed(2)),
     fornecedorId,
-    funcionarioFuncCpf: funcionarioCpf
+    funcionarioId
   };
 
   try {
@@ -660,6 +579,20 @@ async function salvarEntrada() {
       }
     }
 
+    if (notaFiscal) {
+      const dadosNotaFiscal = new FormData();
+      dadosNotaFiscal.append("arquivo", notaFiscal);
+      const respNotaFiscal = await fetch(API.COMPRA_NOTA_FISCAL(compraCod), {
+        method: "POST",
+        body: dadosNotaFiscal
+      });
+
+      if (!respNotaFiscal.ok) {
+        const detalhe = await respNotaFiscal.text();
+        throw new Error(detalhe || "Entrada registrada, mas não foi possível anexar a nota fiscal.");
+      }
+    }
+
     msg("Entrada registrada com sucesso!", "success");
     limparTudo();
     await carregarCompras(1);
@@ -667,6 +600,23 @@ async function salvarEntrada() {
     console.error(erro);
     msg(erro.message || "Erro ao salvar entrada.", "danger");
   }
+}
+
+function validarNotaFiscalSelecionada(arquivo) {
+  const tamanhoMaximo = 10 * 1024 * 1024;
+  if (!arquivo.name.toLowerCase().endsWith(".pdf")) {
+    msg("Selecione um arquivo no formato PDF.", "danger");
+    return false;
+  }
+  if (arquivo.size === 0) {
+    msg("O PDF selecionado está vazio.", "danger");
+    return false;
+  }
+  if (arquivo.size > tamanhoMaximo) {
+    msg("O PDF deve ter no máximo 10 MB.", "danger");
+    return false;
+  }
+  return true;
 }
 
 function construirQueryCompras() {
@@ -749,7 +699,7 @@ function desenharTabelaCompras() {
         <td>${entrada.produtoResumo || "-"}</td>
         <td>R$ ${fmt(entrada.compra_valor_tt)}</td>
         <td>${entrada.fornecedor || "-"}</td>
-        <td>${formatarDataBr(entrada.data_compra)}</td>
+        <td>${window.vstockFormatters.date(entrada.data_compra)}</td>
         <td>${entrada.funcionario || "-"}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -820,6 +770,11 @@ async function abrirEdicaoCompra(compraCod) {
                   <label class="form-label">Funcionário</label>
                   <input type="text" class="form-control" value="${compra.funcionario || "-"}" disabled>
                 </div>
+                <div class="col-12">
+                  <label class="form-label" for="editNotaFiscalPdf">Nova nota fiscal (PDF, opcional)</label>
+                  <input id="editNotaFiscalPdf" class="form-control" type="file" accept="application/pdf,.pdf" aria-describedby="editNotaFiscalAjuda">
+                  <div id="editNotaFiscalAjuda" class="form-text">Selecione um novo PDF somente se quiser substituir a nota atual.</div>
+                </div>
               </div>
               <div class="table-responsive modal-tabela-wrapper">
                 <table class="table table-sm align-middle modal-tabela-detalhes">
@@ -853,6 +808,9 @@ async function abrirEdicaoCompra(compraCod) {
     modal.show();
 
     document.getElementById("btnConfirmarEdicaoCompra")?.addEventListener("click", async () => {
+      const novaNotaFiscal = modalEl.querySelector("#editNotaFiscalPdf")?.files?.[0] || null;
+      if (novaNotaFiscal && !validarNotaFiscalSelecionada(novaNotaFiscal)) return;
+
       const itensPayload = itens.map((item, indice) => {
         const quantidade = Number(modalEl.querySelector(`[data-campo="qtd"][data-idx="${indice}"]`)?.value || 0);
         const total = window.vstockCurrency.parse(modalEl.querySelector(`[data-campo="total"][data-idx="${indice}"]`)?.value);
@@ -879,7 +837,7 @@ async function abrirEdicaoCompra(compraCod) {
       const body = {
         dataCompra: modalEl.querySelector("#editCompraData")?.value || "",
         fornecedorId: compra.fornecedor_id || null,
-        funcionarioFuncCpf: compra.funcionario_func_cpf,
+        funcionarioId: compra.funcionario_id,
         itens: itensPayload
       };
 
@@ -895,10 +853,24 @@ async function abrirEdicaoCompra(compraCod) {
           throw new Error(erro || "Falha ao atualizar entrada.");
         }
 
+        if (novaNotaFiscal) {
+          const dadosNotaFiscal = new FormData();
+          dadosNotaFiscal.append("arquivo", novaNotaFiscal);
+          const respNotaFiscal = await fetch(API.COMPRA_NOTA_FISCAL(compraCod), {
+            method: "POST",
+            body: dadosNotaFiscal
+          });
+
+          if (!respNotaFiscal.ok) {
+            const erro = await respNotaFiscal.text();
+            throw new Error(erro || "Entrada atualizada, mas não foi possível substituir a nota fiscal.");
+          }
+        }
+
         modal.hide();
         await carregarCompras(paginaAtualCompras);
         await carregarProdutos();
-        msg("Entrada atualizada com sucesso.", "success");
+        msg(novaNotaFiscal ? "Entrada e nota fiscal atualizadas com sucesso." : "Entrada atualizada com sucesso.", "success");
       } catch (erro) {
         console.error(erro);
         msg(erro.message || "Não foi possível atualizar a entrada.", "danger");
@@ -933,7 +905,7 @@ async function abrirDetalhesCompra(compraCod, dataEntrada = "") {
           <td class="text-end">${qtd}</td>
           <td class="text-end">R$ ${fmt(subtotal)}</td>
           <td class="text-end">${Number(item.estoque || 0)}</td>
-          <td>${formatarDataBr(item.validade)}</td>
+          <td>${window.vstockFormatters.date(item.validade)}</td>
         </tr>
       `;
     });
@@ -966,7 +938,7 @@ async function abrirDetalhesCompra(compraCod, dataEntrada = "") {
                 </div>
                 <div class="modal-resumo-card">
                   <span>Data da Entrada</span>
-                  <strong>${formatarDataBr(dataEntrada)}</strong>
+                  <strong>${window.vstockFormatters.date(dataEntrada)}</strong>
                 </div>
               </div>
 
@@ -986,6 +958,9 @@ async function abrirDetalhesCompra(compraCod, dataEntrada = "") {
               </div>
             </div>
             <div class="modal-footer modal-form-footer">
+              <button class="btn btn-outline-primary" id="btnVerNotaFiscal" type="button">
+                <i class="bi bi-file-earmark-pdf"></i> Ver NF
+              </button>
               <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Fechar</button>
             </div>
           </div>
@@ -994,11 +969,56 @@ async function abrirDetalhesCompra(compraCod, dataEntrada = "") {
     `;
 
     document.body.insertAdjacentHTML("beforeend", html);
+    document.getElementById("btnVerNotaFiscal")?.addEventListener("click", () => abrirNotaFiscal(compraCod));
     const modal = new bootstrap.Modal(document.getElementById("modalDetalhesCompra"));
     modal.show();
   } catch (erro) {
     console.error(erro);
     msg("Não foi possível abrir os detalhes da entrada.", "danger");
+  }
+}
+
+async function abrirNotaFiscal(compraCod) {
+  const botao = document.getElementById("btnVerNotaFiscal");
+  if (botao) botao.disabled = true;
+
+  try {
+    const resp = await fetch(API.COMPRA_NOTA_FISCAL(compraCod));
+    if (resp.status === 404) throw new Error("Esta entrada não possui nota fiscal anexada.");
+    if (!resp.ok) throw new Error("Não foi possível abrir a nota fiscal.");
+
+    const pdf = await resp.blob();
+    const urlPdf = URL.createObjectURL(pdf);
+    const anterior = document.getElementById("modalVisualizarNotaFiscal");
+    if (anterior) anterior.remove();
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="modal fade" id="modalVisualizarNotaFiscal" tabindex="-1" aria-labelledby="tituloVisualizarNotaFiscal" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+          <div class="modal-content modal-surface">
+            <div class="modal-header modal-brand-header">
+              <h5 class="modal-title" id="tituloVisualizarNotaFiscal"><i class="bi bi-file-earmark-pdf"></i> Nota fiscal</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body p-0">
+              <iframe title="Visualização da nota fiscal" src="${urlPdf}" style="width: 100%; height: min(75vh, 760px); border: 0;"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+
+    const modalEl = document.getElementById("modalVisualizarNotaFiscal");
+    modalEl.addEventListener("hidden.bs.modal", () => {
+      URL.revokeObjectURL(urlPdf);
+      modalEl.remove();
+    }, { once: true });
+    new bootstrap.Modal(modalEl).show();
+  } catch (erro) {
+    console.error(erro);
+    msg(erro.message || "Não foi possível abrir a nota fiscal.", "danger");
+  } finally {
+    if (botao) botao.disabled = false;
   }
 }
 
@@ -1065,7 +1085,7 @@ async function salvarProdutoRapido() {
     prodDescr: descricao,
     qtdMin,
     valorUnitario,
-    codigoBarras: normalizarCodigoBarras(el("#novoProdutoCodigoBarras")?.value || ""),
+    codigoBarras: window.vstockText.normalizeCode(el("#novoProdutoCodigoBarras")?.value || ""),
     categoria: {
       catCod,
       catDescr
@@ -1110,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.vstockCurrency.attachMask(el("#filtroCompraValor"));
   window.vstockCurrency.attachMask(el("#novoProdutoValorUnitario"));
 
-  el("#dataCompra").value = hojeISO();
+  el("#dataCompra").value = window.vstockFormatters.todayIso();
   await preencherFuncionarioLogado();
 
   await carregarProdutos();
@@ -1195,6 +1215,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
 
 
 

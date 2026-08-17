@@ -1,4 +1,4 @@
-﻿// principal.js
+// principal.js
 // Responsabilidades:
 // - carregar a identidade visual global da empresa
 // - carregar o logotipo da empresa quando houver container na pagina
@@ -10,7 +10,8 @@
     '/api/funcionarios/login',
     '/api/funcionarios/licenca/status',
     '/api/parametrizacao/existeEmpresa',
-    '/api/parametrizacao/unica'
+    '/api/parametrizacao/unica',
+    '/api/modulos/unica'
   ]);
 
   function paginaAtualNome() {
@@ -59,10 +60,21 @@
       headers.set('Authorization', `Bearer ${token}`);
     }
 
+    if (!token && !publicApiPaths.has(path) && !paginaEhPublica()) {
+      limparSessao();
+      window.location.href = 'login.html';
+      throw new Error('Sessao expirada.');
+    }
+
     const response = await originalFetch(input, {
       ...init,
       headers
     });
+
+    if (response.status === 401 && !publicApiPaths.has(path) && !paginaEhPublica()) {
+      limparSessao();
+      window.location.href = 'login.html';
+    }
 
     return response;
   };
@@ -247,16 +259,7 @@ window.vstockCurrency = {
 window.vstockSession = {
   getFuncionario: function () {
     try {
-      var salvo = JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
-      return salvo || {
-        funcCpf: '11111111111',
-        funcNome: 'Administrador Mestre',
-        funcEmail: 'admin@admin.login',
-        username: 'adminmaster',
-        cargo: 'Administrador Geral',
-        tipoAcesso: 99,
-        dataDemissao: null
-      };
+      return JSON.parse(localStorage.getItem('funcionarioLogado') || 'null');
     } catch (erro) {
       console.warn('Não foi possível ler o funcionário logado:', erro);
       return null;
@@ -441,6 +444,18 @@ window.vstockSales = {
 };
 
 window.vstockUi = {
+  toQueryString: function (entries) {
+    var params = new URLSearchParams();
+    (entries || []).forEach(function (entry) {
+      var key = entry && entry[0];
+      var value = entry && entry[1];
+      if (key && value) {
+        params.set(key, value);
+      }
+    });
+    return params.toString();
+  },
+
   createAlertHandler: function (defaultConfig) {
     var baseConfig = defaultConfig || {};
 
@@ -496,16 +511,6 @@ window.vstockUi = {
     return ativo
       ? '<span class="badge text-bg-success">Ativo</span>'
       : '<span class="badge text-bg-secondary">Inativo</span>';
-  },
-
-  toQueryString: function (pares) {
-    var params = new URLSearchParams();
-    (Array.isArray(pares) ? pares : []).forEach(function (par) {
-      if (Array.isArray(par) && par[1] !== undefined && par[1] !== null && String(par[1]).trim() !== '') {
-        params.set(String(par[0]), String(par[1]));
-      }
-    });
-    return params.toString();
   }
 };
 
@@ -538,6 +543,30 @@ window.vstockFilterDropdown = (function () {
       })
       .sort(function (a, b) {
         return a.localeCompare(b, 'pt-BR');
+      });
+  }
+
+  function normalizarOpcoesComValor(lista) {
+    var vistos = new Set();
+    return (Array.isArray(lista) ? lista : [])
+      .map(function (item) {
+        var label = String(item && item.label || '').trim();
+        var value = String(item && item.value || '').trim();
+        var searchText = String(item && (item.searchText || item.label) || '').trim();
+        if (!label || !value) {
+          return null;
+        }
+        return { label: label, value: value, searchText: searchText };
+      })
+      .filter(function (item) {
+        if (!item || vistos.has(item.value)) {
+          return false;
+        }
+        vistos.add(item.value);
+        return true;
+      })
+      .sort(function (a, b) {
+        return a.label.localeCompare(b.label, 'pt-BR');
       });
   }
 
@@ -583,7 +612,9 @@ window.vstockFilterDropdown = (function () {
   }
 
   function obterOpcoesFiltradas(instance) {
-    var opcoes = normalizarOpcoes(instance.getOptions());
+    var opcoes = instance.optionValues
+      ? normalizarOpcoesComValor(instance.getOptions())
+      : normalizarOpcoes(instance.getOptions());
     var termo = normalizarTexto(instance.input.value);
 
     if (!termo) {
@@ -591,7 +622,8 @@ window.vstockFilterDropdown = (function () {
     }
 
     return opcoes.filter(function (item) {
-      return normalizarTexto(item).includes(termo);
+      var texto = instance.optionValues ? item.searchText : item;
+      return normalizarTexto(texto).includes(termo);
     });
   }
 
@@ -613,14 +645,17 @@ window.vstockFilterDropdown = (function () {
     var selecionado = normalizarTexto(instance.input.value);
 
     opcoes.forEach(function (item) {
+      var label = instance.optionValues ? item.label : item;
+      var value = instance.optionValues ? item.value : item;
       var botao = document.createElement('button');
       botao.type = 'button';
       botao.className = 'vstock-filter-dropdown-item';
-      if (normalizarTexto(item) === selecionado) {
+      if (normalizarTexto(label) === selecionado) {
         botao.classList.add('ativo');
       }
-      botao.dataset.value = item;
-      botao.textContent = item;
+      botao.dataset.value = label;
+      botao.dataset.optionValue = value;
+      botao.textContent = label;
       instance.dropdown.appendChild(botao);
     });
 
@@ -659,6 +694,7 @@ window.vstockFilterDropdown = (function () {
       input: input,
       dropdown: estrutura.dropdown,
       getOptions: typeof config.getOptions === 'function' ? config.getOptions : function () { return []; },
+      optionValues: config.optionValues === true,
       onInputValueChange: typeof config.onInputValueChange === 'function' ? config.onInputValueChange : null,
       onOptionSelect: typeof config.onOptionSelect === 'function' ? config.onOptionSelect : null,
       emptyText: config.emptyText || 'Nenhuma opção encontrada'
@@ -696,7 +732,7 @@ window.vstockFilterDropdown = (function () {
       input.value = botao.dataset.value || '';
       renderizar(instance, false);
       if (instance.onOptionSelect) {
-        instance.onOptionSelect(input.value);
+        instance.onOptionSelect(input.value, botao.dataset.optionValue || input.value);
       } else if (instance.onInputValueChange) {
         instance.onInputValueChange(input.value);
       }
@@ -798,10 +834,11 @@ document.addEventListener('DOMContentLoaded', async function () {
   var LICENCA_STATUS_URL = 'http://localhost:8080/api/funcionarios/licenca/status';
   var SIDEBAR_SCROLL_KEY = 'vstockSidebarScrollTop';
   var SIDEBAR_GROUPS_KEY = 'vstockSidebarGroupsState';
+  var SIDEBAR_COLLAPSED_KEY = 'vstockSidebarCollapsed';
   var statusLicencaAtual = null;
 
-  if (paginaAtual === 'login.html') {
-    window.location.href = 'index.html';
+  if (paginaAtual !== 'login.html' && !(localStorage.getItem('authToken') || '').trim()) {
+    window.location.href = 'login.html';
     return;
   }
 
@@ -941,13 +978,31 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
 
-  function normalizarModulos(empresa) {
-      return {
-        estoque: empresa ? empresa.moduloEstoque !== false : true,
-        alertas: empresa ? empresa.moduloAlertas !== false : true,
-        vendas: empresa ? empresa.moduloVendas === true : false
-      };
+  async function carregarModulosUnicos() {
+    try {
+      const response = await fetch('http://localhost:8080/api/modulos/unica', {
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return await response.json();
+    } catch (err) {
+      console.warn('Erro ao carregar os modulos do sistema:', err);
+      return null;
     }
+  }
+
+  function normalizarModulos(modulos) {
+    return {
+      estoque: modulos ? modulos.moduloEstoque !== false : true,
+      alertas: modulos ? modulos.moduloAlertas !== false : true,
+      vendas: modulos ? modulos.moduloVendas === true : false
+    };
+  }
 
   function obterLogoSistema(empresa) {
     var logoBanco = empresa && (empresa.logotipoBig || empresa.logotipoSmall);
@@ -973,6 +1028,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       var marca = marcas[i];
       marca.classList.add('navbar-brand-minimal');
       marca.setAttribute('aria-label', 'VStock');
+
+      if (document.querySelector('.sidebar') && !marca.parentElement.querySelector('[data-sidebar-collapse-toggle]')) {
+        var botaoMenu = document.createElement('button');
+        botaoMenu.className = 'sidebar-collapse-toggle sidebar-collapse-toggle-topbar';
+        botaoMenu.type = 'button';
+        botaoMenu.setAttribute('data-sidebar-collapse-toggle', '');
+        botaoMenu.setAttribute('aria-label', 'Recolher menu lateral');
+        botaoMenu.setAttribute('title', 'Recolher menu lateral');
+        botaoMenu.setAttribute('aria-expanded', 'true');
+        botaoMenu.innerHTML = '<i class="bi bi-arrow-left" aria-hidden="true"></i>';
+        marca.insertAdjacentElement('afterend', botaoMenu);
+      }
     }
   }
 
@@ -998,11 +1065,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     var base = String(document.title || '').split('|')[0].trim();
     return base || 'Painel operacional';
-  }
-
-  function obterDescricaoPaginaTopo() {
-    var descricao = document.querySelector('.page-header p, .page-title p, .page-subtitle');
-    return descricao ? descricao.textContent.trim() : '';
   }
 
   function normalizarLayoutAplicacao() {
@@ -1071,7 +1133,11 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     var titulo = intro.querySelector('.app-topbar-title');
     if (titulo) {
-      titulo.textContent = obterTituloPaginaTopo();
+      var tituloPagina = obterTituloPaginaTopo();
+      titulo.textContent = tituloPagina;
+      if (paginaAtual === 'caixa.html') {
+        titulo.innerHTML = '<i class="bi bi-cash-register" aria-hidden="true"></i> ' + tituloPagina;
+      }
     }
 
     var subtitulo = intro.querySelector('.app-topbar-subtitle');
@@ -1085,12 +1151,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   }
 
-  const empresa = await carregarEmpresaUnica();
-  const modulos = normalizarModulos(empresa);
+  const [empresa, configuracaoModulos] = await Promise.all([carregarEmpresaUnica(), carregarModulosUnicos()]);
+  const modulos = normalizarModulos(configuracaoModulos);
   aplicarTema(empresa);
   aplicarLogoNavbar(obterLogoSistema(empresa));
-  simplificarBrandingNavbar();
   normalizarLayoutAplicacao();
+  simplificarBrandingNavbar();
 
   var logoContainer = document.getElementById('logoEmpresa');
   if (empresa && logoContainer) {
@@ -1103,6 +1169,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   var btnSair = document.getElementById('btnSairSistema');
   var topoDireitaBase = document.querySelector('.app-topbar-actions') || document.querySelector('.navbar .text-end') || document.querySelector('.brand-navbar .text-end') || document.querySelector('.navbar .text-white');
   var blocoTopoSistema = null;
+  var versaoStatusSessaoCaixa = 0;
 
   function formatarDataLicenca(valor) {
     if (!valor) {
@@ -1324,9 +1391,82 @@ document.addEventListener('DOMContentLoaded', async function () {
     existente.innerHTML = '<i class="bi bi-patch-check"></i><span>' + obterResumoLicenca(statusLicencaAtual) + '</span>';
   }
 
+  async function renderizarStatusSessaoCaixaNavbar() {
+    var versaoRequisicao = ++versaoStatusSessaoCaixa;
+    var existente = document.getElementById('navbar-cash-session-status');
+    if (!modulos.vendas || paginaAtual === 'login.html') {
+      existente?.remove();
+      return;
+    }
+
+    blocoTopoSistema = garantirEstruturaTopoSistema();
+    if (!blocoTopoSistema) {
+      return;
+    }
+
+    if (!existente) {
+      existente = document.createElement('div');
+      existente.id = 'navbar-cash-session-status';
+      existente.className = 'navbar-cash-session-status is-closed';
+      existente.setAttribute('aria-live', 'polite');
+      existente.innerHTML = `
+        <span class="navbar-cash-session-dot" aria-hidden="true"></span>
+        <span class="navbar-cash-session-copy">
+          <small>Status da sessão</small>
+          <strong data-cash-session-title>Consultando...</strong>
+        </span>
+        <div class="navbar-cash-session-popover" role="status">
+          <div class="navbar-cash-session-detail"><span>Aberto em</span><strong data-cash-session-opened-at>-</strong></div>
+          <div class="navbar-cash-session-detail"><span>Total vendido</span><strong data-cash-session-sales>R$ 0,00</strong></div>
+          <a class="navbar-cash-session-link" href="caixa.html"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> Ver caixa</a>
+        </div>
+      `;
+      blocoTopoSistema.insertBefore(existente, blocoTopoSistema.querySelector('#navbarAccountMenu'));
+    }
+
+    try {
+      var response = await fetch('http://localhost:8080/api/caixa/sessao/aberta', {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store'
+      });
+      var caixaAberto = response.ok;
+      var sessao = caixaAberto && response.status !== 204 ? await response.json() : null;
+
+      if (response.status !== 204 && !response.ok) {
+        throw new Error('Não foi possível consultar o status do caixa.');
+      }
+
+      if (versaoRequisicao !== versaoStatusSessaoCaixa || !existente.isConnected) {
+        return;
+      }
+
+      existente.classList.toggle('is-closed', !caixaAberto);
+      existente.querySelector('[data-cash-session-title]').textContent = caixaAberto ? 'Caixa aberto' : 'Caixa fechado';
+      if (caixaAberto && sessao) {
+        var dataAberturaPartes = String(sessao.dataAbertura || '').split('T');
+        var dataAbertura = dataAberturaPartes.length === 2
+          ? dataAberturaPartes[0].split('-').reverse().join('/') + ' ' + dataAberturaPartes[1].slice(0, 5)
+          : '-';
+        var resumoResponse = await fetch('http://localhost:8080/api/caixa/resumo', {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store'
+        });
+        var resumo = resumoResponse.ok && resumoResponse.status !== 204 ? await resumoResponse.json() : null;
+        if (versaoRequisicao !== versaoStatusSessaoCaixa || !existente.isConnected) return;
+        existente.querySelector('[data-cash-session-opened-at]').textContent = dataAbertura || '-';
+        existente.querySelector('[data-cash-session-sales]').textContent = window.vstockCurrency.formatMoney(resumo?.vendasLiquidas ?? 0);
+      }
+    } catch (erro) {
+      console.warn('Erro ao consultar o status do caixa:', erro);
+      if (versaoRequisicao === versaoStatusSessaoCaixa) {
+        existente.remove();
+      }
+    }
+  }
+
   function fazerLogout() {
     window.vstockFrontendSecurity.limparSessao();
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
   }
 
   if (paginaAtual !== 'login.html') {
@@ -1340,6 +1480,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   }
 
   renderizarStatusLicencaNavbar();
+  renderizarStatusSessaoCaixaNavbar();
+  window.addEventListener('vstock:cash-session-change', renderizarStatusSessaoCaixaNavbar);
 
   function funcionarioEhAdmin(item) {
     return window.vstockSession.isAdministrador(item);
@@ -1362,11 +1504,75 @@ document.addEventListener('DOMContentLoaded', async function () {
       return true;
     }
 
+    if (!modulos.vendas && ['vendas.html', 'caixa.html', 'historico-caixa.html', 'historico-vendas.html'].includes(paginaAtual)) {
+      return true;
+    }
+
     return false;
   }
 
   function obterSidebarPrincipal() {
     return document.querySelector('.sidebar');
+  }
+
+  function sidebarEstaRecolhida() {
+    try {
+      return sessionStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
+    } catch (erro) {
+      console.warn('Não foi possível ler o estado do menu lateral:', erro);
+      return false;
+    }
+  }
+
+  function salvarEstadoSidebarRecolhida(recolhida) {
+    try {
+      if (recolhida) {
+        sessionStorage.setItem(SIDEBAR_COLLAPSED_KEY, 'true');
+      } else {
+        sessionStorage.removeItem(SIDEBAR_COLLAPSED_KEY);
+      }
+    } catch (erro) {
+      console.warn('Não foi possível salvar o estado do menu lateral:', erro);
+    }
+  }
+
+  function aplicarEstadoSidebarRecolhida(recolhida) {
+    document.body.classList.toggle('sidebar-collapsed', recolhida);
+
+    var botoes = document.querySelectorAll('[data-sidebar-collapse-toggle]');
+    for (var i = 0; i < botoes.length; i++) {
+      var botao = botoes[i];
+      var rotulo = recolhida ? 'Expandir menu lateral' : 'Recolher menu lateral';
+      var icone = botao.querySelector('i');
+
+      botao.setAttribute('aria-label', rotulo);
+      botao.setAttribute('title', rotulo);
+      botao.setAttribute('aria-expanded', recolhida ? 'false' : 'true');
+      if (icone) {
+        icone.className = recolhida ? 'bi bi-arrow-right' : 'bi bi-arrow-left';
+      }
+    }
+  }
+
+  function registrarToggleSidebarRecolhida() {
+    var botoes = document.querySelectorAll('[data-sidebar-collapse-toggle]');
+    for (var i = 0; i < botoes.length; i++) {
+      botoes[i].addEventListener('click', function () {
+        var recolhida = !document.body.classList.contains('sidebar-collapsed');
+        salvarEstadoSidebarRecolhida(recolhida);
+        aplicarEstadoSidebarRecolhida(recolhida);
+      });
+    }
+  }
+
+  function prepararTitulosSidebar() {
+    var itens = document.querySelectorAll('.sidebar .nav-btn');
+    for (var i = 0; i < itens.length; i++) {
+      var titulo = (itens[i].textContent || '').replace(/\s+/g, ' ').trim();
+      if (titulo) {
+        itens[i].setAttribute('title', titulo);
+      }
+    }
   }
 
   function salvarScrollSidebar(valor) {
@@ -1550,22 +1756,25 @@ document.addEventListener('DOMContentLoaded', async function () {
       `
       : '';
 
-    var vendasConteudo = `
+    var vendasConteudo = modulos.vendas
+      ? `
       <a class="${classeLinkSidebar('vendas.html')}" href="vendas.html">
         <i class="bi bi-cart-check"></i> Vendas
+      </a>
+
+      <a class="${classeLinkSidebar('caixa.html')} nav-btn-cash" href="caixa.html">
+        <i class="bi bi-cash-stack" aria-hidden="true"></i><span>Caixa</span>
+      </a>
+
+      <a class="${classeLinkSidebar('historico-caixa.html')}" href="historico-caixa.html">
+        <i class="bi bi-clock-history"></i> Histórico de Caixa
       </a>
 
       <a class="${classeLinkSidebar('historico-vendas.html')}" href="historico-vendas.html">
         <i class="bi bi-receipt-cutoff"></i> Histórico de Vendas
       </a>
-      <a class="${classeLinkSidebar('caixa.html')}" href="caixa.html">
-        <i class="bi bi-cash-register"></i> Caixa
-      </a>
-
-      <a class="${classeLinkSidebar('historico-caixa.html')}" href="historico-caixa.html">
-        <i class="bi bi-wallet2"></i> Histórico de Caixa
-      </a>
-    `;
+      `
+      : '';
 
     var estoqueConteudo = (modulos.estoque || modulos.alertas)
       ? `
@@ -1664,7 +1873,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         titulo: 'Vendas',
         icone: 'bi-cart-check',
         conteudo: vendasConteudo,
-        ativo: ['vendas.html', 'historico-vendas.html', 'caixa.html', 'historico-caixa.html'].includes(paginaAtual)
+        ativo: ['vendas.html', 'caixa.html', 'historico-caixa.html', 'historico-vendas.html'].includes(paginaAtual)
       })}
 
       ${montarGrupoSidebar({
@@ -1698,6 +1907,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     registrarPersistenciaSidebar();
     registrarToggleGruposSidebar();
+    prepararTitulosSidebar();
+    aplicarEstadoSidebarRecolhida(sidebarEstaRecolhida());
+    registrarToggleSidebarRecolhida();
     requestAnimationFrame(restaurarScrollSidebar);
   }
 
@@ -1805,6 +2017,38 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   };
 });
+
+window.vstockEditModal = {
+  modal: null,
+  form: null,
+  parent: null,
+  nextSibling: null,
+  open({ title, form }) {
+    if (!form || !window.bootstrap?.Modal) return;
+    this.close();
+    this.form = form;
+    this.parent = form.parentElement;
+    this.nextSibling = form.nextSibling;
+    const modalElement = document.createElement("div");
+    modalElement.className = "modal fade cadastro-edit-modal";
+    modalElement.tabIndex = -1;
+    modalElement.innerHTML = `<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"><div class="modal-content cadastro-edit-modal-content"><div class="modal-header cadastro-edit-modal-header"><h5 class="modal-title"><i class="bi bi-pencil-square"></i> ${title}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button></div><div class="modal-body cadastro-edit-modal-body"></div></div></div>`;
+    document.body.appendChild(modalElement);
+    modalElement.querySelector(".cadastro-edit-modal-body").appendChild(form);
+    this.modal = new bootstrap.Modal(modalElement);
+    modalElement.addEventListener("hidden.bs.modal", () => {
+      if (this.form !== form) return;
+      if (this.nextSibling && this.nextSibling.parentNode === this.parent) this.parent.insertBefore(form, this.nextSibling);
+      else this.parent.appendChild(form);
+      modalElement.remove();
+      this.modal = null;
+      this.form = null;
+    }, { once: true });
+    this.modal.show();
+  },
+  close() { this.modal?.hide(); }
+};
+
 
 
 

@@ -1,4 +1,4 @@
-﻿const API_CATEGORIA = {
+const API_CATEGORIA = {
   LISTA: "http://localhost:8080/api/categorias-produto",
   NOVA: "http://localhost:8080/api/categorias-produto",
   ATUALIZAR: (id) => `http://localhost:8080/api/categorias-produto/${id}`,
@@ -6,6 +6,7 @@
 };
 
 const $categoria = (sel) => document.querySelector(sel);
+const msgCategoria = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let categoriaEditandoId = null;
 let categoriasCache = [];
@@ -14,23 +15,6 @@ const ITENS_POR_PAGINA_CATEGORIAS = 10;
 
 function formCategoria() {
   return $categoria("#categoriaForm");
-}
-
-function msgCategoria(texto, tipo = "danger") {
-  const box = $categoria("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
 }
 
 function badgeStatus(ativo) {
@@ -58,6 +42,7 @@ function atualizarModoFormulario() {
 
 function limparFormularioCategoria() {
   categoriaEditandoId = null;
+  window.vstockEditModal?.close();
   $categoria("#categoriaDescricao").value = "";
   formCategoria()?.classList.remove("validacao-tentada");
   atualizarModoFormulario();
@@ -236,6 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (btn.dataset.acao === "editar") {
       preencherFormularioCategoria(categoria);
+      window.vstockEditModal?.open({ title: "Editar Categoria", form: formCategoria() });
     }
 
     if (btn.dataset.acao === "status") {
@@ -243,5 +229,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
 
 

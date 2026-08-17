@@ -1,6 +1,7 @@
 const API_CAIXA_SESSAO = "http://localhost:8080/api/caixa/sessao";
 const API_CAIXA_MOVIMENTOS = "http://localhost:8080/api/caixa/movimentos";
 const API_CAIXA_RESUMO = "http://localhost:8080/api/caixa/resumo";
+const API_VENDA_DETALHE = (id) => `http://localhost:8080/api/vendas/${id}`;
 
 const $caixa = (seletor) => document.querySelector(seletor);
 const mensagemCaixa = window.vstockUi.createAlertHandler({
@@ -220,10 +221,12 @@ async function fecharCaixa(evento) {
       throw new Error(await obterMensagemErro(response, "Não foi possível fechar o caixa."));
     }
 
-    await response.json();
+    const sessaoFechada = await response.json();
+    const resumoFechamento = resumoCaixaAtual;
     $caixa("#cashClosingForm").reset();
     mensagemCaixa("Caixa fechado com sucesso.", "success");
     exibirCaixaFechado();
+    window.vstockCashReceipt.imprimir({ sessao: sessaoFechada, resumo: resumoFechamento });
   } catch (erro) {
     console.error("Erro ao fechar o caixa:", erro);
     mensagemCaixa(erro.message || "Não foi possível fechar o caixa.", "danger");
@@ -253,9 +256,12 @@ async function carregarDadosMovimentos() {
       responseMovimentos.json()
     ]);
 
+    const listaMovimentos = Array.isArray(movimentos) ? movimentos : [];
+    await complementarOrigemDasVendas(listaMovimentos);
+
     resumoCaixaAtual = resumo;
     renderizarResumoCaixa(resumo);
-    renderizarMovimentosCaixa(Array.isArray(movimentos) ? movimentos : []);
+    renderizarMovimentosCaixa(listaMovimentos);
   } catch (erro) {
     console.error("Erro ao carregar movimentos do caixa:", erro);
     mensagemCaixa(erro.message || "Não foi possível atualizar os movimentos do caixa.", "danger");
@@ -301,12 +307,16 @@ function renderizarFormasPagamento(formasPagamento) {
 
 function renderizarMovimentosCaixa(movimentos) {
   const corpo = $caixa("#cashMovementTableBody");
+  const listaMovimentos = $caixa(".cash-movement-list");
+  const semMovimentos = !movimentos.length;
+  listaMovimentos?.classList.toggle("is-empty", semMovimentos);
+
   definirTexto(
     "#cashMovementCount",
     `${movimentos.length} ${movimentos.length === 1 ? "movimento" : "movimentos"}`
   );
 
-  if (!movimentos.length) {
+  if (semMovimentos) {
     corpo.innerHTML = `
       <tr>
         <td class="cash-table-empty" colspan="6">Nenhum movimento registrado nesta sessão.</td>
@@ -317,17 +327,20 @@ function renderizarMovimentosCaixa(movimentos) {
 
   corpo.innerHTML = movimentos.map((movimento) => {
     const tipo = movimento.tipo || "";
+    const tipoExibicao = obterTipoExibicaoMovimento(movimento);
     const negativo = tipo === "SANGRIA" || tipo === "ESTORNO";
     const valor = numeroCaixa(movimento.valor) * (negativo ? -1 : 1);
-    const origem = movimento.vendaId ? `Venda #${movimento.vendaId}` : "Lançamento manual";
+    const origem = movimento.vendaId
+      ? `Venda #${movimento.vendaId}${movimento.clienteNome ? ` — ${movimento.clienteNome}` : ""}`
+      : "Lançamento manual";
     const detalheMotivo = movimento.motivo || movimento.observacao || motivoPadraoMovimento(tipo);
 
     return `
       <tr>
         <td>${formatarDataHora(movimento.dataMovimento)}</td>
         <td>
-          <span class="cash-movement-badge ${classeTipoMovimento(tipo)}">
-            ${rotuloTipoMovimento(tipo)}
+          <span class="cash-movement-badge ${tipoExibicao.classe}">
+            ${tipoExibicao.rotulo}
           </span>
         </td>
         <td>${escaparHtml(origem)}</td>
@@ -508,6 +521,45 @@ function atualizarBotaoMovimento() {
   botao.classList.toggle("cash-primary-button", !sangria);
 }
 
+function obterTipoExibicaoMovimento(movimento) {
+  const tipo = movimento?.tipo;
+  if (tipo === "VENDA") {
+    const mesaNumero = Number(movimento?.mesaNumero);
+    if (movimento?.vendaTipo === "MESA" && Number.isInteger(mesaNumero)) {
+      return { classe: "is-sale", rotulo: `Mesa ${mesaNumero}` };
+    }
+    return { classe: "is-sale", rotulo: "Venda rápida" };
+  }
+
+  return { classe: classeTipoMovimento(tipo), rotulo: rotuloTipoMovimento(tipo) };
+}
+
+async function complementarOrigemDasVendas(movimentos) {
+  const vendasSemOrigem = [...new Set(movimentos
+    .filter((movimento) => movimento?.tipo === "VENDA" && movimento?.vendaId && !movimento?.vendaTipo)
+    .map((movimento) => movimento.vendaId))];
+
+  if (!vendasSemOrigem.length) return;
+
+  const origens = await Promise.all(vendasSemOrigem.map(async (vendaId) => {
+    try {
+      const resposta = await fetch(API_VENDA_DETALHE(vendaId), { headers: { Accept: "application/json" } });
+      if (!resposta.ok) return [vendaId, null];
+
+      const venda = await resposta.json();
+      return [vendaId, { vendaTipo: venda.tipo, mesaNumero: venda.mesaNumero }];
+    } catch {
+      return [vendaId, null];
+    }
+  }));
+
+  const origemPorVenda = new Map(origens);
+  movimentos.forEach((movimento) => {
+    const origem = origemPorVenda.get(movimento.vendaId);
+    if (origem) Object.assign(movimento, origem);
+  });
+}
+
 function rotuloTipoMovimento(tipo) {
   const rotulos = {
     VENDA: "Venda",
@@ -593,3 +645,4 @@ function definirTexto(seletor, texto) {
     elemento.textContent = texto;
   }
 }
+

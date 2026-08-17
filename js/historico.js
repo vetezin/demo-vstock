@@ -49,21 +49,19 @@ function toNumber(valor) {
 }
 
 function montarQuery() {
-  const params = new URLSearchParams();
-
   const dataInicio = $historico("#filtroDataInicio")?.value || "";
   const dataFim = $historico("#filtroDataFim")?.value || "";
   const tipo = $historico("#filtroTipo")?.value || "";
   const produto = $historico("#filtroProduto")?.value?.trim() || "";
   const funcionario = $historico("#filtroFuncionario")?.value?.trim() || "";
 
-  if (dataInicio) params.set("dataInicio", dataInicio);
-  if (dataFim) params.set("dataFim", dataFim);
-  if (tipo) params.set("tipo", tipo);
-  if (produto) params.set("produto", produto);
-  if (funcionario) params.set("funcionario", funcionario);
-
-  return params.toString();
+  return window.vstockUi.toQueryString([
+    ["dataInicio", dataInicio],
+    ["dataFim", dataFim],
+    ["tipo", tipo],
+    ["produto", produto],
+    ["funcionario", funcionario]
+  ]);
 }
 
 function blocosComplementares(item, isEntrada, isVenda) {
@@ -402,3 +400,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     await carregarHistorico(1);
   });
 });
+

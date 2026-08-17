@@ -1,4 +1,4 @@
-﻿const API_FORNECEDOR = {
+const API_FORNECEDOR = {
   LISTA: "http://localhost:8080/api/fornecedor/all",
   NOVO: "http://localhost:8080/api/fornecedor",
   ATUALIZAR: (id) => `http://localhost:8080/api/fornecedor/${id}`,
@@ -6,6 +6,7 @@
 };
 
 const $fornecedor = (selector) => document.querySelector(selector);
+const msgFornecedor = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let fornecedorEditandoId = null;
 let fornecedoresCache = [];
@@ -14,36 +15,6 @@ const ITENS_POR_PAGINA_FORNECEDORES = 10;
 
 function formFornecedor() {
   return $fornecedor("#fornecedorForm");
-}
-
-function msgFornecedor(texto, tipo = "danger") {
-  const box = $fornecedor("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
-function formatarDataFornecedor(valor) {
-  if (!valor) return "-";
-  return new Date(`${valor}T00:00:00`).toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  });
-}
-
-function badgeStatus(ativo) {
-  return ativo
-    ? `<span class="badge text-bg-success">Ativo</span>`
-    : `<span class="badge text-bg-secondary">Inativo</span>`;
 }
 
 function atualizarModoFormulario() {
@@ -65,6 +36,7 @@ function atualizarModoFormulario() {
 
 function limparFormularioFornecedor() {
   fornecedorEditandoId = null;
+  window.vstockEditModal?.close();
   $fornecedor("#nome").value = "";
   $fornecedor("#contato").value = "";
   $fornecedor("#email").value = "";
@@ -103,45 +75,6 @@ function obterOpcoesNomeFornecedor() {
   return fornecedoresCache.map((fornecedor) => fornecedor.nome);
 }
 
-function renderizarPaginacaoFornecedores(totalItens) {
-  const box = $fornecedor("#paginacaoFornecedores");
-  if (!box) return;
-
-  const totalPaginas = Math.max(1, Math.ceil(totalItens / ITENS_POR_PAGINA_FORNECEDORES));
-  paginaAtualFornecedores = Math.min(paginaAtualFornecedores, totalPaginas);
-  const inicio = totalItens === 0 ? 0 : ((paginaAtualFornecedores - 1) * ITENS_POR_PAGINA_FORNECEDORES) + 1;
-  const fim = Math.min(paginaAtualFornecedores * ITENS_POR_PAGINA_FORNECEDORES, totalItens);
-
-  box.innerHTML = `
-    <div class="paginacao-cadastro-resumo">
-      Exibindo ${inicio}-${fim} de ${totalItens} fornecedores
-    </div>
-    <div class="paginacao-cadastro-botoes">
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaAnteriorFornecedor" ${paginaAtualFornecedores === 1 ? "disabled" : ""}>
-        <i class="bi bi-chevron-left"></i> Anterior
-      </button>
-      <span class="paginacao-cadastro-resumo">Página ${paginaAtualFornecedores} de ${totalPaginas}</span>
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaProximaFornecedor" ${paginaAtualFornecedores === totalPaginas || totalItens === 0 ? "disabled" : ""}>
-        Próxima <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-  `;
-
-  $fornecedor("#btnPaginaAnteriorFornecedor")?.addEventListener("click", () => {
-    if (paginaAtualFornecedores > 1) {
-      paginaAtualFornecedores -= 1;
-      renderizarFornecedores();
-    }
-  });
-
-  $fornecedor("#btnPaginaProximaFornecedor")?.addEventListener("click", () => {
-    if (paginaAtualFornecedores < totalPaginas) {
-      paginaAtualFornecedores += 1;
-      renderizarFornecedores();
-    }
-  });
-}
-
 function renderizarFornecedores() {
   const tbody = $fornecedor("#tabelaFornecedores tbody");
   if (!tbody) return;
@@ -166,8 +99,8 @@ function renderizarFornecedores() {
         <td>${window.vstockMasks.phone(fornecedor.telefone ?? "") || "-"}</td>
         <td>${fornecedor.email ?? "-"}</td>
         <td>${fornecedor.contato ?? "-"}</td>
-        <td>${formatarDataFornecedor(fornecedor.dataCadastro ?? fornecedor.data_cadastro)}</td>
-        <td>${badgeStatus(ativo)}</td>
+        <td>${window.vstockFormatters.date(fornecedor.dataCadastro ?? fornecedor.data_cadastro)}</td>
+        <td>${window.vstockUi.badgeStatus(ativo)}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
             <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar" data-id="${id}">
@@ -326,6 +259,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (botao.dataset.acao === "editar") {
       preencherFormularioFornecedor(fornecedor);
+      window.vstockEditModal?.open({ title: "Editar Fornecedor", form: formFornecedor() });
     }
 
     if (botao.dataset.acao === "status") {

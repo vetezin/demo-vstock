@@ -1,4 +1,4 @@
-﻿const API_CLIENTE = {
+const API_CLIENTE = {
   LISTA: "http://localhost:8080/api/cliente/all",
   NOVO: "http://localhost:8080/api/cliente",
   ATUALIZAR: (id) => `http://localhost:8080/api/cliente/${id}`,
@@ -6,6 +6,7 @@
 };
 
 const $cliente = (selector) => document.querySelector(selector);
+const msgCliente = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let clienteEditandoId = null;
 let clientesCache = [];
@@ -14,36 +15,6 @@ const ITENS_POR_PAGINA_CLIENTES = 10;
 
 function formCliente() {
   return $cliente("#clienteForm");
-}
-
-function msgCliente(texto, tipo = "danger") {
-  const box = $cliente("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
-function formatarDataCliente(valor) {
-  if (!valor) return "-";
-  return new Date(valor).toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  });
-}
-
-function badgeStatus(ativo) {
-  return ativo
-    ? `<span class="badge text-bg-success">Ativo</span>`
-    : `<span class="badge text-bg-secondary">Inativo</span>`;
 }
 
 function atualizarModoFormulario() {
@@ -65,6 +36,7 @@ function atualizarModoFormulario() {
 
 function limparFormularioCliente() {
   clienteEditandoId = null;
+  window.vstockEditModal?.close();
   $cliente("#nome").value = "";
   $cliente("#cpfCnpj").value = "";
   $cliente("#telefone").value = "";
@@ -125,8 +97,8 @@ function renderizarClientes() {
         <td>${window.vstockMasks.cpfCnpj(cliente.cpfCnpj ?? cliente.cpf_cnpj ?? "") || "-"}</td>
         <td>${window.vstockMasks.phone(cliente.telefone ?? "") || "-"}</td>
         <td title="${observacao || ""}">${observacao || "-"}</td>
-        <td>${formatarDataCliente(cliente.createdAt ?? cliente.created_at)}</td>
-        <td>${badgeStatus(ativo)}</td>
+        <td>${window.vstockFormatters.date(cliente.createdAt ?? cliente.created_at)}</td>
+        <td>${window.vstockUi.badgeStatus(ativo)}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
             <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar" data-id="${id}">
@@ -283,6 +255,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (botao.dataset.acao === "editar") {
       preencherFormularioCliente(cliente);
+      window.vstockEditModal?.open({ title: "Editar Cliente", form: formCliente() });
     }
 
     if (botao.dataset.acao === "status") {

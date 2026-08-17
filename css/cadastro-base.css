@@ -78,6 +78,11 @@
   max-width: 360px;
 }
 
+.cadastro-toolbar .form-control,
+.cadastro-toolbar .form-select {
+  min-height: 44px;
+}
+
 .paginacao-cadastro {
   display: flex;
   justify-content: space-between;
@@ -125,3 +130,4 @@
     min-height: 0;
   }
 }
+

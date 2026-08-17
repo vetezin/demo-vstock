@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
@@ -10,9 +10,9 @@
 
   <link href="css/style.css" rel="stylesheet"/>
   <link href="css/app.css" rel="stylesheet"/>
-  <link href="css/principal.css" rel="stylesheet"/>
+  <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/entrada-compra.css" rel="stylesheet"/>
-  <link href="css/estoque-paginas.css" rel="stylesheet"/>
+  <link href="css/estoque-paginas.css?v=20260803-desktop" rel="stylesheet"/>
 </head>
 
 <body class="app-shell">
@@ -143,7 +143,7 @@
               <div class="col-md-3">
                 <label class="form-label required">Funcionário Logado</label>
                 <input class="form-control" id="funcionarioNome" disabled placeholder="-"/>
-                <input type="hidden" id="funcionarioCpf"/>
+                <input type="hidden" id="funcionarioId"/>
                 
               </div>
 
@@ -158,6 +158,12 @@
                   </button>
                 </div>
                 
+              </div>
+
+              <div class="col-md-6 offset-md-6">
+                <label class="form-label" for="notaFiscalPdf">Nota fiscal (PDF, opcional)</label>
+                <input id="notaFiscalPdf" class="form-control" type="file" accept="application/pdf,.pdf" aria-describedby="notaFiscalAjuda"/>
+                <div id="notaFiscalAjuda" class="form-text">Envie um único PDF de até 10 MB.</div>
               </div>
             </div>
             </div>
@@ -433,15 +439,15 @@
 
   <div class="modal fade" id="modalNovoProduto" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
+      <div class="modal-content modal-product-surface">
+        <div class="modal-header modal-product-header">
           <h5 class="modal-title">
             <i class="bi bi-box-seam"></i> Novo Produto
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body modal-product-body">
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label required">Nome do Produto</label>
@@ -475,21 +481,15 @@
           </div>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer modal-product-footer">
           <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-success" id="btnSalvarProduto" type="button">Salvar produto</button>
+          <button class="btn modal-product-save-button" id="btnSalvarProduto" type="button">Salvar produto</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="footer-info">
-    <i class="bi bi-box-seam"></i> Plataforma de Estoque v1.0 &copy; 2025
-  </div>
-
+  </div>  <script src="js/mock-api.js?v=frontend-audit"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mock-api.js?v=frontend-audit"></script>
-  <script src="js/principal.js?v=frontend-audit"></script>
+  <script src="js/principal.js"></script>
   <script src="js/entrada-compra.js"></script>
 </body>
 </html>

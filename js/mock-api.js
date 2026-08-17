@@ -76,6 +76,7 @@
         try {
           db = JSON.parse(persisted);
           garantirDadosCaixa();
+          garantirDadosMesas();
           return db;
         } catch (_) {
           localStorage.removeItem(DB_KEY);
@@ -84,6 +85,7 @@
 
       db = await loadSeed();
       garantirDadosCaixa();
+      garantirDadosMesas();
       persistDb();
       return db;
     })();
@@ -115,6 +117,53 @@
       { movimentoId: 4, caixaSessaoId: 1000, tipo: 'VENDA', valor: 948.5, vendaId: 1007, dataMovimento: iso(1, 14, 20), usuarioNome: 'Juliana Operadora', motivo: 'Venda registrada' }
     ];
     persistDb();
+  }
+
+  function garantirDadosMesas() {
+    if (!db.clientes.some((cliente) => String(cliente.nome || '').trim().toLowerCase() === 'consumidor não identificado')) {
+      db.clientes.unshift({ clienteId: nextNumericId(db.clientes, 'clienteId'), nome: 'Consumidor não identificado', cpfCnpj: '', telefone: '', observacao: '', ativo: true });
+    }
+    if (!Array.isArray(db.mesas) || !Array.isArray(db.atendimentosMesas)) {
+      db.mesas = Array.from({ length: 10 }, (_, index) => ({
+        mesaId: index + 1,
+        numero: index + 1,
+        titulo: `Mesa ${index + 1}`
+      }));
+      db.atendimentosMesas = [];
+    }
+    persistDb();
+  }
+
+  function produtoMesa(codigo) {
+    return db.produtos.find((produto) => Number(produto.prodCod) === Number(codigo));
+  }
+
+  function visualizarAtendimentoMesa(atendimento) {
+    const mesa = db.mesas.find((item) => Number(item.mesaId) === Number(atendimento.mesaId));
+    return {
+      atendimentoMesaId: atendimento.atendimentoMesaId,
+      mesaId: atendimento.mesaId,
+      numero: mesa?.numero || atendimento.mesaId,
+      titulo: mesa?.titulo || `Mesa ${atendimento.mesaId}`,
+      clienteId: atendimento.clienteId ?? null,
+      abertaEm: atendimento.abertaEm,
+      itens: clone(atendimento.itens || [])
+    };
+  }
+
+  function listarMesasDemo() {
+    return db.mesas.map((mesa) => {
+      const atendimento = db.atendimentosMesas.find((item) => Number(item.mesaId) === Number(mesa.mesaId));
+      const cliente = db.clientes.find((item) => Number(item.clienteId) === Number(atendimento?.clienteId));
+      const possuiItens = Boolean(atendimento?.itens?.length);
+      return {
+        ...mesa,
+        atendimentoMesaId: atendimento?.atendimentoMesaId || null,
+        clienteId: atendimento?.clienteId ?? null,
+        clienteNome: cliente?.nome || '',
+        status: atendimento ? (possuiItens ? 'EM_CONSUMO' : 'ABERTA') : 'LIVRE'
+      };
+    });
   }
 
   function resumoCaixa(sessao) {
@@ -519,6 +568,23 @@
       addLog('PARAMETRIZACAO_UPDATE', 'Parametrização da demonstração atualizada.');
       return text('Parametrização salva com sucesso.');
     }
+    if (path === '/api/modulos/unica' && method === 'GET') {
+      return json({
+        ...(db.modulos || {}),
+        moduloEstoque: true,
+        moduloAlertas: true,
+        moduloVendas: true,
+        moduloFinanceiro: true,
+        moduloContasPagar: false,
+        moduloContasReceber: false,
+        moduloRelatorios: false
+      });
+    }
+    if (path === '/api/modulos' && method === 'POST') {
+      db.modulos = { ...(db.modulos || {}), ...parseJsonBody(init) };
+      persistDb();
+      return json(db.modulos);
+    }
 
     if (path === '/api/categorias-produto' && method === 'GET') {
       let lista = clone(db.categorias);
@@ -839,6 +905,14 @@
       return json(venda, 201);
     }
 
+    if (path === '/api/vendas/dividida' && method === 'POST') {
+      const body = parseJsonBody(init);
+      const pagamentos = Array.isArray(body.pagamentos) ? body.pagamentos : [];
+      if (!pagamentos.length) return text('Informe os pagamentos da venda.', 400);
+      const valorTotal = pagamentos.reduce((soma, pagamento) => soma + Number(pagamento.valor || 0), 0);
+      return json({ vendaId: nextNumericId(db.vendas, 'vendaId'), status: 'FINALIZADA', valorTotal, pagamentos }, 201);
+    }
+
     if (path === '/api/estoque/consulta' && method === 'GET') return json(buildEstoqueConsulta());
     if (path === '/api/estoque/resumo' && method === 'GET') {
       let lista = buildEstoqueResumo();
@@ -977,6 +1051,88 @@
       persistDb();
       addLog('SAIDA_UPDATE', `Saída #${id} atualizada.`);
       return text('OK');
+    }
+
+    if (path === '/api/mesas' && method === 'GET') {
+      return json(listarMesasDemo());
+    }
+    if (path === '/api/mesas/ativar-proxima' && method === 'POST') {
+      const mesa = {
+        mesaId: nextNumericId(db.mesas, 'mesaId'),
+        numero: nextNumericId(db.mesas, 'numero'),
+        titulo: `Mesa ${nextNumericId(db.mesas, 'numero')}`
+      };
+      db.mesas.push(mesa);
+      persistDb();
+      return json(mesa, 201);
+    }
+    if (path === '/api/mesas/ocultar-ultima' && method === 'POST') {
+      const ultima = [...db.mesas].sort((a, b) => Number(b.numero) - Number(a.numero)).find((mesa) => Number(mesa.numero) > 10);
+      if (!ultima) return text('Não há mesa adicional para ocultar.', 400);
+      if (db.atendimentosMesas.some((item) => Number(item.mesaId) === Number(ultima.mesaId))) return text('A mesa precisa estar livre.', 409);
+      db.mesas = db.mesas.filter((mesa) => Number(mesa.mesaId) !== Number(ultima.mesaId));
+      persistDb();
+      return json(ultima);
+    }
+    const abrirMesaMatch = path.match(/^\/api\/mesas\/(\d+)\/atendimento$/);
+    if (abrirMesaMatch && method === 'POST') {
+      const mesaId = Number(abrirMesaMatch[1]);
+      if (!db.mesas.some((mesa) => Number(mesa.mesaId) === mesaId)) return text('Mesa não encontrada.', 404);
+      if (db.atendimentosMesas.some((item) => Number(item.mesaId) === mesaId)) return text('Mesa já está aberta.', 409);
+      const body = parseJsonBody(init);
+      const itens = (body.itens || []).map((item, index) => {
+        const produto = produtoMesa(item.produtoCod);
+        const precoUnitario = Number(produto?.valorUnitario || 0);
+        return {
+          id: index + 1,
+          produtoCod: Number(item.produtoCod),
+          produtoNome: produto?.prodDescr || 'Produto',
+          quantidade: Number(item.quantidade || 0),
+          precoUnitario,
+          subtotal: Number((precoUnitario * Number(item.quantidade || 0)).toFixed(2)),
+          status: 'ATIVO'
+        };
+      });
+      const atendimento = {
+        atendimentoMesaId: nextNumericId(db.atendimentosMesas, 'atendimentoMesaId'),
+        mesaId,
+        clienteId: body.clienteId == null || body.clienteId === '' ? null : Number(body.clienteId),
+        abertaEm: nowIso(),
+        itens
+      };
+      db.atendimentosMesas.push(atendimento);
+      persistDb();
+      return json(visualizarAtendimentoMesa(atendimento), 201);
+    }
+    const atendimentoMesaMatch = path.match(/^\/api\/mesas\/atendimentos\/(\d+)(?:\/(fechar|cliente|itens))?$/);
+    if (atendimentoMesaMatch) {
+      const atendimento = db.atendimentosMesas.find((item) => Number(item.atendimentoMesaId) === Number(atendimentoMesaMatch[1]));
+      if (!atendimento) return text('Atendimento não encontrado.', 404);
+      const acao = atendimentoMesaMatch[2] || '';
+      if (!acao && method === 'GET') return json(visualizarAtendimentoMesa(atendimento));
+      if (!acao && method === 'PUT') {
+        const body = parseJsonBody(init);
+        atendimento.clienteId = body.clienteId == null || body.clienteId === '' ? null : Number(body.clienteId);
+        atendimento.itens = (body.itens || []).map((item, index) => {
+          const produto = produtoMesa(item.produtoCod);
+          const precoUnitario = Number(item.precoUnitario ?? produto?.valorUnitario ?? 0);
+          const quantidade = Number(item.quantidade || 0);
+          return { id: item.id || index + 1, produtoCod: Number(item.produtoCod), produtoNome: produto?.prodDescr || item.produtoNome || 'Produto', quantidade, precoUnitario, subtotal: Number((precoUnitario * quantidade).toFixed(2)), status: 'ATIVO' };
+        });
+        persistDb();
+        return json(visualizarAtendimentoMesa(atendimento));
+      }
+      if (!acao && method === 'DELETE') {
+        db.atendimentosMesas = db.atendimentosMesas.filter((item) => Number(item.atendimentoMesaId) !== Number(atendimento.atendimentoMesaId));
+        persistDb();
+        return new Response(null, { status: 204 });
+      }
+      if (acao === 'fechar' && method === 'POST') {
+        db.atendimentosMesas = db.atendimentosMesas.filter((item) => Number(item.atendimentoMesaId) !== Number(atendimento.atendimentoMesaId));
+        persistDb();
+        addLog('MESA_FECHADA', `Mesa ${atendimento.mesaId} fechada na demonstração.`);
+        return json({ status: 'FINALIZADA' });
+      }
     }
 
     if (path === '/api/caixa/sessao/aberta' && method === 'GET') {

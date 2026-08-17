@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>HistÃ³rico de Vendas | Plataforma de GestÃ£o</title>
+  <title>Histórico de Vendas | Plataforma de Gestão</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
 
   <link href="css/style.css" rel="stylesheet"/>
   <link href="css/app.css" rel="stylesheet"/>
-  <link href="css/principal.css" rel="stylesheet"/>
+  <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/historico-vendas.css" rel="stylesheet"/>
 </head>
 <body class="app-shell">
@@ -35,10 +35,10 @@
           <div class="sales-history-header-copy">
             <span class="sales-history-badge">
               <i class="bi bi-receipt-cutoff"></i>
-              PÃ³s-venda
+              Pós-venda
             </span>
-            <h1>HistÃ³rico de Vendas</h1>
-            <p>Consulte as vendas jÃ¡ registradas, acompanhe totais e prepare a base para aÃ§Ãµes futuras de detalhe, cancelamento e devoluÃ§Ã£o.</p>
+            <h1>Histórico de Vendas</h1>
+            <p>Consulte as vendas já registradas, acompanhe totais e prepare a base para ações futuras de detalhe, cancelamento e devolução.</p>
           </div>
         </section>
 
@@ -82,14 +82,11 @@
                 </select>
               </div>
               <div>
-                <label class="form-label" for="filtroVendaStatus">Status</label>
-                <select id="filtroVendaStatus" class="form-select">
+                <label class="form-label" for="filtroVendaTipo">Tipo</label>
+                <select id="filtroVendaTipo" class="form-select">
                   <option value="">Todos</option>
-                  <option value="FINALIZADA">Finalizada</option>
-                  <option value="ABERTA">Aberta</option>
-                  <option value="CANCELADA">Cancelada</option>
-                  <option value="PARCIALMENTE_DEVOLVIDA">Parcialmente devolvida</option>
-                  <option value="DEVOLVIDA">Devolvida</option>
+                  <option value="VENDA_RAPIDA">Venda rápida</option>
+                  <option value="MESA">Mesa</option>
                 </select>
               </div>
               <div>
@@ -113,7 +110,7 @@
           <div class="sales-list-header">
             <div>
               <h2>Vendas realizadas</h2>
-              <p>Primeira etapa focada em consulta e conferÃªncia das vendas registradas.</p>
+              <p>Primeira etapa focada em consulta e conferência das vendas registradas.</p>
             </div>
           </div>
 
@@ -125,11 +122,11 @@
                   <th>Data/Hora</th>
                   <th>Cliente</th>
                   <th>Pagamento</th>
-                  <th>Status</th>
+                  <th>Tipo</th>
                   <th>Vendedor</th>
                   <th class="text-end">Itens</th>
                   <th class="text-end">Total</th>
-                  <th class="text-center">AÃ§Ãµes</th>
+                  <th class="text-center">Ações</th>
                 </tr>
               </thead>
               <tbody id="tabelaHistoricoVendasBody"></tbody>
@@ -182,7 +179,10 @@
                   </div>
                   <div class="sales-detail-fact">
                     <small>Vendedor</small>
-                    <strong id="detalheVendaVendedor">-</strong>
+                    <div class="sales-detail-vendedor">
+                      <strong id="detalheVendaVendedor">-</strong>
+                      <span id="detalheVendaTipo"></span>
+                    </div>
                   </div>
                 </div>
               </section>
@@ -206,9 +206,29 @@
                 </div>
 
                 <section class="sales-detail-inline-note d-none" id="detalheVendaObservacaoBloco">
-                  <small>ObservaÃ§Ã£o</small>
+                  <small>Observação</small>
                   <p id="detalheVendaObservacao">-</p>
                 </section>
+              </section>
+
+              <section class="sales-detail-card-shell d-none" id="detalheVendaPagamentosDivididosBloco">
+                <div class="sales-detail-section-header">
+                  <h6>Pagamentos divididos</h6>
+                </div>
+                <div class="table-responsive sales-detail-table-wrapper">
+                  <table class="table table-sm align-middle sales-detail-table">
+                    <thead>
+                      <tr>
+                        <th>Pessoa</th>
+                        <th>Forma</th>
+                        <th class="text-end">Valor</th>
+                        <th class="text-end">Taxa</th>
+                        <th class="text-end">Líquido</th>
+                      </tr>
+                    </thead>
+                    <tbody id="detalheVendaPagamentosDivididosBody"></tbody>
+                  </table>
+                </div>
               </section>
             </div>
 
@@ -257,12 +277,20 @@
                     <strong id="detalheVendaTroco">-</strong>
                   </div>
                 </div>
+                <details class="mt-3 d-none" id="detalheVendaTaxaBloco">
+                  <summary class="fw-semibold">Ver cálculo da taxa</summary>
+                  <div class="sales-detail-summary mt-2">
+                    <div class="sales-detail-summary-row"><span>Valor bruto</span><strong id="detalheVendaValorBruto">R$ 0,00</strong></div>
+                    <div class="sales-detail-summary-row"><span>Taxa descontada</span><strong id="detalheVendaValorTaxa">R$ 0,00</strong></div>
+                    <div class="sales-detail-summary-row sales-detail-summary-total"><span>Líquido a receber</span><strong id="detalheVendaValorLiquido">R$ 0,00</strong></div>
+                  </div>
+                </details>
               </section>
             </aside>
           </div>
         </div>
         <div class="modal-footer sales-detail-modal-footer">
-          <span class="sales-detail-footer-note">Layout compacto para consulta rÃ¡pida da venda.</span>
+          <span class="sales-detail-footer-note">Layout compacto para consulta rápida da venda.</span>
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
         </div>
       </div>
@@ -280,11 +308,11 @@
           <div id="mensagensModalCancelarVenda"></div>
 
           <div id="cancelamentoVendaEtapaAprovacao">
-            <p class="mb-3">Informe o usuÃ¡rio ou e-mail e a senha de um administrador para liberar o cancelamento da venda.</p>
+            <p class="mb-3">Informe o usuário ou e-mail e a senha de um administrador para liberar o cancelamento da venda.</p>
 
             <div class="sales-cancel-form">
               <div>
-                <label class="form-label" for="cancelamentoAdminEmail">UsuÃ¡rio ou e-mail do administrador</label>
+                <label class="form-label" for="cancelamentoAdminEmail">Usuário ou e-mail do administrador</label>
                 <input type="text" id="cancelamentoAdminEmail" class="form-control" autocomplete="username"/>
               </div>
               <div>
@@ -313,12 +341,10 @@
         </div>
       </div>
     </div>
-  </div>
-
+  </div>  <script src="js/mock-api.js?v=frontend-audit"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mock-api.js?v=frontend-audit"></script>
-  <script src="js/principal.js?v=frontend-audit"></script>
-  <script src="js/historico-vendas.js"></script>
+  <script src="js/principal.js"></script>
+  <script src="js/historico-vendas.js?v=20260809-tipo-venda"></script>
 </body>
 </html>
 

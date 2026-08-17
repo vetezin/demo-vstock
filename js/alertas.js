@@ -1,4 +1,4 @@
-﻿const API_ALERTAS = {
+const API_ALERTAS = {
   CONSULTA: "http://localhost:8080/api/estoque/consulta"
 };
 
@@ -8,17 +8,6 @@ let alertasPaginados = [];
 let paginaAtualAlertas = 1;
 let totalAlertas = 0;
 const ITENS_POR_PAGINA_ALERTAS = 10;
-
-function fmtDataAlerta(valor) {
-  if (!valor) return "-";
-  const apenasData = String(valor).split("T")[0];
-  const partes = apenasData.split("-");
-  if (partes.length === 3) {
-    const [ano, mes, dia] = partes;
-    return `${dia}/${mes}/${ano}`;
-  }
-  return valor;
-}
 
 function renderizarPaginacaoAlertas() {
   window.vstockPagination.render({
@@ -35,10 +24,6 @@ function renderizarPaginacaoAlertas() {
   });
 }
 
-function normalizarTextoAlerta(valor) {
-  return String(valor || "").trim().toLowerCase();
-}
-
 function obterOpcoesProdutoAlerta() {
   return listaAlertas
     .filter((item) => window.calcularStatusEstoque(item).chave !== "EM_ESTOQUE")
@@ -52,8 +37,8 @@ function obterOpcoesCategoriaAlerta() {
 }
 
 function aplicarFiltrosAlertas() {
-  const produto = normalizarTextoAlerta($alerta("#filtroProdutoAlerta")?.value);
-  const categoria = normalizarTextoAlerta($alerta("#filtroCategoriaAlerta")?.value);
+  const produto = window.vstockText.normalize($alerta("#filtroProdutoAlerta")?.value);
+  const categoria = window.vstockText.normalize($alerta("#filtroCategoriaAlerta")?.value);
   const status = $alerta("#filtroStatusAlerta")?.value || "";
 
   return listaAlertas.filter((item) => {
@@ -99,7 +84,7 @@ function renderizarAlertas() {
         <td>${item.prod_descr || "-"}</td>
         <td>${item.categoria || "-"}</td>
         <td class="text-end">${Number(item.saldo_atual || 0)}</td>
-        <td>${fmtDataAlerta(item.proxima_validade)}</td>
+        <td>${window.vstockFormatters.date(item.proxima_validade)}</td>
         <td><span class="status-badge-estoque ${status.classe}">${status.label}</span></td>
         <td class="text-center">
           <a class="btn btn-sm btn-outline-secondary" href="historico.html?produto=${encodeURIComponent(item.prod_descr || "")}">
@@ -158,4 +143,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     onOptionSelect: () => atualizarPaginacaoAlertas(1)
   });
 });
+
 

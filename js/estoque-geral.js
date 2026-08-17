@@ -1,46 +1,15 @@
-﻿const API_ESTOQUE = {
+const API_ESTOQUE = {
   CONSULTA: "http://localhost:8080/api/estoque/consulta"
 };
 
 const $estoque = (sel) => document.querySelector(sel);
+const msgEstoque = window.vstockUi.createAlertHandler({ container: "#mensagens", clear: true });
 const ITENS_POR_PAGINA_ESTOQUE = 10;
 
 let listaEstoque = [];
 let paginaAtualEstoque = 1;
 let totalItensEstoque = 0;
 let totalPaginasEstoque = 1;
-
-function msgEstoque(texto, tipo = "danger") {
-  const box = $estoque("#mensagens");
-  if (!box) return;
-
-  box.innerHTML = `
-    <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
-      ${texto}
-      <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-    </div>
-  `;
-  window.destacarMensagens?.(box);
-}
-
-function fmtDataBr(valor) {
-  if (!valor) return "-";
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return valor;
-
-  const apenasData = String(valor).split("T")[0];
-  const partes = apenasData.split("-");
-  if (partes.length === 3) {
-    const [ano, mes, dia] = partes;
-    return `${dia}/${mes}/${ano}`;
-  }
-
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return valor;
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  }).format(data);
-}
 
 function badgeMovimentacao(tipo, data) {
   if (!tipo || tipo === "-") {
@@ -55,7 +24,7 @@ function badgeMovimentacao(tipo, data) {
       <span class="movimentacao-badge ${classe}">
         <i class="bi ${icone}"></i> ${texto}
       </span>
-      <small class="text-muted">${fmtDataBr(data)}</small>
+      <small class="text-muted">${window.vstockFormatters.date(data)}</small>
     </div>
   `;
 }
@@ -139,12 +108,12 @@ function renderizarTabela(lista) {
         <td>
           <div class="produto-info">
             <strong>${item.prod_descr || "-"}</strong>
-            <small>Cadastro: ${fmtDataBr(item.data_cadastro)} | Min.: ${Number(item.qtd_min || 0)}</small>
+            <small>Cadastro: ${window.vstockFormatters.date(item.data_cadastro)} | Min.: ${Number(item.qtd_min || 0)}</small>
           </div>
         </td>
         <td>${item.categoria || "-"}</td>
         <td class="text-end fw-semibold">${Number(item.saldo_atual || 0)}</td>
-        <td>${fmtDataBr(item.proxima_validade)}</td>
+        <td>${window.vstockFormatters.date(item.proxima_validade)}</td>
         <td>${badgeMovimentacao(item.tipo_ultima_movimentacao, item.ultima_movimentacao)}</td>
         <td><span class="status-badge-estoque ${status.classe}">${status.label}</span></td>
         <td class="text-center">
@@ -215,5 +184,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderizarTudo(1);
   });
 });
+
 
 

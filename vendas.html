@@ -1,19 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Vendas | Plataforma de GestÃ£o</title>
+  <title>Vendas | Plataforma de Gestão</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
 
   <link href="css/style.css" rel="stylesheet"/>
   <link href="css/app.css" rel="stylesheet"/>
-  <link href="css/principal.css" rel="stylesheet"/>
-  <link href="css/entrada-compra.css" rel="stylesheet"/>
+  <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
+  <link href="css/vendas.css?v=20260814-reserva-mesas-r1" rel="stylesheet"/>
   <link href="css/estoque-paginas.css" rel="stylesheet"/>
-  <link href="css/vendas.css" rel="stylesheet"/>
 </head>
 <body class="app-shell">
   <nav class="navbar brand-navbar app-topbar">
@@ -52,7 +51,7 @@
             <div class="pdv-header-actions">
               <button type="button" id="btnAbrirModalClienteVenda" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-person-plus"></i>
-                Cliente
+                Novo Cliente
               </button>
               <button type="button" id="btnAbrirModalFormaPagamento" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-wallet2"></i>
@@ -61,12 +60,21 @@
             </div>
           </div>
 
-          <div class="pdv-layout">
+          <div class="pdv-view-switcher" role="tablist" aria-label="Modo de venda">
+            <button type="button" class="pdv-view-switcher-btn is-active" id="btnModoVendaRapida" role="tab" aria-selected="true">
+              <i class="bi bi-cart-check"></i> Venda rápida
+            </button>
+            <button type="button" class="pdv-view-switcher-btn" id="btnModoMesas" role="tab" aria-selected="false">
+              <i class="bi bi-grid-3x3-gap"></i> Mesas
+            </button>
+          </div>
+
+          <div id="visaoVendaRapida" class="pdv-layout">
             <section class="pdv-panel pdv-products-panel">
               <div class="pdv-toolbar">
                 <label class="pdv-search-box" for="buscaProdutoVenda">
                   <i class="bi bi-search"></i>
-                  <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto por nome ou cÃ³digo..." autocomplete="off"/>
+                  <input id="buscaProdutoVenda" class="form-control" placeholder="Buscar produto por nome ou código..." autocomplete="off"/>
                 </label>
 
                 <select id="filtroCategoriaVenda" class="form-select pdv-native-select">
@@ -84,7 +92,7 @@
               <div class="pdv-section-header">
                 <div class="pdv-section-title">
                   <i class="bi bi-box-seam"></i>
-                  <h2>Produtos DisponÃ­veis</h2>
+                  <h2>Produtos Disponíveis</h2>
                 </div>
                 <span class="pdv-count-pill" id="pdvProductCount">0 itens</span>
               </div>
@@ -119,14 +127,21 @@
                 <div class="pdv-inline-input">
                   <i class="bi bi-person"></i>
                   <select id="clienteVenda" class="form-select pdv-native-select">
-                    <option value="">Cliente BalcÃ£o</option>
+                    <option value="">Consumidor não identificado</option>
                   </select>
                   <div class="pdv-custom-select pdv-custom-select-inline" data-custom-select="clienteVenda">
                     <button type="button" class="pdv-custom-select-toggle" data-custom-select-toggle="clienteVenda" aria-expanded="false">
-                      <span data-custom-select-label="clienteVenda">Cliente BalcÃ£o</span>
+                      <span data-custom-select-label="clienteVenda">Consumidor não identificado</span>
                       <i class="bi bi-chevron-down"></i>
                     </button>
-                    <div class="pdv-custom-select-menu" data-custom-select-menu="clienteVenda"></div>
+                    <div class="pdv-custom-select-menu pdv-client-select-menu" data-custom-select-menu="clienteVenda">
+                      <label class="visually-hidden" for="buscaClienteVenda">Buscar cliente</label>
+                      <div class="pdv-client-select-search">
+                        <i class="bi bi-search"></i>
+                        <input id="buscaClienteVenda" type="search" autocomplete="off" placeholder="Buscar cliente">
+                      </div>
+                      <div class="pdv-client-select-options" data-custom-select-options="clienteVenda"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -168,7 +183,30 @@
                 </div>
               </div>
 
+              <div class="pdv-split-toggle">
+                <div>
+                  <strong>Dividir pagamento</strong>
+                  <small>Registre uma transação para cada pessoa.</small>
+                </div>
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input" type="checkbox" role="switch" id="vendaDivididaAtiva"/>
+                  <label class="visually-hidden" for="vendaDivididaAtiva">Ativar venda dividida</label>
+                </div>
+              </div>
+
               <div class="pdv-payment-grid" id="pdvPaymentOptions"></div>
+
+              <div id="blocoVendaDividida" class="pdv-split-panel d-none">
+                <div class="pdv-field-group">
+                  <label class="pdv-field-label" for="quantidadePagadoresVenda">Quantidade de pessoas</label>
+                  <input type="number" id="quantidadePagadoresVenda" class="form-control" min="2" max="20" step="1" value="2"/>
+                </div>
+                <div id="pagamentosDivididosVenda" class="pdv-split-payments"></div>
+                <div class="pdv-split-balance" id="saldoPagamentosDivididos" aria-live="polite">
+                  <span>Falta distribuir</span>
+                  <strong>R$ 0,00</strong>
+                </div>
+              </div>
 
               <div class="pdv-cash-fields">
                 <div class="pdv-field-group d-none" id="blocoValorRecebidoVenda">
@@ -202,7 +240,6 @@
               <option value="ABERTA">Aberta</option>
             </select>
             <input class="form-control" id="funcionarioNomeVenda" disabled placeholder="-"/>
-            <input type="hidden" id="funcionarioCpfVenda"/>
             <input id="codigoBarrasVenda" class="form-control" autocomplete="off"/>
 
             <div class="produto-busca-grupo">
@@ -226,7 +263,7 @@
                   <th class="text-end">Qtd</th>
                   <th class="text-end">Valor Unit.</th>
                   <th class="text-end">Subtotal</th>
-                  <th class="text-center">AÃ§Ãµes</th>
+                  <th class="text-center">Ações</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -237,6 +274,27 @@
             </select>
             <textarea id="observacaoVenda" class="form-control" rows="2" placeholder="Opcional"></textarea>
           </div>
+
+          <section id="visaoMesas" class="mesas-view d-none" aria-labelledby="tituloMesas">
+            <div class="mesas-view-header">
+              <div>
+                <h2 id="tituloMesas">Mesas</h2>
+                <p>Abra uma mesa para acompanhar o consumo até o fechamento da conta.</p>
+              </div>
+              <div class="mesas-view-actions">
+                <button type="button" class="btn btn-outline-success" id="btnNovaMesa">
+                  <i class="bi bi-plus-lg"></i> Nova Mesa
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="btnOcultarUltimaMesa">
+                  <i class="bi bi-eye-slash"></i> Ocultar Mesa
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="btnAtualizarMesas">
+                  <i class="bi bi-arrow-clockwise"></i> Atualizar
+                </button>
+              </div>
+            </div>
+            <div id="mesasGrid" class="mesas-grid" aria-live="polite"></div>
+          </section>
         </section>
       </main>
     </div>
@@ -252,11 +310,15 @@
         <div class="modal-body">
           <form id="formaPagamentoForm" class="row g-3 mb-4">
             <input type="hidden" id="formaPagamentoIdEdicao"/>
-            <div class="col-md-8">
+            <div class="col-md-6">
               <label class="form-label required">Nome</label>
-              <input type="text" id="formaPagamentoNome" class="form-control" placeholder="Ex.: ConvÃªnio" required maxlength="60"/>
+              <input type="text" id="formaPagamentoNome" class="form-control" placeholder="Ex.: Convênio" required maxlength="60"/>
             </div>
-            <div class="col-md-4 d-flex align-items-end gap-2">
+            <div class="col-md-3">
+              <label class="form-label" for="formaPagamentoTaxa">Taxa (%)</label>
+              <input type="number" id="formaPagamentoTaxa" class="form-control" min="0" max="100" step="0.01" value="0" inputmode="decimal"/>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
               <button type="submit" class="btn btn-success flex-fill">
                 <i class="bi bi-check2-circle"></i> Salvar
               </button>
@@ -271,8 +333,9 @@
               <thead>
                 <tr>
                   <th>Nome</th>
+                  <th>Taxa</th>
                   <th>Status</th>
-                  <th class="text-center">AÃ§Ãµes</th>
+                  <th class="text-center">Ações</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -308,7 +371,7 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">ObservaÃ§Ã£o</label>
+              <label class="form-label">Observação</label>
               <textarea id="clienteVendaObservacao" class="form-control" rows="3" maxlength="500"></textarea>
             </div>
 
@@ -328,12 +391,19 @@
 
   <div class="modal fade" id="modalConfirmarVenda" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-receipt-cutoff text-danger"></i> Confirmar Venda</h5>
+      <div class="modal-content venda-confirmacao-modal-content">
+        <div class="modal-header venda-confirmacao-modal-header">
+          <div class="venda-confirmacao-title-wrap">
+            <span class="venda-confirmacao-title-icon"><i class="bi bi-receipt-cutoff"></i></span>
+            <div>
+              <span class="venda-confirmacao-eyebrow">Última conferência</span>
+              <h5 class="modal-title">Confirmar Venda</h5>
+            </div>
+          </div>
+
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body venda-confirmacao-modal-body">
           <p class="text-muted mb-3">Confira os detalhes da venda antes de confirmar.</p>
 
           <div class="table-responsive mb-3 venda-modal-produtos-card">
@@ -350,7 +420,7 @@
             </table>
           </div>
 
-          <div class="venda-modal-resumo-card">
+          <div class="venda-modal-resumo-card venda-confirmacao-finance-card">
             <div class="venda-resumo-linha">
               <span>Subtotal</span>
               <strong id="resumoConfirmacaoVendaSubtotal">R$ 0,00</strong>
@@ -365,7 +435,7 @@
             </div>
           </div>
 
-          <div class="venda-modal-resumo-card">
+          <div class="venda-modal-resumo-card venda-confirmacao-payment-card">
             <div class="venda-resumo-linha">
               <span>Forma de Pagamento</span>
               <strong id="resumoConfirmacaoVendaFormaPagamento">-</strong>
@@ -378,14 +448,15 @@
               <span>Troco</span>
               <strong class="text-success" id="resumoConfirmacaoVendaTroco">R$ 0,00</strong>
             </div>
+            <div id="resumoConfirmacaoVendaPagamentosDivididos" class="d-none"></div>
           </div>
 
           <div class="saida-info-banner mt-3">
             <i class="bi bi-info-circle"></i>
-            <span>Ao confirmar, o estoque serÃ¡ atualizado e a venda serÃ¡ registrada.</span>
+            <span>Ao confirmar, o estoque será atualizado e a venda será registrada.</span>
           </div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer venda-confirmacao-modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             Cancelar
           </button>
@@ -397,10 +468,140 @@
     </div>
   </div>
 
+  <div class="modal fade" id="modalMesa" tabindex="-1" aria-labelledby="modalMesaTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content mesa-modal-content">
+        <div class="modal-header mesa-modal-header">
+          <div class="mesa-modal-identity">
+            <span class="mesa-modal-icon"><i class="bi bi-table"></i></span>
+            <div>
+              <h5 class="modal-title" id="modalMesaTitulo">Mesa</h5>
+              <small id="modalMesaAbertura"></small>
+            </div>
+          </div>
+          <button type="button" class="btn-close mesa-modal-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body mesa-modal-body">
+          <section class="mesa-modal-section" aria-labelledby="mesaClienteTitulo">
+            <div class="d-flex align-items-end gap-2">
+              <div class="flex-grow-1">
+                <label id="mesaClienteTitulo" class="form-label" for="mesaCliente">Cliente</label>
+                <input id="mesaCliente" class="form-control" type="search" placeholder="Pesquisar cliente" autocomplete="off">
+              </div>
+              <button type="button" id="btnAlterarClienteMesa" class="btn btn-outline-secondary text-nowrap d-none"><i class="bi bi-pencil-square"></i> Alterar Cliente</button>
+              <button type="button" id="btnNovoClienteMesa" class="btn btn-outline-secondary text-nowrap"><i class="bi bi-person-plus"></i> Novo Cliente</button>
+            </div>
+          </section>
+
+          <section class="mesa-modal-section" aria-labelledby="mesaItensTitulo">
+            <h6 id="mesaItensTitulo">Itens da conta</h6>
+            <div id="modalMesaItens" class="mesas-modal-itens"></div>
+          </section>
+
+          <section class="mesa-modal-section" aria-labelledby="mesaAdicionarTitulo">
+            <h6 id="mesaAdicionarTitulo">Adicionar item</h6>
+            <div class="mesas-modal-add">
+              <div class="mesa-product-search">
+                <label class="visually-hidden" for="mesaBuscaProduto">Buscar produto por nome ou código de barras</label>
+                <div class="mesa-product-search-input">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <input id="mesaBuscaProduto" class="form-control" type="search" placeholder="Nome ou código de barras" autocomplete="off">
+                </div>
+                <div id="mesaProdutosResultados" class="mesa-product-results" role="listbox" aria-label="Produtos encontrados"></div>
+                <select id="mesaProdutoSelecionado" class="visually-hidden" aria-hidden="true" tabindex="-1"></select>
+              </div>
+              <input id="mesaQuantidade" class="form-control" type="number" min="1" value="1" aria-label="Quantidade">
+              <button type="button" id="btnAdicionarItemMesa" class="btn mesa-modal-add-button"><i class="bi bi-plus-lg"></i> Adicionar</button>
+            </div>
+          </section>
+
+          <section class="mesa-modal-section" aria-labelledby="mesaPagamentoTitulo">
+            <div class="pdv-split-toggle" id="mesaDividirPagamentoBloco">
+              <div>
+                <strong>Dividir pagamento</strong>
+                <small>Registre mais de uma forma de pagamento para esta mesa.</small>
+              </div>
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="mesaVendaDivididaAtiva">
+                <label class="visually-hidden" for="mesaVendaDivididaAtiva">Dividir pagamento da mesa</label>
+              </div>
+            </div>
+            <div id="mesaBlocoFormaPagamento">
+              <label id="mesaPagamentoTitulo" for="mesaFormaPagamento" class="form-label">Forma de Pagamento</label>
+              <div class="mesa-modal-payment-select">
+                <i class="bi bi-credit-card-2-front"></i>
+                <select id="mesaFormaPagamento" class="form-select"></select>
+              </div>
+            </div>
+            <div id="mesaBlocoPagamentoDividido" class="pdv-split-panel d-none">
+              <div class="pdv-field-group">
+                <label class="pdv-field-label" for="mesaQuantidadePagadores">Quantidade de pessoas</label>
+                <input type="number" id="mesaQuantidadePagadores" class="form-control" min="2" max="20" step="1" value="2">
+              </div>
+              <div id="mesaPagamentosDivididos" class="pdv-split-payments"></div>
+              <div class="pdv-split-balance" id="mesaSaldoPagamentosDivididos" aria-live="polite">
+                <span>Falta distribuir</span>
+                <strong>R$ 0,00</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div class="modal-footer mesa-modal-footer">
+          <div class="mesas-modal-total"><span>Total parcial</span><strong id="modalMesaTotal">R$ 0,00</strong></div>
+          <div class="mesa-modal-actions">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="button" class="btn mesa-modal-close-account" id="btnSalvarMesa"><i class="bi bi-check2-circle"></i> Salvar Mesa</button>
+            <button type="button" class="btn btn-outline-secondary d-none" id="btnCancelarAlteracoesMesa">Cancelar alterações</button>
+            <button type="button" class="btn mesa-modal-close-account d-none" id="btnSalvarAlteracoesMesa"><i class="bi bi-check2-circle"></i> Salvar alterações</button>
+            <button type="button" class="btn btn-outline-danger d-none" id="btnLimparMesa"><i class="bi bi-trash3"></i> Limpar Mesa</button>
+            <button type="button" class="btn mesa-modal-close-account d-none" id="btnFinalizarMesa"><i class="bi bi-check2-circle"></i> Fechar Mesa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalConfirmarOcultarMesa" tabindex="-1" aria-labelledby="tituloConfirmarOcultarMesa" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tituloConfirmarOcultarMesa"><i class="bi bi-eye-slash me-2"></i>Ocultar mesa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Deseja ocultar a &uacute;ltima mesa adicional?</p>
+          <p class="text-muted mb-0">A &uacute;ltima mesa da lista voltar&aacute; para a reserva. Voc&ecirc; poder&aacute; ativ&aacute;-la novamente pelo bot&atilde;o Nova Mesa.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-outline-secondary" id="btnConfirmarOcultarMesa"><i class="bi bi-eye-slash"></i> Ocultar Mesa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalConfirmarLimpezaMesa" tabindex="-1" aria-labelledby="tituloConfirmarLimpezaMesa" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tituloConfirmarLimpezaMesa"><i class="bi bi-trash3 text-danger me-2"></i>Limpar mesa</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Deseja limpar esta mesa?</p>
+          <p class="text-muted mb-0">O cliente e os itens serão removidos, e a mesa ficará livre para um novo atendimento.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmarLimparMesa"><i class="bi bi-trash3"></i> Limpar Mesa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/mock-api.js?v=frontend-audit-r2"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mock-api.js?v=frontend-audit"></script>
-  <script src="js/principal.js?v=frontend-audit"></script>
-  <script src="js/vendas.js"></script>
+  <script src="js/principal.js?v=20260814-cliente-id-r1"></script>
+  <script src="js/vendas.js?v=20260814-funcionario-sessao-r1"></script>
+  <script src="js/mesas.js?v=20260814-edicao-cliente-r1"></script>
 </body>
 </html>
-

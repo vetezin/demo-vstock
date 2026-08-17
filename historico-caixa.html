@@ -1,14 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>HistÃ³rico de Caixa | Plataforma de GestÃ£o</title>
+  <title>Histórico de Caixa | Plataforma de Gestão</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
   <link href="css/style.css" rel="stylesheet"/>
   <link href="css/app.css" rel="stylesheet"/>
-  <link href="css/principal.css?v=20260801-caixa-historico" rel="stylesheet"/>
+  <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/caixa.css?v=20260801-caixa-historico" rel="stylesheet"/>
 </head>
 <body class="app-shell cash-page">
@@ -22,49 +22,49 @@
   </nav>
 
   <div class="main-container app-layout">
-    <aside class="sidebar" aria-label="NavegaÃ§Ã£o principal"></aside>
+    <aside class="sidebar" aria-label="Navegação principal"></aside>
     <div class="content page-content">
       <main class="page-wrapper cash-page-wrapper">
         <section class="cash-page-header">
           <div>
-            <span class="cash-eyebrow"><i class="bi bi-clock-history"></i> ConferÃªncia e auditoria</span>
-            <h1>HistÃ³rico de Caixa</h1>
-            <p>Consulte sessÃµes registradas. Use <strong>Ver detalhes</strong> para conferir valores, pagamentos e movimentos sem poluir a listagem.</p>
+            <span class="cash-eyebrow"><i class="bi bi-clock-history"></i> Conferência e auditoria</span>
+            <h1>Histórico de Caixa</h1>
+            <p>Consulte sessões registradas. Use <strong>Ver detalhes</strong> para conferir valores, pagamentos e movimentos sem poluir a listagem.</p>
           </div>
           <a class="btn cash-secondary-button" href="caixa.html"><i class="bi bi-arrow-left"></i> Voltar ao caixa atual</a>
         </section>
 
         <div id="mensagens"></div>
 
-        <section class="cash-history-summary" aria-label="Resumo do histÃ³rico">
-          <article><span><i class="bi bi-journal-check"></i></span><div><small>SessÃµes encontradas</small><strong id="cashHistoryCount">0</strong></div></article>
-          <article><span><i class="bi bi-currency-dollar"></i></span><div><small>Vendas lÃ­quidas</small><strong id="cashHistoryNetSales">R$ 0,00</strong></div></article>
-          <article><span><i class="bi bi-check2-circle"></i></span><div><small>Sem diferenÃ§a</small><strong id="cashHistoryBalanced">0</strong></div></article>
-          <article class="is-attention"><span><i class="bi bi-exclamation-triangle"></i></span><div><small>Com diferenÃ§a</small><strong id="cashHistoryDivergent">0</strong></div></article>
+        <section class="cash-history-summary" aria-label="Resumo do histórico">
+          <article><span><i class="bi bi-journal-check"></i></span><div><small>Sessões encontradas</small><strong id="cashHistoryCount">0</strong></div></article>
+          <article><span><i class="bi bi-currency-dollar"></i></span><div><small>Vendas líquidas</small><strong id="cashHistoryNetSales">R$ 0,00</strong></div></article>
+          <article><span><i class="bi bi-check2-circle"></i></span><div><small>Sem diferença</small><strong id="cashHistoryBalanced">0</strong></div></article>
+          <article class="is-attention"><span><i class="bi bi-exclamation-triangle"></i></span><div><small>Com diferença</small><strong id="cashHistoryDivergent">0</strong></div></article>
         </section>
 
         <section class="cash-card">
           <div class="cash-card-header">
-            <div class="cash-card-title"><span><i class="bi bi-funnel"></i></span><div><h2>Filtros</h2><p>Localize sessÃµes por perÃ­odo, operador ou situaÃ§Ã£o.</p></div></div>
+            <div class="cash-card-title"><span><i class="bi bi-funnel"></i></span><div><h2>Filtros</h2><p>Localize sessões por período, operador ou situação.</p></div></div>
           </div>
           <div class="cash-card-body">
             <div class="cash-filter-grid cash-history-filter-grid">
               <div><label class="form-label" for="cashHistoryStart">Data inicial</label><input class="form-control" id="cashHistoryStart" type="date"/></div>
               <div><label class="form-label" for="cashHistoryEnd">Data final</label><input class="form-control" id="cashHistoryEnd" type="date"/></div>
               <div><label class="form-label" for="cashHistoryOperator">Operador</label><input class="form-control" id="cashHistoryOperator" placeholder="Nome do operador"/></div>
-              <div><label class="form-label" for="cashHistoryStatus">SituaÃ§Ã£o</label><select class="form-select" id="cashHistoryStatus"><option value="">Todas</option><option value="ABERTO">Aberto</option><option value="FECHADO_SEM_DIFERENCA">Fechado sem diferenÃ§a</option><option value="FECHADO_COM_DIFERENCA">Fechado com diferenÃ§a</option></select></div>
+              <div><label class="form-label" for="cashHistoryStatus">Situação</label><select class="form-select" id="cashHistoryStatus"><option value="">Todas</option><option value="ABERTO">Aberto</option><option value="FECHADO_SEM_DIFERENCA">Fechado sem diferença</option><option value="FECHADO_COM_DIFERENCA">Fechado com diferença</option></select></div>
             </div>
-            <div class="cash-filter-actions"><button class="btn cash-secondary-button" id="cashHistoryClear" type="button"><i class="bi bi-eraser"></i> Limpar</button><button class="btn cash-primary-button" id="cashHistorySearch" type="button"><i class="bi bi-search"></i> Buscar sessÃµes</button></div>
+            <div class="cash-filter-actions"><button class="btn cash-secondary-button" id="cashHistoryClear" type="button"><i class="bi bi-eraser"></i> Limpar</button><button class="btn cash-primary-button" id="cashHistorySearch" type="button"><i class="bi bi-search"></i> Buscar sessões</button></div>
           </div>
         </section>
 
         <section class="cash-card cash-history-list">
           <div class="cash-card-header">
-            <div class="cash-card-title"><span><i class="bi bi-journals"></i></span><div><h2>SessÃµes de caixa</h2><p>Dados resumidos; os demais valores ficam no detalhe da sessÃ£o.</p></div></div>
+            <div class="cash-card-title"><span><i class="bi bi-journals"></i></span><div><h2>Sessões de caixa</h2><p>Dados resumidos; os demais valores ficam no detalhe da sessão.</p></div></div>
           </div>
           <div class="table-responsive cash-table-wrapper">
             <table class="table align-middle cash-table cash-history-table">
-              <thead><tr><th>SessÃ£o</th><th>PerÃ­odo</th><th>Operador</th><th>SituaÃ§Ã£o</th><th class="text-end">DiferenÃ§a</th><th class="text-center">Detalhes</th></tr></thead>
+              <thead><tr><th>Sessão</th><th>Período</th><th>Operador</th><th>Situação</th><th class="text-end">Diferença</th><th class="text-center">Detalhes</th></tr></thead>
               <tbody id="cashHistoryTableBody"></tbody>
             </table>
           </div>
@@ -77,29 +77,29 @@
   <div aria-hidden="true" aria-labelledby="cashHistoryDetailTitle" class="modal fade" id="cashHistoryDetailModal" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-scrollable cash-history-detail-dialog">
       <div class="modal-content cash-history-modal">
-        <div class="modal-header"><div><span class="cash-eyebrow">Auditoria da sessÃ£o</span><h2 class="modal-title" id="cashHistoryDetailTitle">Detalhes do caixa <span id="cashDetailSessionId"></span></h2></div><button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button></div>
+        <div class="modal-header"><div><span class="cash-eyebrow">Auditoria da sessão</span><h2 class="modal-title" id="cashHistoryDetailTitle">Detalhes do caixa <span id="cashDetailSessionId"></span></h2></div><div class="cash-history-modal-actions"><button class="btn cash-secondary-button cash-history-print-button" id="cashHistoryPrintReceipt" type="button"><i class="bi bi-printer"></i> Imprimir comprovante</button><button aria-label="Fechar" class="btn-close" data-bs-dismiss="modal" type="button"></button></div></div>
         <div class="modal-body">
           <section class="cash-history-detail-metrics">
             <article><small>Saldo inicial</small><strong id="cashDetailInitialBalance">R$ 0,00</strong></article>
-            <article><small>Vendas lÃ­quidas</small><strong id="cashDetailNetSales">R$ 0,00</strong></article>
+            <article><small>Vendas líquidas</small><strong id="cashDetailNetSales">R$ 0,00</strong></article>
             <article><small>Saldo esperado</small><strong id="cashDetailExpectedBalance">R$ 0,00</strong></article>
             <article><small>Valor contado</small><strong id="cashDetailCountedAmount">R$ 0,00</strong></article>
-            <article><small>DiferenÃ§a</small><strong id="cashDetailDifference">R$ 0,00</strong></article>
+            <article><small>Diferença</small><strong id="cashDetailDifference">R$ 0,00</strong></article>
           </section>
 
-          <section class="cash-history-detail-section"><h3>InformaÃ§Ãµes da sessÃ£o</h3><dl class="cash-details-list"><div><dt>Abertura</dt><dd id="cashDetailOpenedAt">-</dd></div><div><dt>Operador da abertura</dt><dd id="cashDetailOpeningOperator">-</dd></div><div><dt>Fechamento</dt><dd id="cashDetailClosedAt">-</dd></div><div><dt>Operador do fechamento</dt><dd id="cashDetailClosingOperator">-</dd></div><div class="cash-details-full"><dt>ObservaÃ§Ã£o de abertura</dt><dd id="cashDetailOpeningNote">Sem observaÃ§Ã£o.</dd></div><div class="cash-details-full"><dt>ObservaÃ§Ã£o de fechamento</dt><dd id="cashDetailClosingNote">Sem observaÃ§Ã£o.</dd></div></dl></section>
+          <section class="cash-history-detail-section"><h3>Informações da sessão</h3><dl class="cash-details-list"><div><dt>Abertura</dt><dd id="cashDetailOpenedAt">-</dd></div><div><dt>Operador da abertura</dt><dd id="cashDetailOpeningOperator">-</dd></div><div><dt>Fechamento</dt><dd id="cashDetailClosedAt">-</dd></div><div><dt>Operador do fechamento</dt><dd id="cashDetailClosingOperator">-</dd></div><div class="cash-details-full"><dt>Observação de abertura</dt><dd id="cashDetailOpeningNote">Sem observação.</dd></div><div class="cash-details-full"><dt>Observação de fechamento</dt><dd id="cashDetailClosingNote">Sem observação.</dd></div></dl></section>
 
-          <section class="cash-history-detail-section"><h3>ConferÃªncia por forma de pagamento</h3><div class="cash-payment-list cash-history-payments" id="cashDetailPaymentList"></div></section>
+          <section class="cash-history-detail-section"><h3>Conferência por forma de pagamento</h3><div class="cash-payment-list cash-history-payments" id="cashDetailPaymentList"></div></section>
+          <details class="cash-history-detail-section d-none" id="cashDetailTaxaBloco"><summary>Ver resumo financeiro por forma de pagamento</summary><div class="cash-payment-list cash-history-payments mt-3" id="cashDetailTaxaList"></div></details>
 
-          <section class="cash-history-detail-section"><h3>Movimentos da sessÃ£o</h3><div class="table-responsive cash-table-wrapper"><table class="table align-middle cash-table"><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Origem</th><th>ResponsÃ¡vel</th><th>Motivo</th><th class="text-end">Valor</th></tr></thead><tbody id="cashDetailMovementBody"></tbody></table></div></section>
+          <section class="cash-history-detail-section"><h3>Movimentos da sessão</h3><div class="table-responsive cash-table-wrapper"><table class="table align-middle cash-table"><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Origem</th><th>Responsável</th><th>Motivo</th><th class="text-end">Valor</th></tr></thead><tbody id="cashDetailMovementBody"></tbody></table></div></section>
         </div>
       </div>
     </div>
-  </div>
-
+  </div>  <script src="js/mock-api.js?v=frontend-audit"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/mock-api.js?v=frontend-audit"></script>
-  <script src="js/principal.js?v=frontend-audit"></script>
+  <script src="js/principal.js?v=20260801-caixa-historico"></script>
+  <script src="js/caixa-comprovante.js?v=20260803-impressao"></script>
   <script src="js/historico-caixa.js?v=20260801-caixa-historico"></script>
 </body>
 </html>

@@ -105,3 +105,34 @@
   --preview-secondary: #094C55;
   --preview-accent: #74AED6;
 }
+/* Modal reutilizado pelos fluxos de edição dos cadastros. */
+.cadastro-edit-modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: 0 22px 54px rgba(9, 76, 85, 0.2);
+}
+
+.cadastro-edit-modal-header {
+  padding: 1rem 1.15rem;
+  border-bottom: 0;
+  background: linear-gradient(135deg, #0b6268, #087f79);
+  color: #ffffff;
+}
+
+.cadastro-edit-modal-header .modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.cadastro-edit-modal-body {
+  padding: 1.15rem;
+  background: #ffffff;
+}
+
+.cadastro-edit-modal-body form {
+  margin: 0;
+}
+

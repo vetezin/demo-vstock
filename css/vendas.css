@@ -1,16 +1,583 @@
-.app-shell .sidebar {
-  width: var(--app-sidebar-width);
-  min-width: var(--app-sidebar-width);
-}
-
-.app-shell .content.page-content,
-.app-shell .footer-info {
-  margin-left: var(--app-sidebar-width);
-}
-
 .pdv-page {
   display: grid;
   gap: 1rem;
+}
+
+.pdv-view-switcher {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.3rem;
+  gap: 0.3rem;
+  border: 1px solid rgba(224, 218, 209, 0.96);
+  border-radius: 14px;
+  background: #fffdfa;
+}
+
+.pdv-view-switcher-btn {
+  min-height: 42px;
+  padding: 0.55rem 1rem;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.pdv-view-switcher-btn.is-active {
+  background: #006b68;
+  color: #fff;
+}
+
+.mesas-view {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  border: 1px solid #e4e9ee;
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+}
+
+.mesas-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mesas-view-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mesas-view-header h2 {
+  margin: 0;
+  color: #1f2a37;
+  font-size: clamp(1.6rem, 2.5vw, 2.1rem);
+  font-weight: 800;
+}
+
+.mesas-view-header p {
+  margin: 0.45rem 0 0;
+  color: #64748b;
+}
+
+.mesas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+  gap: 1.25rem;
+}
+
+.mesa-modal-content {
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.98);
+  border-radius: 22px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+}
+
+.mesa-modal-header {
+  min-height: 130px;
+  padding: 1.65rem 1.8rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #ffffff, #fbfdfc);
+}
+
+.mesa-modal-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mesa-modal-icon {
+  display: inline-flex;
+  width: 60px;
+  height: 60px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #eef6f0;
+  color: #087b4d;
+  font-size: 1.75rem;
+}
+
+.mesa-modal-identity .modal-title {
+  margin: 0;
+  color: #17212b;
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+.mesa-modal-identity small {
+  display: block;
+  margin-top: 0.2rem;
+  color: #64748b;
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.mesa-modal-close {
+  width: 48px;
+  height: 48px;
+  margin: 0 !important;
+  border: 1px solid #dbe3eb;
+  border-radius: 12px;
+  opacity: 1;
+}
+
+.mesa-modal-body {
+  display: grid;
+  gap: 1.65rem;
+  padding: 1.75rem 1.8rem;
+}
+
+.mesa-modal-section h6,
+.mesa-modal-section .form-label {
+  margin: 0 0 0.85rem;
+  color: #1f2937;
+  font-size: 1rem;
+  font-weight: 850;
+}
+
+#mesaClienteTitulo {
+  margin-bottom: 0.95rem;
+  font-size: 1.12rem;
+}
+
+#mesaCliente {
+  min-height: 48px;
+  border-radius: 12px;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+  font-size: 1rem;
+}
+
+#btnNovoClienteMesa {
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.mesas-modal-itens {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.mesas-modal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 88px;
+  padding: 0.95rem 1.05rem;
+  border: 1px solid #dce4eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.mesa-item-description {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.mesa-item-description > span:last-child {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.mesa-item-icon {
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #eef6f0;
+  color: #087b4d;
+  font-size: 1.3rem;
+}
+
+.mesas-modal-item strong {
+  color: #1f2937;
+  font-size: 0.98rem;
+}
+
+.mesas-modal-item small {
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mesa-item-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #334155;
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.mesas-modal-item .btn-link {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #fff1f2;
+  text-decoration: none;
+}
+
+.mesas-modal-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px auto;
+  gap: 0.75rem;
+}
+
+.mesa-product-search {
+  position: relative;
+  min-width: 0;
+}
+
+.mesa-product-search-input {
+  position: relative;
+}
+
+.mesa-product-search-input > i {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 1rem;
+  color: #64748b;
+  transform: translateY(-50%);
+}
+
+.mesa-product-search-input .form-control {
+  padding-left: 2.8rem;
+}
+
+.mesa-product-results {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  left: 0;
+  display: none;
+  overflow: hidden;
+  border: 1px solid #cfd9e3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+}
+
+.mesa-product-results.ativo {
+  display: grid;
+}
+
+.mesa-product-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.72rem 0.9rem;
+  border: 0;
+  border-bottom: 1px solid #edf1f5;
+  background: #fff;
+  color: #273444;
+  text-align: left;
+}
+
+.mesa-product-result:last-child {
+  border-bottom: 0;
+}
+
+.mesa-product-result:hover,
+.mesa-product-result:focus {
+  background: #effaf4;
+  outline: 0;
+}
+
+.mesa-product-result span {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+  font-weight: 700;
+}
+
+.mesa-product-result small {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.mesa-product-result strong {
+  color: #087b4d;
+  white-space: nowrap;
+}
+
+.mesa-product-empty {
+  padding: 0.82rem 0.9rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.mesas-modal-add .form-select,
+.mesas-modal-add .form-control,
+.mesa-modal-payment-select .form-select {
+  min-height: 56px;
+  border-color: #cfd9e3;
+  border-radius: 12px;
+  box-shadow: none;
+  color: #273444;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.mesas-modal-add .form-select:focus,
+.mesas-modal-add .form-control:focus,
+.mesa-modal-payment-select .form-select:focus {
+  border-color: #008b62;
+  box-shadow: 0 0 0 3px rgba(0, 139, 98, 0.11);
+}
+
+.mesa-modal-add-button {
+  min-width: 160px;
+  border: 1px solid #00915f;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #087b4d;
+  font-weight: 800;
+}
+
+.mesa-modal-add-button:hover,
+.mesa-modal-add-button:focus {
+  border-color: #007d54;
+  background: #effaf4;
+  color: #006d49;
+}
+
+.mesa-modal-payment-select {
+  position: relative;
+}
+
+#mesaBlocoFormaPagamento {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e3ebf1;
+}
+
+#mesaPagamentoTitulo {
+  display: block;
+  margin-bottom: 0.95rem;
+  color: #1f2937;
+  font-size: 1.08rem;
+  font-weight: 850;
+}
+
+.mesa-modal-payment-select > i {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 1rem;
+  color: #475569;
+  transform: translateY(-50%);
+}
+
+.mesa-modal-payment-select .form-select {
+  padding-left: 2.8rem;
+}
+
+.mesa-modal-footer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.25rem 1.8rem;
+  border-top: 1px solid #e5e7eb;
+  background: #fbfcfd;
+}
+
+.mesas-modal-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #17212b;
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.mesas-modal-total strong {
+  color: #087b4d;
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.mesa-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.mesa-modal-actions .btn {
+  min-height: 52px;
+  min-width: 120px;
+  border-radius: 12px;
+  font-weight: 800;
+}
+
+.mesa-modal-close-account {
+  min-width: 175px !important;
+  border: 0;
+  background: #008b62;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 139, 98, 0.18);
+}
+
+.mesa-modal-close-account:hover,
+.mesa-modal-close-account:focus {
+  background: #007652;
+  color: #ffffff;
+}
+
+@media (max-width: 575px) {
+  .mesa-modal-header,
+  .mesa-modal-body,
+  .mesa-modal-footer {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .mesas-modal-add,
+  .mesa-modal-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .mesa-modal-add-button,
+  .mesa-modal-actions .btn,
+  .mesa-modal-close-account {
+    width: 100%;
+  }
+
+  .mesa-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+.mesa-card {
+  position: relative;
+  min-height: 250px;
+  padding: 1.35rem 1.25rem 1.1rem;
+  overflow: hidden;
+  border: 1px solid #e5e9ee;
+  border-radius: 18px;
+  background: #fff;
+  color: #17212b;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.mesa-card::before {
+  position: absolute;
+  display: none;
+}
+
+.mesa-card.is-consumo::before { background: #006b68; }
+.mesa-card.is-aberta::before { background: #d97706; }
+
+.mesa-card:hover {
+  border-color: rgba(0, 107, 104, 0.28);
+  box-shadow: 0 14px 28px rgba(0, 107, 104, 0.1);
+  transform: translateY(-3px);
+}
+
+.mesa-card-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  margin-bottom: 1.25rem;
+  border-radius: 50%;
+  background: #f1f4f7;
+  color: #64748b;
+  font-size: 1.55rem;
+}
+
+.mesa-card.is-aberta .mesa-card-icon {
+  background: #fff3df;
+  color: #d97706;
+}
+
+.mesa-card.is-consumo .mesa-card-icon {
+  background: #e5f6ef;
+  color: #15925d;
+}
+
+.mesa-card-number {
+  display: block;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.mesa-card-title {
+  display: block;
+  margin-top: 0.45rem;
+  overflow: hidden;
+  color: #006b68;
+  font-size: 1.1rem;
+  font-weight: 850;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mesa-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.mesa-card-status {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  margin-top: 0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.mesa-card.is-aberta .mesa-card-status {
+  background: #fff3df;
+  color: #c56d00;
+}
+
+.mesa-card.is-consumo .mesa-card-status {
+  background: #e5f6ef;
+  color: #15804f;
+}
+
+.mesa-card-arrow {
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 767px) {
+  .mesas-view-header { align-items: flex-start; flex-direction: column; }
+  .mesas-view-actions { width: 100%; }
+  .pdv-view-switcher { width: 100%; }
+  .pdv-view-switcher-btn { flex: 1; }
 }
 
 .pdv-page-header {
@@ -185,6 +752,53 @@
 
 .pdv-custom-select.is-open .pdv-custom-select-menu {
   display: block;
+}
+
+.pdv-client-select-menu {
+  padding: 0.5rem;
+}
+
+.pdv-client-select-search {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.1rem 0.1rem 0.45rem;
+  padding: 0 0.7rem;
+  min-height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.38);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.pdv-client-select-search i {
+  color: #64748b;
+}
+
+.pdv-client-select-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #1f2937;
+  font-size: 0.92rem;
+}
+
+.pdv-client-select-search input::placeholder {
+  color: #94a3b8;
+}
+
+.pdv-client-select-options {
+  max-height: 238px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.pdv-client-select-empty {
+  margin: 0;
+  padding: 0.85rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 .pdv-custom-select-option {
@@ -821,7 +1435,7 @@
   }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1200px) {
   .pdv-layout {
     grid-template-columns: 1fr;
   }
@@ -858,3 +1472,128 @@
     align-items: flex-start;
   }
 }
+.pdv-split-toggle {
+  align-items: center;
+  background: #f4f8fb;
+  border: 1px solid #cfddea;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding: 12px 14px;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.pdv-split-toggle.is-active {
+  background: linear-gradient(135deg, #edf9f7, #f8fcfb);
+  border-color: #69b9b2;
+  box-shadow: 0 0 0 3px rgba(0, 107, 104, 0.08);
+}
+
+.pdv-split-toggle.is-active strong {
+  color: #006b68;
+}
+
+.pdv-split-toggle strong,
+.pdv-split-toggle small {
+  display: block;
+}
+
+.pdv-split-toggle small {
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.pdv-split-panel {
+  background: #f7fbfc;
+  border: 1px solid #b9d9e2;
+  border-radius: 14px;
+  margin-top: 12px;
+  padding: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.pdv-split-panel::before {
+  content: "Distribua o total entre os pagamentos";
+  display: block;
+  margin-bottom: 0.8rem;
+  color: #21636d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.pdv-split-payments {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pdv-split-payment {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.pdv-split-payment-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pdv-split-payment-fields {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+.pdv-split-cash-fields {
+  display: grid;
+  gap: 10px;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pdv-split-balance {
+  align-items: center;
+  border-top: 1px solid #c6e2e5;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.pdv-split-balance strong {
+  padding: 0.3rem 0.55rem;
+  border-radius: 8px;
+  background: #fff4df;
+  color: #b7791f;
+}
+
+.pdv-split-balance.is-complete strong { color: #15803d; }
+.pdv-split-balance.is-complete strong { background: #e8f7ee; }
+.pdv-split-balance.is-invalid strong { color: #b91c1c; background: #fff0f0; }
+
+.venda-split-confirmation-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.venda-split-confirmation-item {
+  align-items: center;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 8px;
+}
+
+@media (max-width: 575.98px) {
+  .pdv-split-payment-fields,
+  .pdv-split-cash-fields {
+    grid-template-columns: 1fr;
+  }
+}
+

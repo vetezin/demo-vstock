@@ -1,4 +1,4 @@
-﻿const API = {
+const API = {
   ESTOQUE_RESUMO: "http://localhost:8080/api/estoque/resumo?ativosOnly=true",
   FUNCIONARIO_POR_EMAIL: (email) => `http://localhost:8080/api/funcionarios/buscaEmail?email=${encodeURIComponent(email)}`,
   SAIDAS: "http://localhost:8080/api/saida-estoque",
@@ -8,12 +8,12 @@
 };
 
 const el = (sel) => document.querySelector(sel);
+const msg = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let itensDaSaida = [];
 let indiceEditando = null;
 let cacheProdutos = [];
 let modalObservacao = null;
-let modalRecebimentoDinheiro = null;
 let observacaoTemporaria = "";
 let debounceBuscaProduto = null;
 let produtosVisiveis = [];
@@ -24,115 +24,13 @@ let totalPaginasSaidas = 1;
 let totalSaidas = 0;
 const ITENS_POR_PAGINA_SAIDAS = 10;
 
-function hojeISO() {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "America/Sao_Paulo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-}
-
-function msg(texto, tipo = "danger") {
-  const box = el("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
 function motivoLabel(valor) {
   const mapa = {
     USO_INTERNO: "Uso interno",
     PERDA: "Perda",
-    AVARIA: "Avaria",
-    VENDA: "Venda"
+    AVARIA: "Avaria"
   };
   return mapa[valor] || valor || "-";
-}
-
-function formatarDataBr(valor) {
-  if (!valor) return "-";
-  if (/^\d{2}\/\d{2}\/\d{4}$/.test(valor)) return valor;
-
-  const apenasData = String(valor).split("T")[0];
-  const partes = apenasData.split("-");
-  if (partes.length === 3) {
-    const [ano, mes, dia] = partes;
-    return `${dia}/${mes}/${ano}`;
-  }
-
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return valor;
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  }).format(data);
-}
-
-function formatarMoeda(valor) {
-  return window.vstockCurrency.formatMoney(valor || 0);
-}
-
-function formatarMoedaCampo(valor) {
-  return window.vstockCurrency.formatNumber(valor || 0);
-}
-
-function normalizarTexto(valor) {
-  return String(valor || "").trim().toLowerCase();
-}
-
-function normalizarCodigoBarras(valor) {
-  return String(valor || "").trim();
-}
-
-function resumirProdutos(itens) {
-  if (!Array.isArray(itens) || !itens.length) return "-";
-  const nomes = itens.map((item) => item.produto || "-").filter(Boolean);
-  if (nomes.length === 1) return nomes[0];
-  return `${nomes[0]} + ${nomes.length - 1} item(ns)`;
-}
-
-function motivoEhVenda(valor) {
-  return String(valor || "").toUpperCase() === "VENDA";
-}
-
-function existemItensDeVenda() {
-  return itensDaSaida.some((item) => motivoEhVenda(item.motivo));
-}
-
-function obterOpcaoRecebimentoDinheiro() {
-  return document.querySelector('input[name="recebimentoDinheiro"]:checked')?.value || "";
-}
-
-function limparOpcaoRecebimentoDinheiro() {
-  document.querySelectorAll('input[name="recebimentoDinheiro"]').forEach((input) => {
-    input.checked = false;
-  });
-}
-
-function atualizarVisibilidadeRecebimentoDinheiro() {
-  const bloco = el("#blocoRecebimentoDinheiro");
-  if (!bloco) return;
-
-  const deveExibir = motivoEhVenda(el("#motivo")?.value) || existemItensDeVenda();
-  if (!deveExibir) {
-    limparOpcaoRecebimentoDinheiro();
-  }
-  bloco.classList.toggle("d-none", !deveExibir);
-}
-
-function obterTotalVendaAtual() {
-  return itensDaSaida.reduce((acc, item) => acc + Number(item.valorTotal || 0), 0);
 }
 
 function montarItensParaEnvio() {
@@ -140,19 +38,8 @@ function montarItensParaEnvio() {
     produtoProdCod: Number(item.prodCod),
     quantidade: Number(item.qtd),
     motivo: item.motivo,
-    observacao: item.observacao || "",
-    valorUnitarioAplicado: motivoEhVenda(item.motivo) ? Number(item.valorUnitarioAplicado || 0) : null,
-    valorTotal: motivoEhVenda(item.motivo) ? Number(item.valorTotal || 0) : null
+    observacao: item.observacao || ""
   }));
-}
-
-function atualizarResumoRecebimentoDinheiro() {
-  const totalVenda = obterTotalVendaAtual();
-  const valorRecebido = window.vstockCurrency.parse(el("#valorRecebidoVenda")?.value || "");
-  const troco = Math.max(valorRecebido - totalVenda, 0);
-
-  el("#totalVendaRecebimento").value = formatarMoeda(totalVenda);
-  el("#trocoVendaRecebimento").value = formatarMoeda(troco);
 }
 
 function atualizarResumoObservacaoTemporaria() {
@@ -162,25 +49,10 @@ function atualizarResumoObservacaoTemporaria() {
   campoResumo.value = observacaoTemporaria || "";
 }
 
-function abrirModalRecebimentoDinheiro() {
-  el("#valorRecebidoVenda").value = formatarMoedaCampo(0);
-  atualizarResumoRecebimentoDinheiro();
-  modalRecebimentoDinheiro?.show();
-}
-
 function localizarProdutoSelecionado() {
   const select = el("#listaProdutos");
   if (!select?.value) return null;
   return cacheProdutos.find((produto) => String(produto.prod_cod) === String(select.value)) || null;
-}
-
-function obterValorUnitarioProduto(produto) {
-  return Number(produto?.valor_unitario || 0);
-}
-
-function calcularValorTotalItem(quantidade, valorUnitario, motivo) {
-  if (!motivoEhVenda(motivo)) return 0;
-  return Number(quantidade || 0) * Number(valorUnitario || 0);
 }
 
 async function carregarProdutos() {
@@ -272,18 +144,13 @@ function focarLeituraCodigoBarras() {
 }
 
 function localizarProdutoPorCodigoBarras(codigoBarras) {
-  const codigoNormalizado = normalizarCodigoBarras(codigoBarras);
-  if (!codigoNormalizado) return null;
-
-  return cacheProdutos.find((produto) =>
-    normalizarCodigoBarras(produto.codigo_barras) === codigoNormalizado
-  ) || null;
+  return window.vstockProducts.findByBarcode(cacheProdutos, codigoBarras, "codigo_barras");
 }
 
 function processarLeituraCodigoBarras() {
   const inputCodigo = el("#codigoBarrasSaida");
   const inputQuantidade = el("#quantidade");
-  const codigo = normalizarCodigoBarras(inputCodigo?.value);
+  const codigo = window.vstockText.normalizeCode(inputCodigo?.value);
 
   if (!inputCodigo || !inputQuantidade || !codigo) {
     return;
@@ -346,36 +213,17 @@ function atualizarSaldoProduto() {
   const select = el("#listaProdutos");
   const saldo = select?.selectedOptions?.[0]?.getAttribute("data-saldo") || "0";
   el("#saldoProduto").value = saldo;
-  const produtoSelecionado = localizarProdutoSelecionado();
-  el("#valorUnitarioProduto").value = formatarMoedaCampo(obterValorUnitarioProduto(produtoSelecionado));
-  atualizarResumoFinanceiroSaida();
 }
 
 function atualizarResumoFinanceiroSaida() {
   const produtoSelecionado = localizarProdutoSelecionado();
-  const quantidadeAtual = Number(el("#quantidade")?.value || 0);
-  const motivoAtual = el("#motivo")?.value || "VENDA";
   if (!produtoSelecionado) {
-    el("#subtotalItemSaida").value = "";
-    atualizarResumoRecebimentoDinheiro();
     return;
   }
-
-  const valorUnitario = obterValorUnitarioProduto(produtoSelecionado);
-  const subtotal = calcularValorTotalItem(quantidadeAtual, valorUnitario, motivoAtual);
-  const totalVenda = itensDaSaida.reduce((acc, item) => acc + Number(item.valorTotal || 0), 0);
-
-  el("#subtotalItemSaida").value = formatarMoedaCampo(subtotal);
-  el("#totalVendaSaida").textContent = formatarMoeda(totalVenda);
-  atualizarResumoRecebimentoDinheiro();
 }
 
 function carregarFuncionarioLogado() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch {
-    return null;
-  }
+  return window.vstockSession.getFuncionario();
 }
 
 async function complementarFuncionarioPorEmail(funcionario) {
@@ -402,7 +250,7 @@ async function preencherFuncionarioLogado() {
     return null;
   }
 
-  if (!(funcionario.funcCpf || funcionario.cpf)) {
+  if (!funcionario.funcionarioId) {
     try {
       funcionario = await complementarFuncionarioPorEmail(funcionario);
     } catch (erro) {
@@ -410,7 +258,7 @@ async function preencherFuncionarioLogado() {
     }
   }
 
-  el("#funcionarioCpf").value = funcionario.funcCpf || funcionario.cpf || "";
+  el("#funcionarioId").value = funcionario.funcionarioId;
   el("#funcionarioNome").value = funcionario.funcNome || funcionario.nome || "";
   return funcionario;
 }
@@ -428,9 +276,6 @@ function atualizarTotalItens() {
   const total = itensDaSaida.reduce((acc, item) => acc + Number(item.qtd || 0), 0);
   el("#resumoSaidaItens").textContent = String(totalItensLista);
   el("#totalItensSaida").textContent = total;
-  el("#totalVendaSaida").textContent = formatarMoeda(
-    itensDaSaida.reduce((acc, item) => acc + Number(item.valorTotal || 0), 0)
-  );
 }
 
 function redesenharTabela() {
@@ -466,8 +311,6 @@ function redesenharTabela() {
           <td class="text-end">${item.saldo}</td>
           <td class="text-end">${item.qtd}</td>
           <td>${motivoLabel(item.motivo)}</td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valorUnitarioAplicado) : "-"}</td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valorTotal) : "-"}</td>
           <td>${item.observacao || "-"}</td>
           <td class="text-center d-flex flex-column flex-sm-row gap-1 justify-content-center">
             <button class="btn btn-sm btn-outline-primary" data-acao="editar" data-idx="${indice}">
@@ -492,11 +335,8 @@ function redesenharTabela() {
               <option value="USO_INTERNO" ${item.motivo === "USO_INTERNO" ? "selected" : ""}>Uso interno</option>
               <option value="PERDA" ${item.motivo === "PERDA" ? "selected" : ""}>Perda</option>
               <option value="AVARIA" ${item.motivo === "AVARIA" ? "selected" : ""}>Avaria</option>
-              <option value="VENDA" ${item.motivo === "VENDA" ? "selected" : ""}>Venda</option>
             </select>
           </td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valorUnitarioAplicado) : "-"}</td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda((Number(item.valorUnitarioAplicado || 0) * Number(item.qtd || 0))) : "-"}</td>
           <td>
             <input type="text" class="form-control form-control-sm" id="edit-observacao-${indice}" value="${item.observacao || ""}">
           </td>
@@ -519,11 +359,8 @@ function redesenharTabela() {
 function adicionarItem() {
   const select = el("#listaProdutos");
   const quantidade = Number(el("#quantidade")?.value || 0);
-  const motivo = el("#motivo")?.value || "VENDA";
+  const motivo = el("#motivo")?.value || "USO_INTERNO";
   const observacao = observacaoTemporaria.trim();
-  const produtoSelecionado = localizarProdutoSelecionado();
-  const valorUnitarioAplicado = obterValorUnitarioProduto(produtoSelecionado);
-  const valorTotal = calcularValorTotalItem(quantidade, valorUnitarioAplicado, motivo);
 
   if (!select?.value) {
     msg("Selecione um produto.", "danger");
@@ -537,11 +374,6 @@ function adicionarItem() {
 
   if (!motivo) {
     msg("Selecione o motivo da saída.", "danger");
-    return;
-  }
-
-  if (motivoEhVenda(motivo) && valorUnitarioAplicado <= 0) {
-    msg("O produto selecionado nao possui valor unitario valido para venda.", "danger");
     return;
   }
 
@@ -564,9 +396,7 @@ function adicionarItem() {
     saldo,
     qtd: quantidade,
     motivo,
-    observacao,
-    valorUnitarioAplicado: motivoEhVenda(motivo) ? valorUnitarioAplicado : 0,
-    valorTotal
+    observacao
   });
 
   indiceEditando = null;
@@ -575,14 +405,11 @@ function adicionarItem() {
   select.value = "";
   el("#saldoProduto").value = "";
   el("#quantidade").value = "";
-  el("#motivo").value = "VENDA";
+  el("#motivo").value = "USO_INTERNO";
   el("#observacaoItem").value = "";
-  el("#valorUnitarioProduto").value = formatarMoedaCampo(0);
-  el("#subtotalItemSaida").value = formatarMoedaCampo(0);
   observacaoTemporaria = "";
   atualizarResumoObservacaoTemporaria();
   atualizarResumoFinanceiroSaida();
-  atualizarVisibilidadeRecebimentoDinheiro();
 }
 
 function removerItem(indice) {
@@ -603,7 +430,7 @@ function cancelarEdicao() {
 
 function salvarEdicao(indice) {
   const qtd = Number(el(`#edit-qtd-${indice}`)?.value || 0);
-  const motivo = el(`#edit-motivo-${indice}`)?.value || "VENDA";
+  const motivo = el(`#edit-motivo-${indice}`)?.value || "USO_INTERNO";
   const observacao = el(`#edit-observacao-${indice}`)?.value?.trim() || "";
   const item = itensDaSaida[indice];
   const reservado = quantidadeReservadaProduto(item.prodCod, indice);
@@ -623,21 +450,12 @@ function salvarEdicao(indice) {
     return;
   }
 
-  const valorUnitarioAplicado = motivoEhVenda(motivo) ? Number(item.valorUnitarioAplicado || 0) : 0;
-  if (motivoEhVenda(motivo) && valorUnitarioAplicado <= 0) {
-    msg("O produto selecionado nao possui valor unitario valido para venda.", "danger");
-    return;
-  }
-
   item.qtd = qtd;
   item.motivo = motivo;
   item.observacao = observacao;
-  item.valorUnitarioAplicado = valorUnitarioAplicado;
-  item.valorTotal = calcularValorTotalItem(qtd, valorUnitarioAplicado, motivo);
 
   indiceEditando = null;
   redesenharTabela();
-  atualizarVisibilidadeRecebimentoDinheiro();
 }
 
 function limparTudo() {
@@ -646,22 +464,18 @@ function limparTudo() {
   observacaoTemporaria = "";
   const funcionario = carregarFuncionarioLogado();
 
-  el("#dataSaida").value = hojeISO();
-  el("#funcionarioCpf").value = funcionario?.funcCpf || funcionario?.cpf || "";
+  el("#dataSaida").value = window.vstockFormatters.todayIso();
+  el("#funcionarioId").value = funcionario?.funcionarioId || "";
   el("#funcionarioNome").value = funcionario?.funcNome || funcionario?.nome || "";
   el("#buscaProdutoSaida").value = "";
   el("#listaProdutos").value = "";
   fecharDropdownProdutos();
   el("#saldoProduto").value = "";
   el("#quantidade").value = "";
-  el("#motivo").value = "VENDA";
+  el("#motivo").value = "USO_INTERNO";
   el("#observacaoItem").value = "";
   el("#codigoBarrasSaida").value = "";
-  el("#valorUnitarioProduto").value = formatarMoedaCampo(0);
-  el("#subtotalItemSaida").value = formatarMoedaCampo(0);
-  limparOpcaoRecebimentoDinheiro();
   atualizarResumoObservacaoTemporaria();
-  atualizarVisibilidadeRecebimentoDinheiro();
   focarLeituraCodigoBarras();
 
   redesenharTabela();
@@ -669,14 +483,14 @@ function limparTudo() {
 
 async function enviarSaida(itensPayload) {
   const dataSaida = el("#dataSaida")?.value || "";
-  const funcionarioFuncCpf = el("#funcionarioCpf")?.value || "";
+  const funcionarioId = Number(el("#funcionarioId")?.value || 0);
 
   if (!dataSaida) {
     msg("Informe a data da saída.", "danger");
     return;
   }
 
-  if (!funcionarioFuncCpf) {
+  if (!funcionarioId) {
     msg("Informe o funcionário responsável.", "danger");
     return;
   }
@@ -688,7 +502,7 @@ async function enviarSaida(itensPayload) {
 
   const body = {
     dataSaida,
-    funcionarioFuncCpf,
+    funcionarioId,
     itens: itensPayload
   };
 
@@ -715,40 +529,6 @@ async function enviarSaida(itensPayload) {
 }
 
 async function salvarSaida() {
-  if (existemItensDeVenda()) {
-    const opcaoRecebimento = obterOpcaoRecebimentoDinheiro();
-    if (!opcaoRecebimento) {
-      msg("Selecione se a venda foi recebida em dinheiro.", "danger");
-      return;
-    }
-
-    if (opcaoRecebimento === "SIM") {
-      abrirModalRecebimentoDinheiro();
-      return;
-    }
-
-    await enviarSaida(montarItensParaEnvio());
-    return;
-  }
-
-  await enviarSaida(montarItensParaEnvio());
-}
-
-async function confirmarSaidaComRecebimentoDinheiro() {
-  const totalVenda = obterTotalVendaAtual();
-  const valorRecebido = window.vstockCurrency.parse(el("#valorRecebidoVenda")?.value || "");
-
-  if (valorRecebido <= 0) {
-    msg("Informe o valor recebido em dinheiro.", "danger");
-    return;
-  }
-
-  if (valorRecebido < totalVenda) {
-    msg("O valor recebido não pode ser menor que o total da venda.", "danger");
-    return;
-  }
-
-  modalRecebimentoDinheiro?.hide();
   await enviarSaida(montarItensParaEnvio());
 }
 
@@ -828,8 +608,7 @@ function desenharTabelaSaidas() {
       tr.innerHTML = `
         <td>${saida.produtoResumo || "-"}</td>
         <td class="text-end">${saida.quantidade_total || 0}</td>
-        <td class="text-end">${formatarMoeda(saida.total_venda || 0)}</td>
-        <td>${formatarDataBr(saida.data_saida)}</td>
+        <td>${window.vstockFormatters.date(saida.data_saida)}</td>
         <td>${saida.funcionario || "-"}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
@@ -869,11 +648,8 @@ async function abrirEdicaoSaida(saidaCod) {
             <option value="USO_INTERNO" ${item.motivo === "USO_INTERNO" ? "selected" : ""}>Uso interno</option>
             <option value="PERDA" ${item.motivo === "PERDA" ? "selected" : ""}>Perda</option>
             <option value="AVARIA" ${item.motivo === "AVARIA" ? "selected" : ""}>Avaria</option>
-            <option value="VENDA" ${item.motivo === "VENDA" ? "selected" : ""}>Venda</option>
           </select>
         </td>
-        <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valor_unitario_aplicado || 0) : "-"}</td>
-        <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valor_total || 0) : "-"}</td>
         <td><input type="text" class="form-control form-control-sm" data-campo="observacao" data-idx="${indice}" value="${item.observacao || ""}"></td>
       </tr>
     `).join("");
@@ -904,8 +680,6 @@ async function abrirEdicaoSaida(saidaCod) {
                       <th>Produto</th>
                       <th class="text-end">Qtd</th>
                       <th>Motivo</th>
-                      <th class="text-end">Valor</th>
-                      <th class="text-end">Subtotal</th>
                       <th>Observação</th>
                     </tr>
                   </thead>
@@ -944,17 +718,13 @@ async function abrirEdicaoSaida(saidaCod) {
           produtoProdCod: Number(item.produto_cod),
           quantidade,
           motivo,
-          observacao,
-          valorUnitarioAplicado: motivoEhVenda(motivo) ? Number(item.valor_unitario_aplicado || 0) : null,
-          valorTotal: motivoEhVenda(motivo)
-            ? calcularValorTotalItem(quantidade, Number(item.valor_unitario_aplicado || 0), motivo)
-            : null
+          observacao
         };
       });
 
       const body = {
         dataSaida: modalEl.querySelector("#editSaidaData")?.value || "",
-        funcionarioFuncCpf: saida.funcionario_func_cpf,
+        funcionarioId: saida.funcionario_id,
         itens: itensPayload
       };
 
@@ -1009,14 +779,12 @@ async function abrirDetalhesSaida(saidaCod, dataSaida = "") {
           <td class="text-end">${qtd}</td>
           <td class="text-end">${Number(item.saldo_atual || 0)}</td>
           <td>${motivoLabel(item.motivo)}</td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valor_unitario_aplicado || 0) : "-"}</td>
-          <td class="text-end">${motivoEhVenda(item.motivo) ? formatarMoeda(item.valor_total || 0) : "-"}</td>
           <td>${item.observacao || "-"}</td>
         </tr>
       `;
     });
 
-    const produtoResumo = resumirProdutos(itens);
+    const produtoResumo = window.vstockProducts.summarizeItems(itens);
     const html = `
       <div class="modal fade" id="modalDetalhesSaida" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-detalhes modal-detalhes-saida">
@@ -1039,7 +807,7 @@ async function abrirDetalhesSaida(saidaCod, dataSaida = "") {
                 </div>
                 <div class="modal-resumo-card">
                   <span>Data da Saída</span>
-                  <strong>${formatarDataBr(dataSaida)}</strong>
+                  <strong>${window.vstockFormatters.date(dataSaida)}</strong>
                 </div>
               </div>
 
@@ -1079,30 +847,23 @@ async function abrirDetalhesSaida(saidaCod, dataSaida = "") {
 
 document.addEventListener("DOMContentLoaded", async () => {
   modalObservacao = new bootstrap.Modal(document.getElementById("modalObservacao"));
-  modalRecebimentoDinheiro = new bootstrap.Modal(document.getElementById("modalRecebimentoDinheiro"));
-  window.vstockCurrency.attachMask?.(el("#valorRecebidoVenda"));
 
-  el("#dataSaida").value = hojeISO();
-  el("#motivo").value = "VENDA";
+  el("#dataSaida").value = window.vstockFormatters.todayIso();
+  el("#motivo").value = "USO_INTERNO";
   atualizarResumoObservacaoTemporaria();
   await preencherFuncionarioLogado();
 
   await carregarProdutos();
   await carregarSaidas();
   atualizarResumoFinanceiroSaida();
-  atualizarVisibilidadeRecebimentoDinheiro();
   focarLeituraCodigoBarras();
 
   el("#btnFiltrarSaidas")?.addEventListener("click", () => {
     carregarSaidas(1);
   });
   el("#quantidade")?.addEventListener("input", atualizarResumoFinanceiroSaida);
-  el("#motivo")?.addEventListener("change", () => {
-    atualizarResumoFinanceiroSaida();
-    atualizarVisibilidadeRecebimentoDinheiro();
-  });
+  el("#motivo")?.addEventListener("change", atualizarResumoFinanceiroSaida);
   el("#listaProdutos")?.addEventListener("change", atualizarSaldoProduto);
-  el("#valorRecebidoVenda")?.addEventListener("input", atualizarResumoRecebimentoDinheiro);
   el("#btnLimparFiltroSaidas")?.addEventListener("click", () => {
     limparFiltrosSaidas();
     carregarSaidas(1);
@@ -1122,7 +883,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   el("#btnAddItem")?.addEventListener("click", adicionarItem);
   el("#btnSalvar")?.addEventListener("click", salvarSaida);
-  el("#btnConfirmarRecebimentoDinheiro")?.addEventListener("click", confirmarSaidaComRecebimentoDinheiro);
   el("#btnLimparTudo")?.addEventListener("click", limparTudo);
   el("#btnAbrirObservacao")?.addEventListener("click", () => {
     el("#observacaoItem").value = observacaoTemporaria;
@@ -1153,7 +913,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (acao === "editar") entrarEdicao(idx);
     if (acao === "remover") {
       removerItem(idx);
-      atualizarVisibilidadeRecebimentoDinheiro();
     }
     if (acao === "salvar-edicao") salvarEdicao(idx);
     if (acao === "cancelar-edicao") cancelarEdicao();
@@ -1171,6 +930,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 });
+
 
 
 

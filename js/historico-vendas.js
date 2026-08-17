@@ -20,12 +20,20 @@ let modalCancelarVenda = null;
 let vendaCancelamentoAtualId = null;
 let aprovacaoAdminCancelamento = null;
 let cancelamentoBloqueadoPrazo = false;
+let limiteHorasCancelamento = 12;
 
 const ITENS_POR_PAGINA_HISTORICO_VENDAS = 12;
-const LIMITE_HORAS_CANCELAMENTO = 12;
 
 function vendaEstaCancelada(venda) {
   return String(venda?.status || "").trim().toUpperCase() === "CANCELADA";
+}
+
+function badgeTipoVenda(venda) {
+  const mesaNumero = Number(venda?.mesaNumero);
+  if (String(venda?.tipo || "").toUpperCase() === "MESA" && Number.isInteger(mesaNumero)) {
+    return '<span class="sales-type-badge mesa"><i class="bi bi-table"></i> Mesa ' + mesaNumero + '</span>';
+  }
+  return '<span class="sales-type-badge venda-rapida"><i class="bi bi-lightning-charge"></i> Venda rápida</span>';
 }
 
 function obterObservacaoValida(observacao) {
@@ -44,8 +52,28 @@ function podeCancelarPorPrazo(dataVenda) {
   if (!dataVenda) return false;
   const data = new Date(dataVenda);
   if (Number.isNaN(data.getTime())) return false;
-  const limite = new Date(data.getTime() + LIMITE_HORAS_CANCELAMENTO * 60 * 60 * 1000);
+  const limite = new Date(data.getTime() + limiteHorasCancelamento * 60 * 60 * 1000);
   return Date.now() <= limite.getTime();
+}
+
+async function carregarLimiteHorasCancelamento() {
+  try {
+    const response = await fetch("http://localhost:8080/api/parametrizacao/unica", {
+      method: "GET",
+      headers: { Accept: "application/json" }
+    });
+    if (!response.ok) {
+      return;
+    }
+
+    const empresa = await response.json();
+    const numero = Number.parseInt(String(empresa?.horasLimiteCancelamentoVenda ?? "").trim(), 10);
+    if (Number.isInteger(numero) && numero > 0) {
+      limiteHorasCancelamento = numero;
+    }
+  } catch (erro) {
+    console.error(erro);
+  }
 }
 
 function localizarVendaHistorico(vendaId) {
@@ -53,23 +81,21 @@ function localizarVendaHistorico(vendaId) {
 }
 
 function montarQueryHistoricoVendas() {
-  const params = new URLSearchParams();
-
   const dataInicio = $historicoVendas("#filtroVendaDataInicio")?.value || "";
   const dataFim = $historicoVendas("#filtroVendaDataFim")?.value || "";
   const cliente = $historicoVendas("#filtroVendaCliente")?.value?.trim() || "";
   const formaPagamento = $historicoVendas("#filtroVendaFormaPagamento")?.value?.trim() || "";
-  const status = $historicoVendas("#filtroVendaStatus")?.value || "";
+  const tipo = $historicoVendas("#filtroVendaTipo")?.value || "";
   const vendedor = $historicoVendas("#filtroVendaVendedor")?.value?.trim() || "";
 
-  if (dataInicio) params.set("dataInicio", dataInicio);
-  if (dataFim) params.set("dataFim", dataFim);
-  if (cliente) params.set("cliente", cliente);
-  if (formaPagamento) params.set("formaPagamento", formaPagamento);
-  if (status) params.set("status", status);
-  if (vendedor) params.set("vendedor", vendedor);
-
-  return params.toString();
+  return window.vstockUi.toQueryString([
+    ["dataInicio", dataInicio],
+    ["dataFim", dataFim],
+    ["cliente", cliente],
+    ["formaPagamento", formaPagamento],
+    ["tipo", tipo],
+    ["vendedor", vendedor]
+  ]);
 }
 
 function validarPeriodoHistoricoVendas() {
@@ -128,11 +154,7 @@ function renderizarTabelaHistoricoVendas(lista) {
       <td>${window.vstockFormatters.dateTime(item.dataVenda)}</td>
       <td>${item.clienteNome || "Venda sem cliente identificado"}</td>
       <td>${item.formaPagamentoNome || "-"}</td>
-      <td>
-        <span class="sales-status-badge ${window.vstockSales.statusClass(item.status)}">
-          ${window.vstockSales.formatStatus(item.status)}
-        </span>
-      </td>
+      <td>${badgeTipoVenda(item)}</td>
       <td>${item.vendedorNome || "-"}</td>
       <td class="text-end">${window.vstockFormatters.integer(item.quantidadeItens)}</td>
       <td class="text-end fw-semibold">${window.vstockCurrency.formatMoney(item.valorTotal)}</td>
@@ -226,7 +248,7 @@ function limparFiltrosHistoricoVendas() {
   $historicoVendas("#filtroVendaDataFim").value = "";
   $historicoVendas("#filtroVendaCliente").value = "";
   $historicoVendas("#filtroVendaFormaPagamento").value = "";
-  $historicoVendas("#filtroVendaStatus").value = "";
+  $historicoVendas("#filtroVendaTipo").value = "";
   $historicoVendas("#filtroVendaVendedor").value = "";
 }
 
@@ -256,7 +278,7 @@ function abrirModalCancelarVenda(vendaId) {
     $historicoVendas("#btnAprovarCancelamentoVenda").classList.add("d-none");
     const dataVendaFormatada = formatarDataHoraSemVirgula(venda?.dataVenda);
     msgModalCancelarVenda(
-      `Esta venda foi realizada em ${dataVendaFormatada} e so pode ser cancelada nas primeiras ${LIMITE_HORAS_CANCELAMENTO} horas.`,
+      `Esta venda foi realizada em ${dataVendaFormatada} e so pode ser cancelada nas primeiras ${limiteHorasCancelamento} horas.`,
       "warning"
     );
   }
@@ -265,10 +287,14 @@ function abrirModalCancelarVenda(vendaId) {
 
 function preencherModalDetalheVenda(detalhe) {
   const itens = Array.isArray(detalhe?.itens) ? detalhe.itens : [];
+  const pagamentos = Array.isArray(detalhe?.pagamentos) ? detalhe.pagamentos : [];
   const observacaoValida = obterObservacaoValida(detalhe?.observacao);
   const motivoCancelamento = obterObservacaoValida(detalhe?.motivoCancelamento);
   const status = detalhe?.status || "";
   const troco = Number(detalhe?.troco || 0);
+  const valorBruto = Number(detalhe?.valorTotal || 0);
+  const valorLiquidoReceber = Number(detalhe?.valorLiquidoReceber ?? valorBruto);
+  const valorTaxa = Math.max(valorBruto - valorLiquidoReceber, 0);
   const vendaCancelada = vendaEstaCancelada(detalhe);
 
   $historicoVendas("#detalheVendaId").textContent = detalhe?.vendaId ? `#${detalhe.vendaId}` : "-";
@@ -281,11 +307,16 @@ function preencherModalDetalheVenda(detalhe) {
   $historicoVendas("#detalheVendaCliente").textContent = detalhe?.clienteNome || "Venda sem cliente identificado";
   $historicoVendas("#detalheVendaPagamento").textContent = detalhe?.formaPagamentoNome || "-";
   $historicoVendas("#detalheVendaVendedor").textContent = detalhe?.vendedorNome || "-";
+  $historicoVendas("#detalheVendaTipo").innerHTML = badgeTipoVenda(detalhe);
   $historicoVendas("#detalheVendaSubtotal").textContent = window.vstockCurrency.formatMoney(detalhe?.valorSubtotal);
   $historicoVendas("#detalheVendaDesconto").textContent = window.vstockCurrency.formatMoney(detalhe?.valorDesconto);
   $historicoVendas("#detalheVendaTotal").textContent = window.vstockCurrency.formatMoney(detalhe?.valorTotal);
   $historicoVendas("#detalheVendaRecebido").textContent = detalhe?.valorRecebido == null ? "-" : window.vstockCurrency.formatMoney(detalhe.valorRecebido);
   $historicoVendas("#detalheVendaTroco").textContent = detalhe?.troco == null ? "-" : window.vstockCurrency.formatMoney(detalhe.troco);
+  $historicoVendas("#detalheVendaValorBruto").textContent = window.vstockCurrency.formatMoney(valorBruto);
+  $historicoVendas("#detalheVendaValorTaxa").textContent = window.vstockCurrency.formatMoney(valorTaxa);
+  $historicoVendas("#detalheVendaValorLiquido").textContent = window.vstockCurrency.formatMoney(valorLiquidoReceber);
+  $historicoVendas("#detalheVendaTaxaBloco").classList.toggle("d-none", valorTaxa <= 0);
   $historicoVendas("#detalheVendaObservacao").textContent = observacaoValida || "";
   $historicoVendas("#detalheVendaObservacaoBloco").classList.toggle("d-none", !observacaoValida);
   $historicoVendas("#detalheVendaTroco").closest(".sales-detail-summary-row")?.classList.toggle("is-positive", troco > 0);
@@ -302,6 +333,21 @@ function preencherModalDetalheVenda(detalhe) {
       <td class="text-end fw-semibold">${window.vstockCurrency.formatMoney(item.valorSubtotal)}</td>
     </tr>
   `).join("");
+
+  const blocoPagamentos = $historicoVendas("#detalheVendaPagamentosDivididosBloco");
+  const corpoPagamentos = $historicoVendas("#detalheVendaPagamentosDivididosBody");
+  blocoPagamentos?.classList.toggle("d-none", !detalhe?.vendaDividida || !pagamentos.length);
+  if (corpoPagamentos) {
+    corpoPagamentos.innerHTML = pagamentos.map((pagamento, indice) => `
+      <tr>
+        <td>${pagamento.ordemPagamento || indice + 1}</td>
+        <td>${pagamento.formaPagamentoNome || "-"}</td>
+        <td class="text-end">${window.vstockCurrency.formatMoney(pagamento.valor)}</td>
+        <td class="text-end">${window.vstockCurrency.formatMoney(Math.max(Number(pagamento.valor || 0) - Number(pagamento.valorLiquidoReceber || 0), 0))}</td>
+        <td class="text-end fw-semibold">${window.vstockCurrency.formatMoney(pagamento.valorLiquidoReceber)}</td>
+      </tr>
+    `).join("");
+  }
 }
 
 async function abrirDetalheVenda(vendaId) {
@@ -399,6 +445,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   modalDetalheVenda = new bootstrap.Modal(document.getElementById("modalDetalheVenda"));
   modalCancelarVenda = new bootstrap.Modal(document.getElementById("modalCancelarVenda"));
 
+  await carregarLimiteHorasCancelamento();
   await carregarFormasPagamentoHistorico();
   await carregarHistoricoVendas(1);
 
@@ -436,3 +483,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   $historicoVendas("#btnAprovarCancelamentoVenda")?.addEventListener("click", aprovarCancelamentoVenda);
   $historicoVendas("#btnConfirmarCancelamentoVenda")?.addEventListener("click", confirmarCancelamentoVenda);
 });
+

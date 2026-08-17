@@ -1,4 +1,4 @@
-﻿const API_PRODUTO = {
+const API_PRODUTO = {
   LISTA: "http://localhost:8080/api/produtos/lista",
   NOVO: "http://localhost:8080/api/produtos",
   ATUALIZAR: (id) => `http://localhost:8080/api/produtos/${id}`,
@@ -7,6 +7,7 @@
 };
 
 const $produto = (selector) => document.querySelector(selector);
+const msgProduto = window.vstockUi.createAlertHandler({ container: "#mensagens", autoRemoveMs: 4500 });
 
 let produtoEditandoId = null;
 let produtosCache = [];
@@ -15,40 +16,6 @@ const ITENS_POR_PAGINA_PRODUTOS = 10;
 
 function formProduto() {
   return $produto("#produtoForm");
-}
-
-function msgProduto(texto, tipo = "danger") {
-  const box = $produto("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-  setTimeout(() => div.remove(), 4500);
-}
-
-function formatarDataProduto(valor) {
-  if (!valor) return "-";
-  return new Date(`${valor}T00:00:00`).toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo"
-  });
-}
-
-function badgeStatus(ativo) {
-  return ativo
-    ? `<span class="badge text-bg-success">Ativo</span>`
-    : `<span class="badge text-bg-secondary">Inativo</span>`;
-}
-
-function formatarMoedaProduto(valor) {
-  return window.vstockCurrency.formatMoney(valor || 0);
 }
 
 function atualizarModoFormulario() {
@@ -70,6 +37,7 @@ function atualizarModoFormulario() {
 
 function limparFormularioProduto() {
   produtoEditandoId = null;
+  window.vstockEditModal?.close();
   $produto("#produtoDescricao").value = "";
   $produto("#produtoQtdMin").value = "";
   $produto("#produtoValorUnitario").value = "";
@@ -126,55 +94,28 @@ function preencherFormularioProduto(produto) {
 }
 
 function obterProdutosFiltrados() {
-  const filtro = $produto("#filtroNomeProduto")?.value?.trim().toLowerCase() || "";
-  if (!filtro) return produtosCache;
+  const filtroNome = $produto("#filtroNomeProduto")?.value?.trim().toLowerCase() || "";
+  const filtroCategoria = $produto("#filtroCategoriaProduto")?.value?.trim().toLowerCase() || "";
+  const filtroStatus = $produto("#filtroStatusProduto")?.value || "";
 
-  return produtosCache.filter((produto) =>
-    String(produto.prodDescr ?? produto.prod_descr ?? "").toLowerCase().includes(filtro)
-  );
+  return produtosCache.filter((produto) => {
+    const nome = String(produto.prodDescr ?? produto.prod_descr ?? "").toLowerCase();
+    const categoria = String(produto.categoria?.catDescr ?? produto.categoria?.cat_descr ?? "").toLowerCase();
+    const ativo = produto.ativo !== false;
+    const correspondeStatus = !filtroStatus || (filtroStatus === "ativo" ? ativo : !ativo);
+
+    return nome.includes(filtroNome) && categoria.includes(filtroCategoria) && correspondeStatus;
+  });
 }
 
 function obterOpcoesNomeProduto() {
   return produtosCache.map((produto) => produto.prodDescr ?? produto.prod_descr);
 }
 
-function renderizarPaginacaoProdutos(totalItens) {
-  const box = $produto("#paginacaoProdutos");
-  if (!box) return;
-
-  const totalPaginas = Math.max(1, Math.ceil(totalItens / ITENS_POR_PAGINA_PRODUTOS));
-  paginaAtualProdutos = Math.min(paginaAtualProdutos, totalPaginas);
-  const inicio = totalItens === 0 ? 0 : ((paginaAtualProdutos - 1) * ITENS_POR_PAGINA_PRODUTOS) + 1;
-  const fim = Math.min(paginaAtualProdutos * ITENS_POR_PAGINA_PRODUTOS, totalItens);
-
-  box.innerHTML = `
-    <div class="paginacao-cadastro-resumo">
-      Exibindo ${inicio}-${fim} de ${totalItens} produtos
-    </div>
-    <div class="paginacao-cadastro-botoes">
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaAnteriorProduto" ${paginaAtualProdutos === 1 ? "disabled" : ""}>
-        <i class="bi bi-chevron-left"></i> Anterior
-      </button>
-      <span class="paginacao-cadastro-resumo">Página ${paginaAtualProdutos} de ${totalPaginas}</span>
-      <button type="button" class="btn btn-outline-secondary btn-sm" id="btnPaginaProximaProduto" ${paginaAtualProdutos === totalPaginas || totalItens === 0 ? "disabled" : ""}>
-        Próxima <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-  `;
-
-  $produto("#btnPaginaAnteriorProduto")?.addEventListener("click", () => {
-    if (paginaAtualProdutos > 1) {
-      paginaAtualProdutos -= 1;
-      renderizarProdutos();
-    }
-  });
-
-  $produto("#btnPaginaProximaProduto")?.addEventListener("click", () => {
-    if (paginaAtualProdutos < totalPaginas) {
-      paginaAtualProdutos += 1;
-      renderizarProdutos();
-    }
-  });
+function obterOpcoesCategoriaProduto() {
+  return [...new Set(produtosCache
+    .map((produto) => produto.categoria?.catDescr ?? produto.categoria?.cat_descr)
+    .filter(Boolean))];
 }
 
 function renderizarProdutos() {
@@ -199,10 +140,10 @@ function renderizarProdutos() {
         <td>${produto.prodDescr ?? produto.prod_descr ?? "-"}</td>
         <td>${produto.categoria?.catDescr ?? produto.categoria?.cat_descr ?? "-"}</td>
         <td>${produto.qtdMin ?? produto.qtd_min ?? 0}</td>
-        <td>${formatarMoedaProduto(produto.valorUnitario ?? produto.valor_unitario ?? 0)}</td>
+        <td>${window.vstockCurrency.formatMoney(produto.valorUnitario ?? produto.valor_unitario ?? 0)}</td>
         <td>${produto.codigoBarras ?? produto.codigo_barras ?? "-"}</td>
-        <td>${formatarDataProduto(produto.dataCadastro ?? produto.data_cadastro)}</td>
-        <td>${badgeStatus(ativo)}</td>
+        <td>${window.vstockFormatters.date(produto.dataCadastro ?? produto.data_cadastro)}</td>
+        <td>${window.vstockUi.badgeStatus(ativo)}</td>
         <td class="text-center">
           <div class="d-flex gap-2 justify-content-center flex-wrap">
             <button type="button" class="btn btn-sm btn-outline-primary" data-acao="editar" data-id="${id}">
@@ -356,6 +297,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       renderizarProdutos();
     }
   });
+  window.vstockFilterDropdown.attach({
+    input: "#filtroCategoriaProduto",
+    getOptions: obterOpcoesCategoriaProduto,
+    onInputValueChange: () => {
+      paginaAtualProdutos = 1;
+      renderizarProdutos();
+    },
+    onOptionSelect: () => {
+      paginaAtualProdutos = 1;
+      renderizarProdutos();
+    }
+  });
+  $produto("#filtroStatusProduto")?.addEventListener("change", () => {
+    paginaAtualProdutos = 1;
+    renderizarProdutos();
+  });
 
   $produto("#tabelaProdutos tbody")?.addEventListener("click", (event) => {
     const botao = event.target.closest("button");
@@ -367,6 +324,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (botao.dataset.acao === "editar") {
       preencherFormularioProduto(produto);
+      window.vstockEditModal?.open({ title: "Editar Produto", form: formProduto() });
     }
 
     if (botao.dataset.acao === "status") {

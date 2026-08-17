@@ -83,22 +83,22 @@ function renderizarKpis(produtos, estoque, historico) {
     ? ((faturamentoMes - faturamentoMesAnterior) / faturamentoMesAnterior) * 100
     : null;
 
-  setText("kpiProdutosCadastrados", formatInteger(produtosCadastrados));
+  setText("kpiProdutosCadastrados", window.vstockFormatters.integer(produtosCadastrados));
   setHtml("kpiProdutosCadastradosObs", `<i class="bi bi-arrow-up-right"></i> +${produtosMesAtual} este mês`);
 
-  setText("kpiItensEstoque", formatInteger(itensEmEstoque));
-  setHtml("kpiItensEstoqueObs", `<i class="bi bi-boxes"></i> ${formatInteger(estoque.length)} produtos com saldo`);
+  setText("kpiItensEstoque", window.vstockFormatters.integer(itensEmEstoque));
+  setHtml("kpiItensEstoqueObs", `<i class="bi bi-boxes"></i> ${window.vstockFormatters.integer(estoque.length)} produtos com saldo`);
 
-  setText("kpiBaixoEstoque", formatInteger(baixoEstoque));
-  setHtml("kpiBaixoEstoqueObs", `<i class="bi bi-exclamation-triangle"></i> ${formatInteger(baixoEstoque)} itens em atenção`);
+  setText("kpiBaixoEstoque", window.vstockFormatters.integer(baixoEstoque));
+  setHtml("kpiBaixoEstoqueObs", `<i class="bi bi-exclamation-triangle"></i> ${window.vstockFormatters.integer(baixoEstoque)} itens em atenção`);
 
-  setText("kpiVencidos", formatInteger(vencidos));
-  setHtml("kpiVencidosObs", `<i class="bi bi-clock-history"></i> ${formatInteger(vencidos)} produtos vencidos`);
+  setText("kpiVencidos", window.vstockFormatters.integer(vencidos));
+  setHtml("kpiVencidosObs", `<i class="bi bi-clock-history"></i> ${window.vstockFormatters.integer(vencidos)} produtos vencidos`);
 
-  setText("kpiVendasHoje", formatInteger(vendasHoje.length));
-  setHtml("kpiVendasHojeObs", `<i class="bi bi-arrow-up-right"></i> ${formatCurrency(somarValores(vendasHoje, "valorTotal"))} hoje`);
+  setText("kpiVendasHoje", window.vstockFormatters.integer(vendasHoje.length));
+  setHtml("kpiVendasHojeObs", `<i class="bi bi-arrow-up-right"></i> ${window.vstockCurrency.formatMoney(somarValores(vendasHoje, "valorTotal"))} hoje`);
 
-  setText("kpiFaturamentoMes", formatCurrency(faturamentoMes));
+  setText("kpiFaturamentoMes", window.vstockCurrency.formatMoney(faturamentoMes));
   setHtml(
     "kpiFaturamentoMesObs",
     variacaoFaturamento === null
@@ -129,7 +129,7 @@ function renderizarGraficoCategorias(estoque) {
     const percentual = maiorValor > 0 ? Math.max(8, Math.round((valor / maiorValor) * 100)) : 0;
 
     setText(`categoriaLabel${i}`, label);
-    setText(`categoriaValor${i}`, formatInteger(valor));
+    setText(`categoriaValor${i}`, window.vstockFormatters.integer(valor));
 
     const bar = document.getElementById(`categoriaBar${i}`);
     if (bar) {
@@ -161,10 +161,10 @@ function renderizarAlertas(estoque) {
     return;
   }
 
-  badge.textContent = `${formatInteger(alertas.length)} itens`;
+  badge.textContent = `${window.vstockFormatters.integer(alertas.length)} itens`;
 
   if (titulo) {
-    titulo.textContent = `Existem ${formatInteger(alertas.length)} produtos em atenção no estoque.`;
+    titulo.textContent = `Existem ${window.vstockFormatters.integer(alertas.length)} produtos em atenção no estoque.`;
   }
 
   lista.innerHTML = alertas.slice(0, 2).map(({ item, status }) => {
@@ -256,7 +256,7 @@ function renderizarMovimentacoesRecentes(historico) {
           <strong>${escapeHtml(item?.produto || "Produto")}</strong>
           <small>${escapeHtml(detalhe)}</small>
         </div>
-        <span class="movement-value ${tipo === "ENTRADA" ? "positive" : "negative"}">${valorSinal}${formatInteger(numero(item?.quantidade))} un</span>
+        <span class="movement-value ${tipo === "ENTRADA" ? "positive" : "negative"}">${valorSinal}${window.vstockFormatters.integer(numero(item?.quantidade))} un</span>
       </div>
     `;
   }).join("");
@@ -269,18 +269,18 @@ function montarDescricaoAlerta(item, status) {
   const validade = parseDate(item?.proxima_validade);
 
   if (status.chave === "VENCIDO") {
-    return `${nome} venceu em ${formatDate(validade)} e requer conferência imediata.`;
+    return `${nome} venceu em ${window.vstockFormatters.date(validade)} e requer conferência imediata.`;
   }
 
   if (status.chave === "VENCENDO") {
-    return `${nome} vence em ${formatDate(validade)} e precisa de prioridade no giro.`;
+    return `${nome} vence em ${window.vstockFormatters.date(validade)} e precisa de prioridade no giro.`;
   }
 
   if (status.chave === "SEM_ESTOQUE") {
     return `${nome} está sem saldo disponível no estoque.`;
   }
 
-  return `${nome} está com ${formatInteger(saldo)} unidades para mínimo de ${formatInteger(minimo)}.`;
+  return `${nome} está com ${window.vstockFormatters.integer(saldo)} unidades para mínimo de ${window.vstockFormatters.integer(minimo)}.`;
 }
 
 function prioridadeStatus(chave) {
@@ -364,25 +364,6 @@ function numero(valor) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function formatInteger(valor) {
-  return new Intl.NumberFormat("pt-BR").format(numero(valor));
-}
-
-function formatCurrency(valor) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  }).format(numero(valor));
-}
-
-function formatDate(valor) {
-  if (!valor) {
-    return "-";
-  }
-
-  return valor.toLocaleDateString("pt-BR");
-}
-
 function formatPercent(valor) {
   return `${valor >= 0 ? "+" : ""}${valor.toFixed(1)}%`;
 }
@@ -432,3 +413,4 @@ function renderizarEstadoFallback() {
     card.classList.add("d-none");
   }
 }
+

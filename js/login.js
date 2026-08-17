@@ -9,11 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  function funcionarioEhAdminMestre(funcionario) {
-    const email = String(funcionario?.funcEmail || funcionario?.email || "").trim().toLowerCase();
-    return Number(funcionario?.tipoAcesso) === 99 && (email === "admin@admin" || email === "admin@admin.login");
-  }
-
   async function existeEmpresaCadastrada() {
     try {
       const response = await fetch("http://localhost:8080/api/parametrizacao/existeEmpresa", {
@@ -79,11 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = (
-      document.getElementById("email")?.value
-      ?? document.getElementById("acesso")?.value
-      ?? ""
-    ).trim();
+    const acesso = document.getElementById("acesso")?.value?.trim() ?? "";
     const senha = document.getElementById("senha")?.value ?? "";
     const licenca = licencaInput?.value?.trim() ?? "";
 
@@ -96,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const loginResponse = await fetch("http://localhost:8080/api/funcionarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ email, senha, licenca }).toString()
+        body: new URLSearchParams({ acesso, senha, licenca }).toString()
       });
 
       if (loginResponse.ok) {
@@ -110,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const empresaConfigurada = await existeEmpresaCadastrada();
-        window.location.href = (!empresaConfigurada && funcionarioEhAdminMestre(funcionario))
+        window.location.href = (!empresaConfigurada && window.vstockSession.isAdministradorMestre(funcionario))
           ? "parametrizacao.html"
           : "index.html";
         return;
@@ -129,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (loginResponse.status === 404) {
-        if (err) err.textContent = "Funcionario nao encontrado.";
+        if (err) err.textContent = "Usuario ou e-mail nao encontrado.";
         return;
       }
 
@@ -141,3 +132,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+

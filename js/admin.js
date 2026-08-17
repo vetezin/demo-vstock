@@ -5,46 +5,15 @@ const API_ADMIN = {
 };
 
 const $admin = (sel) => document.querySelector(sel);
-
-function lerFuncionarioAdmin() {
-  try {
-    return JSON.parse(localStorage.getItem("funcionarioLogado") || "null");
-  } catch (_) {
-    return null;
-  }
-}
+const msgAdmin = window.vstockUi.createAlertHandler({ container: "#mensagens", clear: true });
 
 function garantirAcessoAdminTela() {
-  const funcionario = lerFuncionarioAdmin();
-  if (!funcionario || Number(funcionario.tipoAcesso) !== 99) {
+  const funcionario = window.vstockSession.getFuncionario();
+  if (!window.vstockSession.isAdministrador(funcionario)) {
     window.location.href = funcionario ? "index.html" : "login.html";
     return false;
   }
   return true;
-}
-
-function msgAdmin(texto, tipo = "danger") {
-  const box = $admin("#mensagens");
-  if (!box) return;
-
-  const div = document.createElement("div");
-  div.className = `alert alert-${tipo} alert-dismissible fade show`;
-  div.role = "alert";
-  div.innerHTML = `
-    ${texto}
-    <button class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-  `;
-
-  box.innerHTML = "";
-  box.appendChild(div);
-  window.destacarMensagens?.(box);
-}
-
-function formatarDataHoraLog(valor) {
-  if (!valor) return "-";
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return valor;
-  return data.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 }
 
 function construirQueryLogs() {
@@ -82,7 +51,7 @@ function renderizarLogs(logs) {
 
   tbody.innerHTML = logs.map((log) => `
     <tr>
-      <td>${formatarDataHoraLog(log.createdAt)}</td>
+      <td>${window.vstockFormatters.dateTime(log.createdAt, { preserveInvalid: true, options: {} })}</td>
       <td>${log.usuario || "-"}</td>
       <td><span class="admin-operacao-badge">${log.operacao || "-"}</span></td>
       <td class="admin-log-mensagem">${log.mensagem || "-"}</td>
@@ -178,3 +147,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   $admin("#filtroLogLimite")?.addEventListener("change", carregarLogs);
 });
+

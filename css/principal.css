@@ -73,6 +73,7 @@ header {
 }
 
 .navbar-cash-session-status {
+  position: relative;
   min-width: 164px;
   padding: 0.52rem 0.75rem;
   display: inline-flex;
@@ -82,6 +83,56 @@ header {
   border-radius: 14px;
   background: #edf9f2;
   color: #16794b;
+}
+
+.navbar-cash-session-status:hover .navbar-cash-session-popover,
+.navbar-cash-session-status:focus-within .navbar-cash-session-popover {
+  display: block;
+}
+
+.navbar-cash-session-popover {
+  display: none;
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  width: 238px;
+  padding: 0.85rem;
+  border: 1px solid rgba(30, 80, 64, 0.15);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(35, 48, 43, 0.16);
+}
+
+.navbar-cash-session-popover::before {
+  content: "";
+  position: absolute;
+  top: -0.6rem;
+  right: 0;
+  left: 0;
+  height: 0.65rem;
+}
+
+.navbar-cash-session-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.2rem 0;
+  color: #64706b;
+  font-size: 0.78rem;
+}
+
+.navbar-cash-session-detail strong { color: #23312c; font-weight: 700; }
+
+.navbar-cash-session-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  color: #08766f;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .navbar-cash-session-status.is-closed {
@@ -124,6 +175,8 @@ header {
   background: #b42318;
   box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.08);
 }
+
+.navbar-cash-session-status.is-closed .navbar-cash-session-popover { display: none; }
 
 .navbar .container-fluid,
 .brand-navbar .container-fluid {
@@ -633,6 +686,12 @@ header {
   transform: translateY(-50%);
 }
 
+/* O estilo global de button:hover aplica translateY(-1px); preserve o centro do controle. */
+.sidebar-collapse-toggle-topbar:hover,
+.sidebar-collapse-toggle-topbar:focus-visible {
+  transform: translateY(-50%);
+}
+
 .content {
   flex: 1;
   min-width: 0;
@@ -1053,6 +1112,48 @@ input[type="text"] {
   }
 }
 
+@media (max-width: 1200px) and (min-width: 769px) {
+  body {
+    --app-page-padding-x: 20px;
+    --app-page-padding-y: 20px;
+  }
+
+  .app-shell .content.page-content,
+  .app-shell .page-content > *,
+  .app-shell .page-content .page-wrapper {
+    min-width: 0;
+  }
+
+  .navbar-system-row,
+  .navbar-system-meta {
+    gap: 0.5rem;
+  }
+}
+
+/* Ajuste de desktop compacto: preserva área operacional suficiente quando a
+ * navegação lateral ainda está expandida (1280px e 1366px). */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  body {
+    --app-sidebar-width: 248px;
+    --app-page-padding-x: clamp(1.25rem, 2vw, 1.75rem);
+    --app-page-padding-y: clamp(1.25rem, 2vw, 1.75rem);
+  }
+}
+
+/* Em 1280px as tabelas de listagem devem ocupar o painel disponível, sem
+ * deslocar a página ou depender de rolagem horizontal interna. */
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .app-shell .page-content .table-responsive > .table {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .app-shell .page-content .table-responsive > .table th,
+  .app-shell .page-content .table-responsive > .table td {
+    overflow-wrap: anywhere;
+  }
+}
+
 @media (min-width: 769px) {
   body.sidebar-collapsed {
     --app-sidebar-width: 84px;
@@ -1122,6 +1223,11 @@ input[type="text"] {
 
   body.sidebar-collapsed .sidebar-collapse-toggle-topbar {
     left: calc(var(--app-sidebar-width) / 2);
+    transform: translate(-50%, -50%);
+  }
+
+  body.sidebar-collapsed .sidebar-collapse-toggle-topbar:hover,
+  body.sidebar-collapsed .sidebar-collapse-toggle-topbar:focus-visible {
     transform: translate(-50%, -50%);
   }
 }
@@ -1233,3 +1339,4 @@ input[type="text"] {
     padding: 1.2rem;
   }
 }
+
