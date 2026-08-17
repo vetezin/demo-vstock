@@ -28,6 +28,9 @@
       dataDemissao: null
     }));
   }
+  if (!localStorage.getItem('authToken')) {
+    localStorage.setItem('authToken', 'mock-token-demo');
+  }
   const realFetch = window.fetch ? window.fetch.bind(window) : null;
   let db = null;
   let dbPromise = null;

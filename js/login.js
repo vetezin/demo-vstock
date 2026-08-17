@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  window.location.replace("index.html");
+  return;
+
   const form = document.getElementById("loginForm");
   const licencaFieldWrapper = document.getElementById("licencaFieldWrapper");
   const licencaInput = document.getElementById("licenca");
