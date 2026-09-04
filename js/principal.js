@@ -1000,7 +1000,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     return {
       estoque: modulos ? modulos.moduloEstoque !== false : true,
       alertas: modulos ? modulos.moduloAlertas !== false : true,
-      vendas: modulos ? modulos.moduloVendas === true : false
+      vendas: modulos ? modulos.moduloVendas === true : false,
+      oficina: modulos ? modulos.moduloOficina === true : false
     };
   }
 
@@ -1508,6 +1509,10 @@ document.addEventListener('DOMContentLoaded', async function () {
       return true;
     }
 
+    if (!modulos.oficina && ['cadastro-oficina-veiculos.html', 'cadastro-oficina-servicos.html', 'cadastro-oficina-orcamento.html', 'visualizar-oficina-orcamentos.html', 'visualizar-oficina-ordens-servico.html'].includes(paginaAtual)) {
+      return true;
+    }
+
     return false;
   }
 
@@ -1808,6 +1813,27 @@ document.addEventListener('DOMContentLoaded', async function () {
       `
       : '';
 
+    var oficinaConteudo = modulos.oficina
+      ? `
+      <a class="${classeLinkSidebar('cadastro-oficina-veiculos.html')}" href="cadastro-oficina-veiculos.html">
+        <i class="bi bi-bicycle"></i> Veículos
+      </a>
+      <a class="${classeLinkSidebar('cadastro-oficina-servicos.html')}" href="cadastro-oficina-servicos.html">
+        <i class="bi bi-tools"></i> Serviços
+      </a>
+      <div class="sidebar-submenu-label">Orçamentos</div>
+      <a class="${classeLinkSidebar('cadastro-oficina-orcamento.html')}" href="cadastro-oficina-orcamento.html">
+        <i class="bi bi-file-earmark-plus"></i> Criar orçamento
+      </a>
+      <a class="${classeLinkSidebar('visualizar-oficina-orcamentos.html')}" href="visualizar-oficina-orcamentos.html">
+        <i class="bi bi-files"></i> Visualizar orçamentos
+      </a>
+      <a class="${classeLinkSidebar('visualizar-oficina-ordens-servico.html')}" href="visualizar-oficina-ordens-servico.html">
+        <i class="bi bi-wrench-adjustable"></i> Ordens de serviço
+      </a>
+      `
+      : '';
+
     var adminConteudo = funcionarioEhAdmin(funcionario)
       ? `
       <a class="${classeLinkSidebar('admin.html')}" href="admin.html">
@@ -1882,6 +1908,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         icone: 'bi-box',
         conteudo: estoqueConteudo,
         ativo: ['entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html', 'alertas.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'oficina',
+        titulo: 'Oficina',
+        icone: 'bi-tools',
+        conteudo: oficinaConteudo,
+        ativo: ['cadastro-oficina-veiculos.html', 'cadastro-oficina-servicos.html', 'cadastro-oficina-orcamento.html', 'visualizar-oficina-orcamentos.html', 'visualizar-oficina-ordens-servico.html'].includes(paginaAtual)
       })}
 
       ${montarGrupoSidebar({
@@ -2048,7 +2082,6 @@ window.vstockEditModal = {
   },
   close() { this.modal?.hide(); }
 };
-
 
 
 

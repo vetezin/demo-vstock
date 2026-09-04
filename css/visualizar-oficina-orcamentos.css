@@ -1,0 +1,25 @@
+.orcamentos-header { align-items: center; }
+.orcamentos-header-titulo { min-width: 0; }
+.orcamentos-header-titulo h2 { margin-bottom: .3rem; }
+.orcamentos-header .btn { flex: 0 0 auto; }
+.orcamentos-filtros { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 220px) auto; gap: 1rem; align-items: end; }
+.orcamentos-filtro-acoes { display: flex; justify-content: flex-end; }
+.orcamentos-lista .table thead th { background: rgba(249, 246, 240, 0.92); color: #485451; font-size: .8rem; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.orcamentos-lista .table td { vertical-align: middle; }
+.orcamento-numero { display: block; font-weight: 800; color: #22302c; }
+.orcamento-data { display: inline-flex; align-items: center; gap: .45rem; color: #33413d; font-size: .9rem; font-weight: 700; white-space: nowrap; }
+.orcamento-data i { color: #087a4f; font-size: .88rem; }
+.orcamento-cliente { display: block; font-weight: 700; color: #22302c; }
+.orcamento-veiculo { display: block; margin-top: .15rem; color: #68716d; font-size: .88rem; }
+.orcamento-status { display: inline-flex; align-items: center; justify-content: center; min-width: 122px; padding: .45rem .7rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.orcamento-status.pendente { background: rgba(255, 193, 7, .16); color: #9d6f00; }.orcamento-status.aprovado { background: rgba(25, 135, 84, .12); color: #1f6b46; }.orcamento-status.cancelado { background: rgba(220, 53, 69, .12); color: #b42332; }
+.orcamentos-vazio { display: grid; place-items: center; gap: .35rem; padding: 3rem 1rem; color: #6c757d; text-align: center; }.orcamentos-vazio i { font-size: 2rem; }
+.orcamento-detalhe-modal .modal-header { border-bottom-color: rgba(229, 217, 207, .9); }.orcamento-detalhe-layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 1.25rem; }
+.orcamento-detalhe-bloco { padding: 1rem; border: 1px solid rgba(229, 217, 207, .9); border-radius: 14px; background: #fff; }.orcamento-detalhe-bloco + .orcamento-detalhe-bloco { margin-top: .9rem; }.orcamento-detalhe-bloco h6 { margin-bottom: .9rem; font-weight: 800; color: #33413d; }.orcamento-detalhe-bloco p { white-space: pre-wrap; color: #4f5955; line-height: 1.55; }
+.orcamento-detalhe-dados { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }.orcamento-detalhe-dados small, .orcamento-detalhe-total small { display: block; color: #6c757d; }.orcamento-detalhe-dados strong { display: block; margin-top: .2rem; color: #22302c; }
+.orcamento-detalhe-total { align-self: start; padding: 1.15rem; border-radius: 16px; background: #f7faf8; border: 1px solid rgba(0, 107, 104, .18); }.orcamento-detalhe-total strong { display: block; margin: .18rem 0 1rem; color: #22302c; font-size: 1.05rem; }.orcamento-detalhe-total .orcamento-detalhe-valor-final { margin-bottom: 0; color: #087a4f; font-size: 1.45rem; }
+.orcamento-aviso-os { display: none; }
+.orcamento-detalhe-modal:has(#detalheOrcamentoStatus .aprovado) .modal-footer { justify-content: center; }.orcamento-detalhe-modal:has(#detalheOrcamentoStatus .aprovado) .orcamento-aviso-os { display: flex; align-items: center; gap: .5rem; max-width: 470px; padding: .55rem .7rem; margin: 0 auto; border: 1px solid rgba(157, 111, 0, .18); border-radius: 9px; background: #fffaf0; color: #68716d; font-size: .82rem; line-height: 1.35; }.orcamento-detalhe-modal:has(#detalheOrcamentoStatus .aprovado) .orcamento-aviso-os i { color: #9d6f00; font-size: 1rem; }
+@media (max-width: 768px) { .orcamentos-filtros, .orcamento-detalhe-layout, .orcamento-detalhe-dados { grid-template-columns: 1fr; }.orcamentos-filtro-acoes { justify-content: stretch; }.orcamentos-filtro-acoes .btn, .orcamentos-header .btn { width: 100%; } }
+
+

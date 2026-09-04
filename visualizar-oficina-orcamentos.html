@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualizar Orçamentos | Plataforma de Gestão</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
+  <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visualizar-oficina-orcamentos.css?v=20260829-header-r2" rel="stylesheet" />
+</head>
+<body class="app-shell">
+  <nav class="navbar brand-navbar app-topbar"><div class="container-fluid justify-content-between"><a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html"><img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" /></a><div class="text-white text-end"><div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div></div></div></nav>
+  <div class="main-container app-layout"><aside class="sidebar"><h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5></aside>
+    <main class="content page-content">
+      <div id="mensagens" class="mb-3" aria-live="polite"></div>
+      <header class="page-header orcamentos-header"><div class="orcamentos-header-titulo"><h2><i class="bi bi-clipboard2-check text-danger"></i> Visualizar orçamentos</h2><p class="text-muted mb-0">Acompanhe as propostas e registre a decisão do cliente.</p></div><a href="cadastro-oficina-orcamento.html" class="btn btn-success"><i class="bi bi-plus-circle"></i> Criar orçamento</a></header>
+      <section class="card simple-card mb-4" aria-label="Filtros de orçamentos"><div class="card-body"><div class="orcamentos-filtros">
+        <div class="orcamentos-filtro-busca"><label class="form-label" for="filtroOrcamentoBusca">Buscar orçamento</label><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input id="filtroOrcamentoBusca" class="form-control" type="search" placeholder="Número, cliente, placa ou veículo" /></div></div>
+        <div><label class="form-label" for="filtroOrcamentoStatus">Status</label><select id="filtroOrcamentoStatus" class="form-select"><option value="">Todos os status</option><option value="PENDENTE">Pendente</option><option value="APROVADO">Aprovado</option><option value="CANCELADO">Cancelado</option></select></div>
+        <div class="orcamentos-filtro-acoes"><button id="btnLimparFiltrosOrcamento" type="button" class="btn btn-outline-secondary"><i class="bi bi-eraser"></i> Limpar</button></div>
+      </div></div></section>
+      <section class="card simple-card orcamentos-lista" aria-labelledby="tituloListaOrcamentos"><div class="card-header d-flex align-items-center justify-content-between gap-3"><span id="tituloListaOrcamentos"><i class="bi bi-list-ul"></i> Orçamentos cadastrados</span><small id="resumoOrcamentos" class="text-muted"></small></div><div class="card-body">
+        <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Orçamento</th><th>Data de criação</th><th>Cliente / veículo</th><th>Status</th><th class="text-center">Ação</th></tr></thead><tbody id="tabelaOrcamentosBody"></tbody></table></div>
+        <div id="vazioOrcamentos" class="orcamentos-vazio d-none"><i class="bi bi-inbox"></i><strong>Nenhum orçamento encontrado</strong><span>Ajuste os filtros ou crie uma nova proposta.</span></div><div id="paginacaoOrcamentos" class="paginacao-cadastro mt-3"></div>
+      </div></section>
+    </main>
+  </div>
+  <div class="modal fade" id="modalDetalheOrcamento" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content orcamento-detalhe-modal">
+    <div class="modal-header"><div><h5 class="modal-title" id="detalheOrcamentoTitulo">Orçamento</h5><small id="detalheOrcamentoData" class="text-muted"></small></div><div class="d-flex align-items-center gap-3"><span id="detalheOrcamentoStatus"></span><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div></div>
+    <div class="modal-body"><div class="orcamento-detalhe-layout"><div>
+      <section class="orcamento-detalhe-bloco"><h6>Dados do atendimento</h6><div class="orcamento-detalhe-dados"><div><small>Cliente</small><strong id="detalheOrcamentoCliente">-</strong></div><div><small>Veículo</small><strong id="detalheOrcamentoVeiculo">-</strong></div><div><small>Responsável</small><strong id="detalheOrcamentoFuncionario">-</strong></div></div></section>
+      <section class="orcamento-detalhe-bloco"><h6>Diagnóstico</h6><p id="detalheOrcamentoDiagnostico" class="mb-0"></p></section>
+      <section class="orcamento-detalhe-bloco d-none" id="blocoObservacaoOrcamento"><h6>Observação para o cliente</h6><p id="detalheOrcamentoObservacao" class="mb-0"></p></section>
+      <section class="orcamento-detalhe-bloco"><h6>Itens da proposta</h6><div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Tipo</th><th>Item</th><th class="text-end">Valor</th></tr></thead><tbody id="detalheOrcamentoItens"></tbody></table></div></section>
+    </div><aside class="orcamento-detalhe-total"><small>Subtotal</small><strong id="detalheOrcamentoSubtotal">R$ 0,00</strong><small>Desconto</small><strong id="detalheOrcamentoDesconto">R$ 0,00</strong><hr><small>Total do orçamento</small><strong id="detalheOrcamentoTotal" class="orcamento-detalhe-valor-final">R$ 0,00</strong></aside></div></div>
+    <div class="modal-footer"><p class="orcamento-aviso-os mb-0"><i class="bi bi-lightbulb"></i><span>Acompanhe na aba de Ordens de Serviço o andamento deste orçamento.</span></p><div id="acoesOrcamento" class="d-flex gap-2 flex-wrap ms-auto"></div></div>
+  </div></div></div>
+  <div class="modal fade" id="modalConfirmarStatusOrcamento" tabindex="-1" aria-labelledby="tituloConfirmarStatusOrcamento" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="tituloConfirmarStatusOrcamento"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div>
+    <div class="modal-body"><p class="mb-2" id="mensagemConfirmarStatusOrcamento"></p><p class="text-muted mb-0" id="descricaoConfirmarStatusOrcamento"></p></div>
+    <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button><button type="button" id="btnConfirmarStatusOrcamento"></button></div>
+  </div></div></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script><script src="js/mock-api.js?v=frontend-audit-oficina"></script>
+    <script src="js/principal.js"></script><script src="js/visualizar-oficina-orcamentos.js"></script>
+</body>
+</html>
+
+

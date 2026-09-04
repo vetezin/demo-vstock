@@ -80,6 +80,7 @@
           db = JSON.parse(persisted);
           garantirDadosCaixa();
           garantirDadosMesas();
+          garantirDadosOficina();
           return db;
         } catch (_) {
           localStorage.removeItem(DB_KEY);
@@ -89,6 +90,7 @@
       db = await loadSeed();
       garantirDadosCaixa();
       garantirDadosMesas();
+      garantirDadosOficina();
       persistDb();
       return db;
     })();
@@ -135,6 +137,32 @@
       db.atendimentosMesas = [];
     }
     persistDb();
+  }
+
+  function garantirDadosOficina() {
+    const cliente = db.clientes[0] || { clienteId: 1, nome: 'Cliente demonstração' };
+    const funcionario = db.funcionarios[0] || { funcCpf: '11111111111', funcNome: 'Administrador Mestre' };
+    const categoria = db.categorias[0] || { catId: 1, catDescr: 'Serviços gerais' };
+    if (!Array.isArray(db.oficinaVeiculos)) db.oficinaVeiculos = [{ veiculoId: 1, clienteId: cliente.clienteId, placa: 'ABC1D23', marca: 'Honda', modelo: 'Civic', anoFabricacao: 2022, cor: 'Prata', observacao: 'Veículo de demonstração', clienteNome: cliente.nome, ativo: true }];
+    if (!Array.isArray(db.oficinaServicos)) db.oficinaServicos = [{ servicoId: 1, categoriaId: categoria.catId || categoria.categoriaId || 1, descricao: 'Troca de óleo e filtros', detalhes: 'Óleo sintético e filtro de óleo', valorServico: 180, categoriaDescricao: categoria.catDescr || categoria.descricao || 'Serviços gerais', ativo: true }];
+    if (!Array.isArray(db.oficinaOrcamentos)) db.oficinaOrcamentos = [{ orcamentoId: 1001, clienteId: cliente.clienteId, clienteNome: cliente.nome, veiculoId: 1, veiculoDescricao: 'Honda Civic • ABC1D23', funcionarioId: funcionario.funcCpf, funcionarioNome: funcionario.funcNome, diagnostico: 'Revisão preventiva', observacao: 'Demonstração VStock', valorDesconto: 0, valorTotal: 180, status: 'ABERTO', criadoEm: nowIso(), itens: [{ tipo: 'SERVICO', servicoId: 1, descricao: 'Troca de óleo e filtros', quantidade: 1, valorUnitario: 180, subtotal: 180 }] }];
+    if (!Array.isArray(db.oficinaOrdensServico)) db.oficinaOrdensServico = [{ ordemServicoId: 2001, orcamentoId: 1001, clienteId: cliente.clienteId, clienteNome: cliente.nome, veiculoId: 1, veiculoDescricao: 'Honda Civic • ABC1D23', funcionarioId: funcionario.funcCpf, funcionarioNome: funcionario.funcNome, status: 'EM_ANDAMENTO', diagnostico: 'Revisão preventiva', observacao: 'OS demonstrativa', criadoEm: nowIso(), iniciadoEm: nowIso(), valorTotal: 180, itens: [{ tipo: 'SERVICO', servicoId: 1, descricao: 'Troca de óleo e filtros', quantidade: 1, valorUnitario: 180, subtotal: 180 }] }];
+    persistDb();
+  }
+
+  function oficinaVeiculosList(url) {
+    let lista = db.oficinaVeiculos.map(v => ({ ...v, clienteNome: db.clientes.find(c => Number(c.clienteId) === Number(v.clienteId))?.nome || v.clienteNome || '-' }));
+    if (url.searchParams.get('ativosOnly') === 'true') lista = lista.filter(v => v.ativo !== false);
+    const busca = url.searchParams.get('busca'); if (busca) lista = lista.filter(v => contains(`${v.placa} ${v.marca} ${v.modelo} ${v.clienteNome}`, busca));
+    return lista;
+  }
+
+  function oficinaCatalogo(url) {
+    const produtos = buildEstoqueResumo().map(p => ({ tipo: 'PRODUTO', produtoCod: p.prod_cod, descricao: p.prod_descr, valorUnitario: Number(p.valor_unitario || 0), categoriaId: null, categoriaDescricao: 'Produtos', ativo: p.ativo !== false }));
+    const servicos = db.oficinaServicos.filter(s => s.ativo !== false).map(s => ({ tipo: 'SERVICO', servicoId: s.servicoId, descricao: s.descricao, detalhes: s.detalhes || '', valorUnitario: Number(s.valorServico || 0), categoriaId: s.categoriaId, categoriaDescricao: s.categoriaDescricao || 'Serviços' }));
+    let itens = produtos.concat(servicos); const busca = url.searchParams.get('busca'); if (busca) itens = itens.filter(i => contains(`${i.descricao} ${i.detalhes || ''}`, busca));
+    const pagina = Math.max(0, Number(url.searchParams.get('pagina') || 0)); const tamanho = Math.max(1, Number(url.searchParams.get('tamanho') || 20));
+    return { itens: itens.slice(pagina * tamanho, (pagina + 1) * tamanho), pagina, tamanho, totalItens: itens.length, totalPaginas: Math.ceil(itens.length / tamanho) };
   }
 
   function produtoMesa(codigo) {
@@ -580,7 +608,8 @@
         moduloFinanceiro: true,
         moduloContasPagar: false,
         moduloContasReceber: false,
-        moduloRelatorios: false
+      moduloRelatorios: false
+      ,moduloOficina: true
       });
     }
     if (path === '/api/modulos' && method === 'POST') {
@@ -1055,6 +1084,24 @@
       addLog('SAIDA_UPDATE', `Saída #${id} atualizada.`);
       return text('OK');
     }
+
+    if (path === '/api/oficina/veiculos' && method === 'GET') return json(oficinaVeiculosList(url));
+    if (path === '/api/oficina/veiculos' && (method === 'POST' || method === 'PUT')) {
+      const body = parseJsonBody(init); const id = body.veiculoId || nextNumericId(db.oficinaVeiculos, 'veiculoId');
+      const item = { veiculoId: Number(id), clienteId: Number(body.clienteId), placa: String(body.placa || '').toUpperCase(), marca: body.marca || '', modelo: body.modelo || '', anoFabricacao: body.anoFabricacao || null, cor: body.cor || '', observacao: body.observacao || '', ativo: body.ativo !== false };
+      const idx = db.oficinaVeiculos.findIndex(v => Number(v.veiculoId) === Number(id)); if (idx >= 0) db.oficinaVeiculos[idx] = { ...db.oficinaVeiculos[idx], ...item }; else db.oficinaVeiculos.unshift(item); persistDb(); return json(item, idx >= 0 ? 200 : 201);
+    }
+    const veiculoMatch = path.match(/^\/api\/oficina\/veiculos\/(\d+)$/); if (veiculoMatch && method === 'PATCH') { const v = db.oficinaVeiculos.find(x => Number(x.veiculoId) === Number(veiculoMatch[1])); if (!v) return text('Veículo não encontrado.', 404); v.ativo = parseJsonBody(init).ativo !== false; persistDb(); return json(v); }
+
+    if (path === '/api/oficina/servicos' && method === 'GET') return json(db.oficinaServicos);
+    if (path === '/api/oficina/servicos' && (method === 'POST' || method === 'PUT')) { const body = parseJsonBody(init); const id = body.servicoId || nextNumericId(db.oficinaServicos, 'servicoId'); const item = { servicoId: Number(id), categoriaId: Number(body.categoriaId || 1), descricao: body.descricao || '', detalhes: body.detalhes || '', valorServico: Number(body.valorServico || 0), categoriaDescricao: body.categoriaDescricao || 'Serviços gerais', ativo: body.ativo !== false }; const idx = db.oficinaServicos.findIndex(s => Number(s.servicoId) === Number(id)); if (idx >= 0) db.oficinaServicos[idx] = { ...db.oficinaServicos[idx], ...item }; else db.oficinaServicos.unshift(item); persistDb(); return json(item, idx >= 0 ? 200 : 201); }
+    const servicoMatch = path.match(/^\/api\/oficina\/servicos\/(\d+)$/); if (servicoMatch && method === 'PATCH') { const s = db.oficinaServicos.find(x => Number(x.servicoId) === Number(servicoMatch[1])); if (!s) return text('Serviço não encontrado.', 404); s.ativo = parseJsonBody(init).ativo !== false; persistDb(); return json(s); }
+    if (path === '/api/oficina/orcamentos/catalogo-itens' && method === 'GET') return json(oficinaCatalogo(url));
+    if (path === '/api/oficina/orcamentos' && method === 'GET') return json(db.oficinaOrcamentos);
+    if (path === '/api/oficina/orcamentos' && method === 'POST') { const body = parseJsonBody(init); const id = nextNumericId(db.oficinaOrcamentos, 'orcamentoId'); const itens = Array.isArray(body.itens) ? body.itens.map(i => ({ ...i, quantidade: Number(i.quantidade || 1), valorUnitario: Number(i.valorUnitario || 0), subtotal: Number(i.subtotal || i.valorUnitario || 0) })) : []; const item = { orcamentoId: id, ...body, clienteId: Number(body.clienteId), veiculoId: Number(body.veiculoId), valorTotal: itens.reduce((s, i) => s + Number(i.subtotal || 0), 0) - Number(body.valorDesconto || 0), status: 'ABERTO', criadoEm: nowIso(), itens }; db.oficinaOrcamentos.unshift(item); persistDb(); return json(item, 201); }
+    const orcamentoMatch = path.match(/^\/api\/oficina\/orcamentos\/(\d+)(?:\/(aprovar|cancelar))?$/); if (orcamentoMatch) { const o = db.oficinaOrcamentos.find(x => Number(x.orcamentoId) === Number(orcamentoMatch[1])); if (!o) return text('Orçamento não encontrado.', 404); if (method === 'GET') return json(o); if (method === 'PATCH') { o.status = orcamentoMatch[2] === 'aprovar' ? 'APROVADO' : 'CANCELADO'; persistDb(); return json(o); } }
+    if (path === '/api/oficina/ordens-servico' && method === 'GET') return json(db.oficinaOrdensServico);
+    const osMatch = path.match(/^\/api\/oficina\/ordens-servico\/(\d+)(?:\/(iniciar|finalizar|cancelar))?$/); if (osMatch) { const os = db.oficinaOrdensServico.find(x => Number(x.ordemServicoId) === Number(osMatch[1])); if (!os) return text('Ordem de serviço não encontrada.', 404); if (method === 'GET') return json(os); if (method === 'PUT') { Object.assign(os, parseJsonBody(init)); persistDb(); return json(os); } if (method === 'PATCH') { os.status = ({ iniciar: 'EM_ANDAMENTO', finalizar: 'FINALIZADA', cancelar: 'CANCELADA' })[osMatch[2]] || os.status; persistDb(); return json(os); } }
 
     if (path === '/api/mesas' && method === 'GET') {
       return json(listarMesasDemo());

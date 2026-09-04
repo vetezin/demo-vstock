@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serviços da Oficina | Plataforma de Gestão</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
+  <link href="css/cadastro-base.css" rel="stylesheet" />
+</head>
+<body class="app-shell">
+  <nav class="navbar brand-navbar app-topbar"><div class="container-fluid justify-content-between"><a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html"><img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" /></a><div class="text-white text-end"><div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div></div></div></nav>
+  <div class="main-container app-layout"><aside class="sidebar"><h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5></aside><main class="content page-content">
+    <div id="mensagens" class="mb-3" aria-live="polite"></div>
+    <div class="page-header"><div class="page-header-title-center"><h2><i class="bi bi-tools text-danger"></i> Serviços da Oficina</h2><p class="text-muted mb-0">Defina os serviços que poderão compor os orçamentos e ordens de serviço.</p></div><a href="index.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar para Dashboard</a></div>
+    <section class="card simple-card mb-4"><div class="card-header"><span id="tituloFormularioServico"><i class="bi bi-plus-circle"></i> Novo serviço</span></div><div class="card-body"><form id="servicoForm" class="row g-3">
+      <div class="col-md-5"><label class="form-label required" for="categoriaDescricao">Categoria</label><div class="input-group"><input id="categoriaDescricao" class="form-control" type="text" required autocomplete="off" placeholder="Selecione ou pesquise a categoria" /><button id="btnNovaCategoriaRapida" class="btn btn-outline-primary btn-inline-icon" type="button" title="Cadastrar categoria" aria-label="Cadastrar categoria"><i class="bi bi-plus-circle"></i></button></div><input id="categoriaId" type="hidden" /></div>
+      <div class="col-md-7"><label class="form-label required" for="descricao">Descrição do serviço</label><input id="descricao" class="form-control" type="text" required maxlength="150" placeholder="Ex.: Troca de óleo" /></div>
+      <div class="col-md-4"><label class="form-label required" for="valorServico">Valor do serviço</label><div class="campo-moeda"><span class="campo-moeda-prefixo">R$</span><input id="valorServico" class="form-control" type="text" required placeholder="0,00" /></div></div>
+      <div class="col-md-8"><label class="form-label" for="detalhes">Detalhes</label><input id="detalhes" class="form-control" type="text" maxlength="1000" placeholder="Informações adicionais sobre o serviço" /></div>
+      <div class="col-12 d-flex justify-content-end gap-2 flex-wrap"><button type="button" id="btnCancelarEdicao" class="btn btn-outline-secondary d-none"><i class="bi bi-x-circle"></i> Cancelar edição</button><button type="button" id="btnLimpar" class="btn btn-outline-warning"><i class="bi bi-eraser"></i> Limpar</button><button type="submit" id="btnSalvarServico" class="btn btn-success"><i class="bi bi-check2-circle"></i> Salvar serviço</button></div>
+    </form></div></section>
+    <section class="card simple-card"><div class="card-header"><i class="bi bi-list-ul"></i> Serviços cadastrados</div><div class="card-body">
+      <div class="cadastro-toolbar mb-3"><div class="cadastro-filtro"><label class="form-label" for="filtroDescricao">Buscar serviço</label><input id="filtroDescricao" class="form-control" type="search" placeholder="Descrição do serviço" /></div><div class="cadastro-filtro"><label class="form-label" for="filtroCategoria">Filtrar por categoria</label><select id="filtroCategoria" class="form-select"><option value="">Todas as categorias</option></select></div><div class="cadastro-filtro" style="max-width:190px"><label class="form-label" for="filtroStatus">Status</label><select id="filtroStatus" class="form-select"><option value="todos">Todos</option><option value="ativos">Ativos</option><option value="inativos">Inativos</option></select></div></div>
+      <div class="table-responsive"><table class="table table-hover align-middle" id="tabelaServicos"><thead><tr><th>Serviço</th><th>Categoria</th><th>Detalhes</th><th>Valor</th><th>Status</th><th class="text-center">Ações</th></tr></thead><tbody></tbody></table></div><div id="paginacaoServicos" class="paginacao-cadastro"></div>
+    </div></section>
+  </main></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script><script src="js/mock-api.js?v=frontend-audit-oficina"></script>
+    <script src="js/principal.js"></script><script src="js/cadastro-rapido.js"></script><script src="js/cadastro-oficina-servicos.js"></script>
+</body>
+</html>
+
+

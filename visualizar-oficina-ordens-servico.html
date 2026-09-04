@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ordens de serviço | Plataforma de Gestão</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link href="css/principal.css" rel="stylesheet" />
+  <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visualizar-oficina-ordens-servico.css" rel="stylesheet" />
+</head>
+<body class="app-shell">
+  <nav class="navbar brand-navbar app-topbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" />
+      </a>
+      <div class="text-white text-end"><div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div></div>
+    </div>
+  </nav>
+
+  <div class="main-container app-layout">
+    <aside class="sidebar"><h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5></aside>
+
+    <main class="content page-content">
+      <header class="page-header os-header simple-card">
+        <div class="os-header-copy">
+          <span class="os-eyebrow"><i class="bi bi-wrench-adjustable"></i> Execução da oficina</span>
+          <h2>Ordens de serviço</h2>
+          <p class="text-muted mb-0">Acompanhe o trabalho aprovado, inicie o atendimento e conclua a entrega.</p>
+        </div>
+        <a href="visualizar-oficina-orcamentos.html" class="btn btn-outline-secondary"><i class="bi bi-clipboard2-check"></i> Ver orçamentos</a>
+      </header>
+
+      <section class="os-painel-status" aria-label="Resumo das ordens de serviço">
+        <article class="os-status-card aberta"><span class="os-status-icon"><i class="bi bi-inbox"></i></span><div><small>Abertas</small><strong id="contadorOsAbertas">00</strong><span>Aguardando início</span></div></article>
+        <article class="os-status-card andamento"><span class="os-status-icon"><i class="bi bi-gear-wide-connected"></i></span><div><small>Em andamento</small><strong id="contadorOsAndamento">00</strong><span>Em execução agora</span></div></article>
+        <article class="os-status-card finalizada"><span class="os-status-icon"><i class="bi bi-check2-circle"></i></span><div><small>Finalizadas</small><strong id="contadorOsFinalizadas">00</strong><span>Concluídas neste mês</span></div></article>
+      </section>
+
+      <section class="card simple-card mb-4" aria-label="Filtros de ordens de serviço">
+        <div class="card-body">
+          <div class="os-filtros">
+            <div><label class="form-label" for="filtroOsNumero">Ordem</label><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input id="filtroOsNumero" class="form-control" type="search" placeholder="Número da OS" /></div></div>
+            <div><label class="form-label" for="filtroOsCliente">Cliente</label><input id="filtroOsCliente" class="form-control" type="search" placeholder="Nome do cliente" /></div>
+            <div><label class="form-label" for="filtroOsPlaca">Placa</label><input id="filtroOsPlaca" class="form-control text-uppercase" type="search" placeholder="ABC1D23" maxlength="8" /></div>
+            <div><label class="form-label" for="filtroOsVeiculo">Veículo</label><input id="filtroOsVeiculo" class="form-control" type="search" placeholder="Marca ou modelo" /></div>
+            <div><label class="form-label" for="filtroOsDataInicial">Início em:</label><input id="filtroOsDataInicial" class="form-control" type="date" /></div>
+            <div><label class="form-label" for="filtroOsDataFinal">Até:</label><input id="filtroOsDataFinal" class="form-control" type="date" /></div>
+            <div><label class="form-label" for="filtroOsStatus">Status</label><select id="filtroOsStatus" class="form-select"><option value="">Todos os status</option><option value="ABERTA">Aberta</option><option value="EM_ANDAMENTO">Em andamento</option><option value="FINALIZADA">Finalizada</option><option value="CANCELADA">Cancelada</option></select></div>
+            <div class="os-filtro-acao"><button type="button" id="btnLimparFiltrosOs" class="btn btn-outline-secondary"><i class="bi bi-eraser"></i> Limpar</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card simple-card os-lista" aria-labelledby="tituloListaOs">
+        <div class="card-header d-flex align-items-center justify-content-between gap-3"><span id="tituloListaOs"><i class="bi bi-list-task"></i> Ordens registradas</span><small id="resumoOs" class="text-muted"></small></div>
+        <div class="card-body">
+          <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Ordem</th><th>Cliente / veículo</th><th>Responsável</th><th>Estimativa</th><th>Status</th><th class="text-center">Ação</th></tr></thead><tbody id="tabelaOsBody"></tbody></table></div>
+          <div id="vazioOs" class="os-vazio d-none"><i class="bi bi-inbox"></i><strong>Nenhuma ordem encontrada</strong><span>Ajuste os filtros para encontrar outra ordem.</span></div>
+          <div id="paginacaoOs" class="paginacao-cadastro mt-3"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal fade" id="modalEditarOs" tabindex="-1" aria-labelledby="tituloEditarOs" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content os-execucao-modal">
+        <form id="formEditarOs" novalidate>
+          <div class="modal-header os-execucao-cabecalho">
+            <div>
+              <span class="os-modal-kicker">ORDEM DE SERVIÇO</span>
+              <div class="os-execucao-titulo-linha">
+                <h5 class="modal-title" id="tituloEditarOs">OS #<span id="execucaoOsNumero">-</span></h5>
+                <span class="os-status andamento">Em andamento</span>
+              </div>
+              <p class="mb-0">Orçamento de origem #<strong id="execucaoOsOrcamento">-</strong></p>
+            </div>
+            <button id="btnVerDiagnosticoOs" type="button" class="os-diagnostico-original os-diagnostico-clicavel">
+              <span class="os-diagnostico-titulo"><i class="bi bi-clipboard2-pulse"></i><strong>Diagnóstico original</strong><i class="bi bi-arrows-angle-expand"></i></span>
+              <span id="execucaoOsDiagnostico" class="os-diagnostico-texto">-</span>
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+
+          <div class="modal-body os-execucao-corpo">
+            <div id="mensagemExecucaoOs" class="os-mensagem-execucao d-none" role="status" aria-live="polite" tabindex="-1"></div>
+            <ol class="os-execucao-stepper" aria-label="Etapas da ordem de serviço">
+              <li class="concluido"><span><i class="bi bi-check2"></i></span><strong>Orçamento aprovado</strong></li>
+              <li class="ativo"><span>2</span><strong>Em execução</strong></li>
+              <li><span>3</span><strong>Conclusão</strong></li>
+            </ol>
+
+            <section class="os-execucao-cliente" aria-label="Cliente e veículo">
+              <div class="os-execucao-cliente-icone"><i class="bi bi-person"></i></div>
+              <div class="os-execucao-cliente-principal">
+                <small>Cliente</small>
+                <strong id="execucaoOsCliente">-</strong>
+              </div>
+              <div>
+                <small>Veículo</small>
+                <span id="execucaoOsVeiculo">-</span>
+              </div>
+              <div id="blocoExecucaoOsPlaca" class="d-none">
+                <small>Placa</small>
+                <span id="execucaoOsPlaca">-</span>
+              </div>
+            </section>
+
+            <div class="os-execucao-layout">
+              <div class="os-execucao-conteudo">
+                <section class="os-execucao-bloco">
+                  <div class="os-execucao-bloco-cabecalho">
+                    <div>
+                      <h6>Execução</h6>
+                      <p>Dados atuais do atendimento.</p>
+                    </div>
+                  </div>
+                  <details class="os-editar-execucao">
+                    <summary><i class="bi bi-pencil-square"></i> Editar execução</summary>
+                    <div class="os-edicao-campos">
+                      <div>
+                        <label class="form-label required" for="editarOsFuncionario">Responsável</label>
+                        <select id="editarOsFuncionario" class="form-select" required><option value="">Selecione</option></select>
+                      </div>
+                      <div>
+                        <label class="form-label" for="editarOsPrevisao">Previsão de conclusão</label>
+                        <input id="editarOsPrevisao" class="form-control" type="date" />
+                      </div>
+                      <div class="os-edicao-observacao">
+                        <label class="form-label" for="editarOsObservacao">Observação da execução</label>
+                        <textarea id="editarOsObservacao" class="form-control" rows="3" maxlength="4000"></textarea>
+                      </div>
+                    </div>
+                  </details>
+                  <div class="os-execucao-dados-leitura">
+                    <div><small>Responsável</small><strong id="execucaoOsFuncionario">-</strong></div>
+                    <div><small>Previsão de conclusão</small><strong id="execucaoOsPrevisao">Não informada</strong></div>
+                    <div><small>Observação da execução</small><span id="execucaoOsObservacao">Nenhuma observação da execução.</span></div>
+                  </div>
+                </section>
+
+                <section class="os-execucao-bloco os-execucao-itens">
+                  <div class="os-execucao-bloco-cabecalho">
+                    <div>
+                      <h6>Serviços e itens utilizados</h6>
+                      <p>Registre apenas o que será utilizado nesta ordem.</p>
+                    </div>
+                    <button id="btnAbrirCatalogoOs" type="button" class="btn btn-outline-success"><i class="bi bi-plus-lg"></i> Adicionar item</button>
+                  </div>
+                  <div class="table-responsive os-itens-execucao-lista">
+                    <table class="table align-middle mb-0">
+                      <thead class="visually-hidden"><tr><th>Tipo</th><th>Item</th><th>Valor</th><th>Ação</th></tr></thead>
+                      <tbody id="editarOsItens"></tbody>
+                    </table>
+                  </div>
+                  <section id="catalogoInlineOs" class="os-catalogo-inline d-none" aria-label="Catálogo de itens">
+                    <div class="os-catalogo-inline-cabecalho">
+                      <div><strong>Adicionar produtos e serviços</strong><small>Pesquise e inclua quantos itens forem necessários.</small></div>
+                      <button id="btnFecharCatalogoOs" type="button" class="btn btn-sm btn-outline-secondary"><i class="bi bi-x-lg"></i> Fechar</button>
+                    </div>
+                    <label class="visually-hidden" for="buscaCatalogoOs">Pesquisar item</label>
+                    <div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input id="buscaCatalogoOs" class="form-control" type="search" placeholder="Pesquise por produto ou serviço" /></div>
+                    <div id="resultadosCatalogoOs" class="list-group os-catalogo-resultados"></div>
+                    <div id="paginacaoCatalogoOs" class="paginacao-cadastro mt-3"></div>
+                  </section>
+                </section>
+              </div>
+
+              <aside class="os-execucao-resumo">
+                <small>Resumo da OS</small>
+                <div class="os-resumo-linha"><span>Subtotal dos itens</span><strong id="execucaoOsSubtotal">R$ 0,00</strong></div>
+                <div class="os-resumo-linha"><span>Desconto</span><strong id="execucaoOsDesconto">R$ 0,00</strong></div>
+                <div class="os-resumo-total"><span>Total atual</span><strong id="execucaoOsTotal">R$ 0,00</strong></div>
+                <label class="form-label" for="editarOsDesconto">Desconto</label>
+                <div class="campo-moeda"><span class="campo-moeda-prefixo">R$</span><input id="editarOsDesconto" class="form-control" inputmode="decimal" value="0,00" /></div>
+                <div class="os-execucao-acoes">
+                  <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-check2"></i> Salvar alterações</button>
+                  <button id="btnFinalizarExecucao" type="button" class="btn btn-success"><i class="bi bi-check2-circle"></i> Finalizar serviço</button>
+                </div>
+              </aside>
+            </div>
+          </div>
+          <div class="modal-footer os-execucao-rodape">
+            <button id="btnCancelarExecucao" type="button" class="btn btn-outline-danger"><i class="bi bi-x-circle"></i> Cancelar OS</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDiagnosticoOs" tabindex="-1" aria-labelledby="tituloDiagnosticoOs" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable os-diagnostico-dialog">
+      <div class="modal-content os-diagnostico-modal">
+        <div class="modal-header"><h5 class="modal-title" id="tituloDiagnosticoOs"><i class="bi bi-clipboard2-pulse text-success"></i> Diagnóstico</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div>
+        <div class="modal-body"><p id="diagnosticoCompletoOs" class="mb-0"></p></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalFinalizarOs" tabindex="-1" aria-labelledby="tituloFinalizarOs" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered os-finalizar-dialog">
+      <div class="modal-content os-finalizar-modal">
+        <form id="formFinalizarOs" novalidate>
+          <div class="modal-header os-finalizar-cabecalho">
+            <div>
+              <h5 class="modal-title" id="tituloFinalizarOs">Finalizar ordem de serviço</h5>
+              <p>Informe os dados abaixo para concluir a OS e registrar o pagamento.</p>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body os-finalizar-corpo">
+            <div class="os-finalizar-campo">
+              <label class="form-label required" for="finalizarOsDataEntrega">Data da conclusão</label>
+              <input id="finalizarOsDataEntrega" class="form-control" type="date" required />
+            </div>
+            <div class="os-finalizar-campo">
+              <label class="form-label required" for="finalizarOsFormaPagamento">Forma de pagamento</label>
+              <select id="finalizarOsFormaPagamento" class="form-select" required><option value="">Selecione</option></select>
+            </div>
+            <div id="blocoParcelasOs" class="d-none os-finalizar-parcelas">
+              <label class="form-label required" for="finalizarOsParcelas">Quantidade de parcelas</label>
+              <input id="finalizarOsParcelas" class="form-control" type="number" min="1" max="99" inputmode="numeric" />
+              <div class="form-text">O cartão já foi passado; as parcelas servem apenas para registro.</div>
+            </div>
+            <section class="os-finalizar-total" aria-label="Total a registrar">
+              <span>Total a registrar</span>
+              <strong id="finalizarOsTotal">R$ 0,00</strong>
+            </section>
+          </div>
+          <div class="modal-footer os-finalizar-rodape">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button>
+            <button type="submit" class="btn btn-success"><i class="bi bi-check2-circle"></i> Concluir e registrar pagamento</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalConfirmarOs" tabindex="-1" aria-labelledby="tituloConfirmarOs" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="tituloConfirmarOs"></h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div><div class="modal-body"><p id="mensagemConfirmarOs" class="mb-0"></p></div><div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Voltar</button><button id="btnConfirmarOs" type="button"></button></div></div></div></div>
+
+  <div class="modal fade" id="modalDetalheOs" tabindex="-1" aria-labelledby="detalheOsTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable"><div class="modal-content os-detalhe-modal">
+      <div class="modal-header"><div><span class="os-modal-kicker">ORDEM DE SERVIÇO</span><h5 class="modal-title" id="detalheOsTitulo">OS #000</h5><small id="detalheOsCriacao" class="text-muted"></small></div><div class="d-flex align-items-center gap-3"><span id="detalheOsStatus"></span><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button></div></div>
+      <div class="modal-body">
+        <div class="os-detalhe-layout">
+          <div>
+            <section id="blocoExecucaoOs" class="os-execucao d-none"><span class="os-espera-icone"><i class="bi bi-clock-history"></i></span><div><span class="os-modal-kicker">ANDAMENTO DA OS</span><strong id="detalheOsProximaAcao">-</strong><small id="detalheOsTextoExecucao">-</small></div><div class="os-fluxo-os"><span id="passoOsAberta"><i class="bi bi-check2"></i> Aberta</span><span id="passoOsAndamento"><i class="bi bi-tools"></i> Em execução</span><span id="passoOsFinalizada"><i class="bi bi-flag"></i> Entrega</span></div></section>
+            <section class="os-detalhe-bloco os-atendimento"><div class="os-bloco-cabecalho"><div class="os-bloco-titulo"><span class="os-bloco-icone os-icone-cliente"><i class="bi bi-person"></i></span><h6>Cliente e veículo</h6></div><button id="btnGerenciarPrevisaoOs" type="button" class="btn btn-sm btn-outline-primary d-none"><i class="bi bi-calendar2-week"></i> Ajustar estimativa</button></div><div class="os-detalhe-dados"><div><small>Cliente</small><strong id="detalheOsCliente">-</strong></div><div><small>Veículo</small><strong id="detalheOsVeiculo">-</strong></div><div><small>Responsável</small><strong id="detalheOsFuncionario">-</strong></div><div><small id="rotuloDetalheOsPrevisao">Data estimada de conclusão</small><strong id="detalheOsPrevisao">-</strong></div></div></section>
+            <section class="os-detalhe-bloco"><div class="os-bloco-titulo"><span class="os-bloco-icone os-icone-diagnostico"><i class="bi bi-clipboard2-pulse"></i></span><h6>Diagnóstico do orçamento</h6></div><p id="detalheOsDiagnostico" class="mb-0"></p></section>
+            <section class="os-detalhe-bloco"><div class="os-bloco-cabecalho"><div class="os-bloco-titulo"><span class="os-bloco-icone os-icone-itens"><i class="bi bi-box-seam"></i></span><div><h6 id="detalheOsItensTitulo">Itens da ordem</h6><small id="detalheOsItensAjuda" class="text-muted">Itens aprovados para o atendimento.</small></div></div><button id="btnGerenciarItensOs" type="button" class="btn btn-sm btn-outline-success d-none"><i class="bi bi-pencil-square"></i> Gerenciar itens</button></div><div class="table-responsive mt-3"><table class="table table-sm align-middle mb-0"><thead><tr><th>Tipo</th><th>Item</th><th class="text-end">Valor</th></tr></thead><tbody id="detalheOsItens"></tbody><tfoot><tr class="os-itens-total"><td colspan="2">Valor total</td><td id="detalheOsTotalItens" class="text-end">R$ 0,00</td></tr></tfoot></table></div></section>
+            <section id="blocoConclusaoOs" class="os-detalhe-bloco os-conclusao d-none">
+              <div class="os-conclusao-cabecalho"><div class="os-bloco-titulo"><span class="os-bloco-icone os-icone-conclusao"><i class="bi bi-check2-circle"></i></span><div><h6>Conclusão e pagamento</h6><p class="mb-0">Serviço concluído e pagamento registrado.</p></div></div><span class="os-conclusao-selo"><i class="bi bi-check2-circle"></i> Concluída</span></div>
+              <div class="os-conclusao-dados"><div><small><i class="bi bi-calendar3"></i> Data de conclusão</small><strong id="detalheOsDataEntrega">-</strong></div><div id="blocoDetalheOsDescontoConclusao"><small><i class="bi bi-percent"></i> Desconto aplicado</small><strong id="detalheOsDescontoConclusao">R$ 0,00</strong></div><div><small><i class="bi bi-credit-card"></i> Forma de pagamento</small><strong id="detalheOsPagamentoConclusao">-</strong></div></div>
+              <div id="blocoParcelasDetalheOs" class="os-parcelas d-none"><div class="os-parcelas-titulo"><strong>Parcelas registradas</strong><small id="detalheOsQuantidadeParcelas"></small></div><div id="detalheOsParcelas" class="os-parcelas-lista"></div></div>
+            </section>
+          </div>
+          <aside class="os-detalhe-resumo"><small>Itens e serviços</small><strong id="detalheOsSubtotal">R$ 0,00</strong><small>Desconto</small><strong id="detalheOsDesconto">R$ 0,00</strong><hr><small>Total da OS</small><strong id="detalheOsTotal" class="os-valor-final">R$ 0,00</strong><div class="os-pagamento d-none" id="detalheOsPagamento"><span><i class="bi bi-credit-card"></i> Pagamento</span><strong id="detalheOsFormaPagamento"></strong></div></aside>
+        </div>
+        <section id="totalFinalOs" class="os-total-final d-none"><div><span>Valor total pago</span><small id="detalheOsResumoPagamento">Pagamento confirmado</small></div><strong id="detalheOsValorPago">R$ 0,00</strong></section>
+      </div>
+      <article id="osDocumentoImpressao" class="os-documento-impressao" aria-hidden="true">
+        <header class="os-documento-cabecalho">
+          <div><span>VSTOCK · OFICINA</span><h1>Ordem de serviço</h1><p>OS #<strong id="documentoOsNumero">-</strong> · Orçamento #<strong id="documentoOsOrcamento">-</strong></p></div>
+          <div class="os-documento-status"><strong>Finalizada</strong><span id="documentoOsCriacao">-</span></div>
+        </header>
+        <section class="os-documento-secao os-documento-atendimento"><h2>Cliente e veículo</h2><div class="os-documento-dados"><div><span>Cliente</span><strong id="documentoOsCliente">-</strong></div><div><span>Veículo</span><strong id="documentoOsVeiculo">-</strong></div><div><span>Responsável</span><strong id="documentoOsFuncionario">-</strong></div><div><span>Data de conclusão</span><strong id="documentoOsDataConclusao">-</strong></div></div></section>
+        <section class="os-documento-secao os-documento-diagnostico"><h2>Diagnóstico do orçamento</h2><p id="documentoOsDiagnostico">-</p></section>
+        <section class="os-documento-secao os-documento-itens"><h2>Itens realizados</h2><table><thead><tr><th>Tipo</th><th>Item</th><th class="os-documento-centro">Qtd.</th><th class="os-documento-direita">Valor unitário</th><th class="os-documento-direita">Total</th></tr></thead><tbody id="documentoOsItens"></tbody><tfoot><tr><th colspan="4">Total dos itens</th><th id="documentoOsSubtotal" class="os-documento-direita">R$ 0,00</th></tr></tfoot></table></section>
+        <section class="os-documento-financeiro"><div><span>Desconto aplicado</span><strong id="documentoOsDesconto">R$ 0,00</strong></div><div><span>Forma de pagamento</span><strong id="documentoOsPagamento">-</strong></div><div class="os-documento-total"><span>Valor total pago</span><strong id="documentoOsTotal">R$ 0,00</strong></div></section>
+        <section id="documentoOsParcelasBloco" class="os-documento-secao os-documento-parcelas d-none"><h2>Parcelas registradas</h2><div id="documentoOsParcelas"></div></section>
+        <footer>Documento emitido em <span id="documentoOsEmissao">-</span></footer>
+      </article>
+      <div class="modal-footer"><p class="os-aviso-inicio mb-0"><i class="bi bi-info-circle"></i><span>Ao iniciar o atendimento, você poderá registrar os itens utilizados e a data estimada de conclusão.</span></p><div id="acoesOs" class="d-flex gap-2 flex-wrap ms-auto"></div></div>
+    </div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js?v=frontend-audit-oficina"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/visualizar-oficina-ordens-servico.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Criar Orçamento | Plataforma de Gestão</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/app.css" rel="stylesheet" />
+  <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
+  <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/cadastro-oficina-orcamento.css" rel="stylesheet" />
+</head>
+<body class="app-shell">
+  <nav class="navbar brand-navbar app-topbar">
+    <div class="container-fluid justify-content-between">
+      <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+        <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" />
+      </a>
+      <div class="text-white text-end">
+        <div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container app-layout">
+    <aside class="sidebar"><h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5></aside>
+
+    <main class="content page-content">
+      <div id="mensagens" class="mb-3" aria-live="polite"></div>
+
+      <div class="page-header">
+        <div class="page-header-title-center">
+          <h2><i class="bi bi-clipboard2-check text-danger"></i> Criar orçamento</h2>
+          <p class="text-muted mb-0">Registre o diagnóstico e monte a proposta para o cliente.</p>
+        </div>
+        <a href="index.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar para Dashboard</a>
+      </div>
+
+      <form id="orcamentoForm" novalidate>
+        <div class="orcamento-layout pb-4">
+          <section class="card simple-card orcamento-card-dados">
+            <div class="card-header"><i class="bi bi-clipboard2-data"></i> Dados do orçamento</div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-lg-5">
+                  <label class="form-label required" for="clienteNome">Cliente</label>
+                  <div class="input-group"><input id="clienteNome" class="form-control" type="text" autocomplete="off" placeholder="Pesquise pelo nome do cliente" /><button id="btnNovoClienteRapido" class="btn btn-outline-primary btn-inline-icon" type="button" title="Cadastrar cliente" aria-label="Cadastrar cliente"><i class="bi bi-plus-circle"></i></button></div>
+                  <input id="clienteId" type="hidden" />
+                </div>
+                <div class="col-lg-4">
+                  <label class="form-label required" for="veiculoDescricao">Veículo</label>
+                  <div class="input-group"><input id="veiculoDescricao" class="form-control" type="text" autocomplete="off" placeholder="Primeiro selecione o cliente" disabled /><button id="btnNovoVeiculoRapido" class="btn btn-outline-primary btn-inline-icon" type="button" title="Cadastrar veículo" aria-label="Cadastrar veículo"><i class="bi bi-plus-circle"></i></button></div>
+                  <input id="veiculoId" type="hidden" />
+                </div>
+                <div class="col-lg-3">
+                  <label class="form-label required" for="funcionarioNome">Responsável</label>
+                  <input id="funcionarioNome" class="form-control" type="text" autocomplete="off" placeholder="Selecione" />
+                  <input id="funcionarioId" type="hidden" />
+                </div>
+              </div>
+
+              <div class="orcamento-secao">
+                <label class="form-label required" for="diagnostico">Diagnóstico</label>
+                <textarea id="diagnostico" class="form-control" rows="3" maxlength="4000" required placeholder="Descreva o problema identificado e o que precisa ser realizado."></textarea>
+                <div class="form-text">Esse texto será apresentado ao cliente no orçamento.</div>
+              </div>
+
+              <div class="orcamento-secao mb-0">
+                <label class="form-label" for="observacao">Observação para o cliente</label>
+                <textarea id="observacao" class="form-control" rows="2" maxlength="4000" placeholder="Prazo estimado, condição ou orientação importante."></textarea>
+              </div>
+            </div>
+          </section>
+
+          <aside class="card simple-card orcamento-card-itens">
+            <div class="card-header"><i class="bi bi-list-check"></i> Itens do orçamento</div>
+            <div class="card-body">
+              <button id="btnAbrirItens" type="button" class="btn btn-outline-success w-100 mb-3" data-bs-toggle="modal" data-bs-target="#modalAdicionarItem">
+                <i class="bi bi-plus-lg"></i> Adicionar produto ou serviço
+              </button>
+              <div id="itensVazios" class="text-center text-muted py-3">
+                <i class="bi bi-basket2 d-block fs-4 mb-2"></i>
+                <span class="small">Nenhum item adicionado.</span>
+              </div>
+              <div class="table-responsive d-none orcamento-itens-scroll" id="areaTabelaItens">
+                <table class="table table-hover align-middle mb-0" id="tabelaItens">
+                  <thead><tr><th>Tipo</th><th>Item</th><th class="text-end">Valor</th><th class="text-center">Ação</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+
+              <div class="orcamento-resumo">
+                <div>
+                  <label class="form-label mb-1" for="valorDesconto">Desconto</label>
+                  <div class="campo-moeda">
+                    <span class="campo-moeda-prefixo">R$</span>
+                    <input id="valorDesconto" class="form-control" type="text" value="0,00" inputmode="decimal" />
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between mt-3"><span class="text-muted">Subtotal</span><strong id="valorSubtotal">R$ 0,00</strong></div>
+                <div class="d-flex justify-content-between align-items-end mt-2"><span class="fw-semibold">Total</span><strong id="valorTotal" class="fs-4 text-success">R$ 0,00</strong></div>
+              </div>
+
+              <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="btn btn-success" id="btnSalvar"><i class="bi bi-check2-circle"></i> Salvar orçamento</button>
+                <button type="button" class="btn btn-outline-secondary" id="btnLimpar"><i class="bi bi-eraser"></i> Limpar</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <div class="modal fade" id="modalAdicionarItem" tabindex="-1" aria-labelledby="modalAdicionarItemTitulo" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h5 class="modal-title" id="modalAdicionarItemTitulo"><i class="bi bi-plus-circle text-success"></i> Adicionar item ao orçamento</h5>
+            <p class="text-muted small mb-0">Produtos e serviços disponíveis para esta proposta.</p>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label" for="buscaItem">Pesquisar item</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input id="buscaItem" class="form-control" type="search" placeholder="Nome, código ou categoria" />
+                <button type="button" class="btn btn-outline-primary btn-inline-icon dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Cadastrar item" aria-label="Cadastrar item"><i class="bi bi-plus-circle"></i></button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><button id="btnNovoProdutoRapido" type="button" class="dropdown-item"><i class="bi bi-box-seam me-2 text-primary"></i>Novo produto</button></li>
+                  <li><button id="btnNovoServicoRapido" type="button" class="dropdown-item"><i class="bi bi-tools me-2 text-danger"></i>Novo serviço</button></li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="categoriaItem">Categoria</label>
+              <select id="categoriaItem" class="form-select"><option>Todas as categorias</option></select>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap mb-3" role="group" aria-label="Filtrar por tipo de item">
+            <button type="button" class="btn btn-sm btn-dark filtro-tipo ativo" data-tipo="todos">Todos</button>
+            <button type="button" class="btn btn-sm btn-outline-primary filtro-tipo" data-tipo="produto"><i class="bi bi-box-seam"></i> Produtos</button>
+            <button type="button" class="btn btn-sm btn-outline-danger filtro-tipo" data-tipo="servico"><i class="bi bi-tools"></i> Serviços</button>
+          </div>
+
+          <div class="list-group" id="resultadosItens"></div>
+          <div id="paginacaoItens" class="paginacao-cadastro mt-3"></div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <span class="small text-muted"><i class="bi bi-info-circle"></i> O valor será conferido novamente ao salvar o orçamento.</span>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/mock-api.js?v=frontend-audit-oficina"></script>
+    <script src="js/principal.js"></script>
+  <script src="js/cadastro-rapido.js"></script>
+  <script src="js/cadastro-oficina-orcamento.js"></script>
+</body>
+</html>
+
+
