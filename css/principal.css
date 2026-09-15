@@ -814,6 +814,80 @@ nav li ul {
   gap: 0;
 }
 
+.sidebar-submenu {
+  margin-bottom: 0.35rem;
+}
+
+.sidebar-submenu > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0.72rem 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  list-style: none;
+  border-radius: 12px;
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.sidebar-submenu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.sidebar-submenu > summary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.sidebar-submenu-chevron {
+  margin-left: auto;
+  font-size: 0.75rem;
+  transition: transform 0.18s ease;
+}
+
+.sidebar-submenu:not([open]) .sidebar-submenu-chevron {
+  transform: rotate(-90deg);
+}
+
+.sidebar-submenu-content {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.15rem 0 0.2rem 1.1rem;
+  padding-left: 0.65rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.sidebar-submenu-content .nav-btn,
+.sidebar-submenu-link {
+  min-height: 38px;
+  margin: 0;
+  padding: 0.62rem 0.72rem;
+  font-size: 0.86rem;
+}
+
+.sidebar-submenu-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(255, 255, 255, 0.58);
+  cursor: default;
+}
+
+@media (min-width: 769px) {
+  body.sidebar-collapsed .sidebar-submenu > summary {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  body.sidebar-collapsed .sidebar-submenu > summary span,
+  body.sidebar-collapsed .sidebar-submenu-chevron,
+  body.sidebar-collapsed .sidebar-submenu-content {
+    display: none;
+  }
+}
+
 .nav-btn {
   width: 100%;
   margin-bottom: 0.35rem;
@@ -1032,6 +1106,44 @@ input[type="text"] {
   position: relative;
 }
 
+.vstock-filter-dropdown-group.vstock-filter-dropdown-has-quick-create {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 46px;
+}
+
+/* O filtro transforma o input em um contêiner próprio. Dentro de input-group,
+   ele deve ocupar o espaço restante para o botão de cadastro não comprimir o campo. */
+.input-group > .vstock-filter-dropdown-group {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.input-group > .vstock-filter-dropdown-group > .form-control {
+  width: 100%;
+}
+
+.vstock-filter-dropdown-group.vstock-filter-dropdown-has-quick-create > .form-control {
+  flex: 1 1 auto;
+  height: 100%;
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-inline-icon {
+  flex: 0 0 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-inline-icon.dropdown-toggle::after {
+  display: none;
+}
+
 .vstock-filter-dropdown-input {
   padding-right: 2.8rem;
 }
@@ -1044,6 +1156,33 @@ input[type="text"] {
   color: #6c757d;
   pointer-events: none;
   z-index: 2;
+}
+
+.vstock-filter-dropdown-group.vstock-filter-dropdown-has-quick-create .vstock-filter-dropdown-addon {
+  right: 3.75rem;
+}
+
+.vstock-filter-dropdown-quick-create {
+  z-index: 3;
+  flex: 0 0 3.1rem;
+  height: 100%;
+  min-width: 3.1rem;
+  padding: 0;
+  color: var(--brand-primary);
+  border-color: rgba(var(--brand-primary-rgb), 0.55);
+  background: #fff;
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.vstock-filter-dropdown-quick-create:hover,
+.vstock-filter-dropdown-quick-create:focus-visible {
+  color: var(--brand-primary-dark);
+  border-color: var(--brand-primary);
+  background: rgba(var(--brand-primary-rgb), 0.08);
 }
 
 .vstock-filter-dropdown-menu {
@@ -1339,4 +1478,5 @@ input[type="text"] {
     padding: 1.2rem;
   }
 }
+
 

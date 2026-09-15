@@ -11,6 +11,7 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/cadastro-oficina-veiculos.css" rel="stylesheet" />
 </head>
 <body class="app-shell">
   <nav class="navbar brand-navbar app-topbar">
@@ -151,9 +152,45 @@
     </main>
   </div>
 
+  <div class="modal fade" id="modalHistoricoVeiculo" tabindex="-1"
+       aria-labelledby="tituloHistoricoVeiculo" aria-describedby="historicoVeiculoIdentificacao"
+       aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content historico-modal">
+        <div class="modal-header historico-modal-cabecalho">
+          <div>
+            <p class="historico-sobretitulo mb-1">Oficina · serviços concluídos</p>
+            <h2 class="modal-title h4 mb-1" id="tituloHistoricoVeiculo">Histórico do veículo</h2>
+            <p class="mb-0" id="historicoVeiculoIdentificacao">Veículo não selecionado</p>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                  aria-label="Fechar histórico"></button>
+        </div>
+        <div class="modal-body historico-modal-corpo">
+          <div id="historicoVeiculoMensagem" aria-live="polite"></div>
+          <div id="historicoVeiculoConteudo" aria-live="polite" aria-busy="false"></div>
+        </div>
+        <div class="modal-footer historico-modal-rodape">
+          <nav class="historico-navegacao me-auto" id="historicoVeiculoNavegacao"
+               aria-label="Navegação do histórico" hidden>
+            <button type="button" class="btn btn-outline-primary" id="historicoAnterior" disabled>
+              <i class="bi bi-chevron-left" aria-hidden="true"></i> Anterior
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="historicoProximo" disabled>
+              Próxima <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </nav>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/mock-api.js?v=frontend-audit-oficina"></script>
-    <script src="js/principal.js"></script>
+  <script src="js/principal.js"></script>
   <script src="js/cadastro-rapido.js"></script>
   <script src="js/cadastro-oficina-veiculos.js"></script>
 </body>

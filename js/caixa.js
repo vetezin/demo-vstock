@@ -197,7 +197,7 @@ async function fecharCaixa(evento) {
     return;
   }
 
-  if (!window.confirm("Confirma o fechamento do caixa? Esta sessão não poderá ser reaberta.")) {
+  if (!await confirmarFechamentoCaixa()) {
     return;
   }
 
@@ -233,6 +233,21 @@ async function fecharCaixa(evento) {
   } finally {
     definirBotaoCarregando(botao, false);
   }
+}
+
+function confirmarFechamentoCaixa() {
+  return new Promise((resolve) => {
+    const formulario = document.createElement("form");
+    formulario.className = "d-grid gap-3";
+    formulario.innerHTML = `<p class="mb-0">Confirma o fechamento do caixa?</p><p class="text-muted mb-0">Esta sessão não poderá ser reaberta.</p><div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-outline-secondary">Cancelar</button><button type="submit" class="btn btn-danger"><i class="bi bi-lock-fill"></i> Fechar caixa</button></div>`;
+    let confirmou = false;
+    const modal = window.vstockEditModal;
+    formulario.querySelector("button[type='button']").addEventListener("click", () => modal.close());
+    formulario.addEventListener("submit", (evento) => { evento.preventDefault(); confirmou = true; modal.close(); });
+    document.body.appendChild(formulario);
+    modal.open({ title: "Confirmar fechamento do caixa", form: formulario, iconClass: "bi-exclamation-triangle" });
+    modal.modal._element.addEventListener("hidden.bs.modal", () => { formulario.remove(); resolve(confirmou); }, { once: true });
+  });
 }
 
 async function carregarDadosMovimentos() {
@@ -645,4 +660,3 @@ function definirTexto(seletor, texto) {
     elemento.textContent = texto;
   }
 }
-

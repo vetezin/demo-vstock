@@ -570,7 +570,13 @@ window.vstockFilterDropdown = (function () {
       });
   }
 
-  function garantirEstrutura(input) {
+  function resolverBotaoCadastroRapido(config) {
+    var quickCreate = config && config.quickCreate;
+    if (!quickCreate || quickCreate.enabled !== true || !quickCreate.button) return null;
+    return typeof quickCreate.button === 'string' ? document.querySelector(quickCreate.button) : quickCreate.button;
+  }
+
+  function garantirEstrutura(input, config) {
     var grupo = input.closest('.vstock-filter-dropdown-group');
     if (!grupo) {
       grupo = document.createElement('div');
@@ -592,6 +598,13 @@ window.vstockFilterDropdown = (function () {
       dropdown = document.createElement('div');
       dropdown.className = 'vstock-filter-dropdown-menu';
       grupo.appendChild(dropdown);
+    }
+
+    var botaoCadastroRapido = resolverBotaoCadastroRapido(config);
+    if (botaoCadastroRapido) {
+      grupo.classList.add('vstock-filter-dropdown-has-quick-create');
+      botaoCadastroRapido.classList.add('vstock-filter-dropdown-quick-create');
+      grupo.appendChild(botaoCadastroRapido);
     }
 
     input.setAttribute('autocomplete', 'off');
@@ -689,7 +702,7 @@ window.vstockFilterDropdown = (function () {
       return input || null;
     }
 
-    var estrutura = garantirEstrutura(input);
+    var estrutura = garantirEstrutura(input, config);
     var instance = {
       input: input,
       dropdown: estrutura.dropdown,
@@ -2057,7 +2070,7 @@ window.vstockEditModal = {
   form: null,
   parent: null,
   nextSibling: null,
-  open({ title, form }) {
+  open({ title, form, iconClass = "bi-pencil-square" }) {
     if (!form || !window.bootstrap?.Modal) return;
     this.close();
     this.form = form;
@@ -2066,7 +2079,8 @@ window.vstockEditModal = {
     const modalElement = document.createElement("div");
     modalElement.className = "modal fade cadastro-edit-modal";
     modalElement.tabIndex = -1;
-    modalElement.innerHTML = `<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"><div class="modal-content cadastro-edit-modal-content"><div class="modal-header cadastro-edit-modal-header"><h5 class="modal-title"><i class="bi bi-pencil-square"></i> ${title}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button></div><div class="modal-body cadastro-edit-modal-body"></div></div></div>`;
+    const icon = /^bi-[a-z0-9-]+$/.test(iconClass) ? iconClass : "bi-pencil-square";
+    modalElement.innerHTML = `<div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"><div class="modal-content cadastro-edit-modal-content"><div class="modal-header cadastro-edit-modal-header"><h5 class="modal-title"><i class="bi ${icon}"></i> ${title}</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button></div><div class="modal-body cadastro-edit-modal-body"></div></div></div>`;
     document.body.appendChild(modalElement);
     modalElement.querySelector(".cadastro-edit-modal-body").appendChild(form);
     this.modal = new bootstrap.Modal(modalElement);
@@ -2082,7 +2096,6 @@ window.vstockEditModal = {
   },
   close() { this.modal?.hide(); }
 };
-
 
 
 
