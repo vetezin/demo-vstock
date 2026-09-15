@@ -1408,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   async function renderizarStatusSessaoCaixaNavbar() {
     var versaoRequisicao = ++versaoStatusSessaoCaixa;
     var existente = document.getElementById('navbar-cash-session-status');
-    if (!modulos.vendas || paginaAtual === 'login.html') {
+    if (modulos?.vendas !== true || paginaAtual === 'login.html') {
       existente?.remove();
       return;
     }
@@ -1443,12 +1443,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         headers: { Accept: 'application/json' },
         cache: 'no-store'
       });
-      var caixaAberto = response.ok;
-      var sessao = caixaAberto && response.status !== 204 ? await response.json() : null;
-
       if (response.status !== 204 && !response.ok) {
         throw new Error('Não foi possível consultar o status do caixa.');
       }
+
+      var caixaAberto = response.status !== 204;
+      var sessao = caixaAberto ? await response.json() : null;
 
       if (versaoRequisicao !== versaoStatusSessaoCaixa || !existente.isConnected) {
         return;
@@ -1834,13 +1834,17 @@ document.addEventListener('DOMContentLoaded', async function () {
       <a class="${classeLinkSidebar('cadastro-oficina-servicos.html')}" href="cadastro-oficina-servicos.html">
         <i class="bi bi-tools"></i> Serviços
       </a>
-      <div class="sidebar-submenu-label">Orçamentos</div>
-      <a class="${classeLinkSidebar('cadastro-oficina-orcamento.html')}" href="cadastro-oficina-orcamento.html">
-        <i class="bi bi-file-earmark-plus"></i> Criar orçamento
-      </a>
-      <a class="${classeLinkSidebar('visualizar-oficina-orcamentos.html')}" href="visualizar-oficina-orcamentos.html">
-        <i class="bi bi-files"></i> Visualizar orçamentos
-      </a>
+      <details class="sidebar-submenu" open>
+        <summary><i class="bi bi-clipboard2-check"></i><span>Orçamentos</span><i class="bi bi-chevron-down sidebar-submenu-chevron" aria-hidden="true"></i></summary>
+        <div class="sidebar-submenu-content">
+          <a class="${classeLinkSidebar('cadastro-oficina-orcamento.html')}" href="cadastro-oficina-orcamento.html">
+            <i class="bi bi-plus-circle"></i> Criar orçamento
+          </a>
+          <a class="${classeLinkSidebar('visualizar-oficina-orcamentos.html')}" href="visualizar-oficina-orcamentos.html">
+            <i class="bi bi-list-ul"></i> Visualizar orçamentos
+          </a>
+        </div>
+      </details>
       <a class="${classeLinkSidebar('visualizar-oficina-ordens-servico.html')}" href="visualizar-oficina-ordens-servico.html">
         <i class="bi bi-wrench-adjustable"></i> Ordens de serviço
       </a>
@@ -1916,19 +1920,19 @@ document.addEventListener('DOMContentLoaded', async function () {
       })}
 
       ${montarGrupoSidebar({
-        chave: 'controle-estoque',
-        titulo: 'Controle de Estoque',
-        icone: 'bi-box',
-        conteudo: estoqueConteudo,
-        ativo: ['entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html', 'alertas.html'].includes(paginaAtual)
-      })}
-
-      ${montarGrupoSidebar({
         chave: 'oficina',
         titulo: 'Oficina',
         icone: 'bi-tools',
         conteudo: oficinaConteudo,
         ativo: ['cadastro-oficina-veiculos.html', 'cadastro-oficina-servicos.html', 'cadastro-oficina-orcamento.html', 'visualizar-oficina-orcamentos.html', 'visualizar-oficina-ordens-servico.html'].includes(paginaAtual)
+      })}
+
+      ${montarGrupoSidebar({
+        chave: 'controle-estoque',
+        titulo: 'Controle de Estoque',
+        icone: 'bi-box',
+        conteudo: estoqueConteudo,
+        ativo: ['entrada-compra.html', 'saida-estoque.html', 'estoque.html', 'historico.html', 'alertas.html'].includes(paginaAtual)
       })}
 
       ${montarGrupoSidebar({
@@ -2096,6 +2100,3 @@ window.vstockEditModal = {
   },
   close() { this.modal?.hide(); }
 };
-
-
-

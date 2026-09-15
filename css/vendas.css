@@ -1197,6 +1197,14 @@
   background: #ffffff;
 }
 
+.pdv-inline-input .pdv-quick-add {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 10px;
+}
+
 .pdv-inline-input i {
   color: #64748b;
 }
@@ -1596,4 +1604,3 @@
     grid-template-columns: 1fr;
   }
 }
-
