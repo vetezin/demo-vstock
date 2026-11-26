@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-fornecedor-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -23,6 +25,17 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -107,53 +120,71 @@
     <main class="content page-content">
       <div id="mensagens" class="mb-3"></div>
 
-      <div class="page-header">
+      <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-truck text-danger"></i> Cadastro de Fornecedores</h2>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-truck text-danger"></i> Cadastro de Fornecedores</h1>
           <p class="text-muted mb-0">Mantenha os fornecedores usados na entrada de estoque.</p>
         </div>
-        <a href="entrada-compra.html" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left"></i> Voltar para Entrada
-        </a>
+        <div class="vs-actions">
+          <a href="entrada-compra.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Entrada
+          </a>
+        </div>
       </div>
 
-      <div class="card simple-card mb-4">
-        <div class="card-header">
-          <span id="tituloFormularioFornecedor"><i class="bi bi-person-plus"></i> Novo Fornecedor</span>
+      <div class="card vs-panel simple-card mb-4">
+        <div class="card-header bg-transparent border-bottom">
+          <span id="tituloFormularioFornecedor" class="fw-semibold"><i class="bi bi-person-plus"></i> Novo Fornecedor</span>
         </div>
         <div class="card-body">
-          <form id="fornecedorForm" class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label required">Nome</label>
-              <input type="text" id="nome" class="form-control" placeholder="Nome do fornecedor" required />
+          <form id="fornecedorForm" class="row g-4">
+            <!-- Grupo: Identidade -->
+            <div class="col-12 fornecedor-grupo fornecedor-grupo-identidade" data-grupo="identidade">
+              <div class="fornecedor-grupo-header mb-2 pb-1 border-bottom">
+                <span class="fw-semibold text-secondary small text-uppercase"><i class="bi bi-building"></i> Identidade do Fornecedor</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label required" for="nome">Nome</label>
+                  <input type="text" id="nome" class="form-control" placeholder="Nome do fornecedor" required />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label" for="cpfCnpj">CPF/CNPJ</label>
+                  <input type="text" id="cpfCnpj" class="form-control" placeholder="CPF ou CNPJ" />
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label" for="descricao">Descrição</label>
+                  <input type="text" id="descricao" class="form-control" placeholder="Descrição do fornecedor" />
+                </div>
+              </div>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label required">Contato</label>
-              <input type="text" id="contato" class="form-control" placeholder="Nome do contato" required />
+            <!-- Grupo: Contato -->
+            <div class="col-12 fornecedor-grupo fornecedor-grupo-contato" data-grupo="contato">
+              <div class="fornecedor-grupo-header mb-2 pb-1 border-bottom">
+                <span class="fw-semibold text-secondary small text-uppercase"><i class="bi bi-person-lines-fill"></i> Contato e Comunicação</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label required" for="contato">Contato</label>
+                  <input type="text" id="contato" class="form-control" placeholder="Nome do contato" required />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label required" for="email">Email</label>
+                  <input type="email" id="email" class="form-control" placeholder="contato@fornecedor.com.br" required />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label required" for="telefone">Telefone</label>
+                  <input type="text" id="telefone" class="form-control" placeholder="(18)99999-9999" required />
+                </div>
+              </div>
             </div>
 
-            <div class="col-md-6">
-              <label class="form-label required">Email</label>
-              <input type="email" id="email" class="form-control" placeholder="contato@fornecedor.com.br" required />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label required">Telefone</label>
-              <input type="text" id="telefone" class="form-control" placeholder="(18)99999-9999" required />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">CPF/CNPJ</label>
-              <input type="text" id="cpfCnpj" class="form-control" placeholder="CPF ou CNPJ" />
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Descrição</label>
-              <input type="text" id="descricao" class="form-control" placeholder="Descrição do fornecedor" />
-            </div>
-
-            <div class="col-12 d-flex justify-content-end gap-2">
+            <div class="col-12 d-flex justify-content-end gap-2 flex-wrap vs-actions">
               <button type="button" id="btnCancelarEdicao" class="btn btn-outline-secondary d-none">
                 <i class="bi bi-x-circle"></i> Cancelar edição
               </button>
@@ -168,23 +199,28 @@
         </div>
       </div>
 
-      <div class="card simple-card">
-        <div class="card-header">
-          <i class="bi bi-list-ul"></i> Fornecedores Cadastrados
+      <div class="card vs-panel simple-card">
+        <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span class="fw-semibold"><i class="bi bi-list-ul"></i> Fornecedores Cadastrados</span>
         </div>
         <div class="card-body">
-          <div class="cadastro-toolbar mb-3">
-            <div class="cadastro-filtro">
+          <div class="cadastro-toolbar mb-3 d-flex flex-wrap align-items-end gap-2">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroNomeFornecedor">Filtrar por nome</label>
               <input type="text" id="filtroNomeFornecedor" class="form-control" placeholder="Buscar fornecedor pelo nome" />
             </div>
-            <div class="cadastro-filtro">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroContatoFornecedor">Filtrar por contato</label>
               <input type="text" id="filtroContatoFornecedor" class="form-control" placeholder="Buscar fornecedor pelo contato" />
             </div>
+            <div class="cadastro-filtro-acoes">
+              <button type="button" id="btnLimparFiltroFornecedor" class="btn btn-outline-secondary" onclick="const fn = document.getElementById('filtroNomeFornecedor'); if(fn){ fn.value=''; fn.dispatchEvent(new Event('input', {bubbles:true})); } const fc = document.getElementById('filtroContatoFornecedor'); if(fc){ fc.value=''; fc.dispatchEvent(new Event('input', {bubbles:true})); }">
+                <i class="bi bi-x-circle"></i> Limpar filtros
+              </button>
+            </div>
           </div>
 
-          <div class="table-responsive">
+          <div class="table-responsive vs-data-region">
             <table class="table table-hover align-middle" id="tabelaFornecedores">
               <thead>
                 <tr>

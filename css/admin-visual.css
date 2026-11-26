@@ -1,0 +1,48 @@
+body.vstock-refresh .admin-backup-panel,
+body.vstock-refresh .admin-auditoria-panel {
+  min-width: 0;
+}
+
+body.vstock-refresh .admin-backup-panel .card-header,
+body.vstock-refresh .admin-auditoria-panel .card-header {
+  background: var(--vs-surface);
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+body.vstock-refresh .admin-backup-panel {
+  border-inline-start: 4px solid var(--vs-petroleum);
+}
+
+body.vstock-refresh .admin-auditoria-panel .vs-tag {
+  --vs-tag-bg: color-mix(in srgb, var(--vs-blue) 18%, white);
+  --vs-tag-ink: var(--vs-ink);
+}
+
+body.vstock-refresh .admin-auditoria-panel .table-responsive {
+  border: 1px solid var(--vs-line);
+  border-radius: 10px;
+  background: var(--vs-surface);
+}
+
+body.vstock-refresh .admin-auditoria-panel #tabelaLogsSistema {
+  margin-bottom: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+body.vstock-refresh .admin-auditoria-panel #tabelaLogsSistema th,
+body.vstock-refresh .admin-auditoria-panel #tabelaLogsSistema td {
+  font-variant-numeric: tabular-nums;
+}
+
+body.vstock-refresh .admin-acao-grid .btn,
+body.vstock-refresh .admin-acoes-logs .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  body.vstock-refresh .admin-acao-grid .btn,
+  body.vstock-refresh .admin-acoes-logs .btn {
+    white-space: normal;
+  }
+}

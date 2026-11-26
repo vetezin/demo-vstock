@@ -1,0 +1,72 @@
+/* Refinamentos visuais exclusivos de alertas.html */
+
+.vstock-refresh #tabelaAlertas td.text-end,
+.vstock-refresh .alerta-resumo-card strong,
+.vstock-refresh #qtdAlertasResumo {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .alerta-resumo-card {
+  border-radius: 14px;
+  border: 1px solid var(--vs-line, #DED9CD);
+  background: var(--vs-surface, #FFFFFF);
+  box-shadow: none;
+  padding: 1.25rem 1.5rem;
+}
+
+.vstock-refresh .alerta-resumo-card strong {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #b42332;
+  line-height: 1.1;
+  display: block;
+}
+
+.vstock-refresh .alerta-resumo-card small {
+  color: var(--vs-muted, #52666B);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.vstock-refresh .status-badge-estoque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-left: 3px solid currentColor;
+  letter-spacing: 0.01em;
+}
+
+.vstock-refresh .status-badge-estoque.status-baixo {
+  background: rgba(180, 83, 9, 0.1);
+  color: #b45309;
+}
+
+.vstock-refresh .status-badge-estoque.status-vencendo {
+  background: rgba(194, 65, 12, 0.1);
+  color: #c2410c;
+}
+
+.vstock-refresh .status-badge-estoque.status-vencido {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+}
+
+.vstock-refresh .status-badge-estoque.status-sem {
+  background: rgba(100, 116, 139, 0.12);
+  color: #334155;
+}
+
+.vstock-refresh .status-badge-estoque.status-ok {
+  background: rgba(15, 106, 115, 0.1);
+  color: #0f6a73;
+}

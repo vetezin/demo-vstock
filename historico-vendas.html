@@ -12,8 +12,10 @@
   <link href="css/app.css" rel="stylesheet"/>
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/historico-vendas.css" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/historico-vendas-visual.css" rel="stylesheet"/>
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -21,6 +23,13 @@
       </a>
 
       <div class="text-white topbar-account-slot"></div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
+        </div>
+      </div>
     </div>
   </nav>
 
@@ -37,7 +46,7 @@
               <i class="bi bi-receipt-cutoff"></i>
               Pós-venda
             </span>
-            <h1>Histórico de Vendas</h1>
+            <h1 class="vs-heading">Histórico de Vendas</h1>
             <p>Consulte as vendas já registradas, acompanhe totais e prepare a base para ações futuras de detalhe, cancelamento e devolução.</p>
           </div>
         </section>
@@ -114,7 +123,7 @@
             </div>
           </div>
 
-          <div class="table-responsive sales-table-wrapper">
+          <div class="table-responsive sales-table-wrapper vs-data-region">
             <table class="table align-middle sales-history-table">
               <thead>
                 <tr>

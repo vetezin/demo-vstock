@@ -1,0 +1,47 @@
+/* Refinamentos visuais exclusivos de cadastro-cliente.html */
+
+.vstock-refresh #tabelaClientes td:nth-child(2),
+.vstock-refresh #tabelaClientes td:nth-child(3),
+.vstock-refresh #tabelaClientes td:nth-child(5) {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .cliente-busca-faixa .cadastro-toolbar {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.vstock-refresh .cliente-busca-faixa .cadastro-filtro {
+  flex: 1 1 260px;
+  max-width: 400px;
+}
+
+.vstock-refresh .cliente-busca-faixa .form-control {
+  background-color: var(--vs-surface);
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .vstock-refresh .page-header .vs-actions {
+    justify-content: center;
+  }
+
+  .vstock-refresh .cliente-busca-faixa .cadastro-filtro {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .vstock-refresh #tabelaClientes th,
+  .vstock-refresh #tabelaClientes td {
+    white-space: nowrap;
+  }
+}

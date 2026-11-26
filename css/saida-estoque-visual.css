@@ -1,0 +1,112 @@
+/* Refinamentos visuais exclusivos de saida-estoque.html */
+
+.vstock-refresh .saida-page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh .saida-card.vs-panel {
+  border-color: var(--vs-line);
+  background: var(--vs-surface);
+  box-shadow: none;
+}
+
+.vstock-refresh .saida-section-card {
+  border: 1px solid var(--vs-line);
+  background: var(--vs-surface);
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 1rem;
+}
+
+.vstock-refresh .saida-step-badge {
+  background: var(--vs-petroleum);
+  color: #ffffff;
+}
+
+.vstock-refresh .saida-info-banner {
+  background: var(--vs-brand-wash);
+  border: 1px solid color-mix(in srgb, var(--vs-petroleum) 25%, transparent);
+  color: var(--vs-ink);
+  border-radius: 8px;
+}
+
+.vstock-refresh .saida-info-banner i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .totais-box {
+  background: var(--vs-surface);
+  border: 1px solid var(--vs-line);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-refresh .totais-box strong {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--vs-font-heading);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .totais-box span {
+  color: var(--vs-muted);
+}
+
+.vstock-refresh #saldoProduto,
+.vstock-refresh #quantidade,
+.vstock-refresh #resumoSaidaItens,
+.vstock-refresh #totalItensSaida,
+.vstock-refresh #tabelaItens td.text-end,
+.vstock-refresh #tabelaSaidas td.text-end {
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-refresh .actions-bar {
+  border-top: 1px solid var(--vs-line);
+  padding-top: 1rem;
+}
+
+.vstock-refresh #tabelaItens th,
+.vstock-refresh #tabelaSaidas th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh #tabelaItens td,
+.vstock-refresh #tabelaSaidas td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+/* Permitir saldo disponível ao lado da quantidade em telas pequenas */
+@media (max-width: 767px) {
+  .vstock-refresh .estoque-form-row > .col-saida-saldo,
+  .vstock-refresh .estoque-form-row > .col-saida-qtd {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+}
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vstock-refresh .saida-totais {
+    flex-direction: column;
+  }
+
+  .vstock-refresh .totais-box-compacto {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .vstock-refresh .actions-bar {
+    flex-direction: column-reverse;
+  }
+
+  .vstock-refresh .actions-bar .btn {
+    width: 100%;
+  }
+}

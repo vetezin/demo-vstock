@@ -1,0 +1,41 @@
+/* Refinamentos visuais exclusivos de estoque.html */
+
+.vstock-refresh #tabelaEstoque td.text-end,
+.vstock-refresh .estoque-kpi-card strong {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .status-badge-estoque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-left: 3px solid currentColor;
+  letter-spacing: 0.01em;
+}
+
+.vstock-refresh .status-badge-estoque.status-ok {
+  background: rgba(15, 106, 115, 0.1);
+  color: #0f6a73;
+}
+
+.vstock-refresh .status-badge-estoque.status-baixo {
+  background: rgba(180, 83, 9, 0.1);
+  color: #b45309;
+}
+
+.vstock-refresh .status-badge-estoque.status-vencendo {
+  background: rgba(194, 65, 12, 0.1);
+  color: #c2410c;
+}
+
+.vstock-refresh .status-badge-estoque.status-vencido,
+.vstock-refresh .status-badge-estoque.status-zerado {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+}

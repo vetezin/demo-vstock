@@ -1,0 +1,102 @@
+﻿body.vstock-refresh {
+  --vs-page-bg: #F7F4EC;
+  --vs-page-surface: #FFFFFF;
+  --vs-page-ink: #21353A;
+  --vs-page-petroleum: #0F6A73;
+  --vs-page-blue: #74AED6;
+  background: var(--vs-page-bg);
+  color: var(--vs-page-ink);
+}
+
+body.vstock-refresh .page-header {
+  gap: 0.75rem;
+}
+
+body.vstock-refresh .page-header-title-center .vs-kicker {
+  display: inline-block;
+  margin-bottom: 0.25rem;
+}
+
+body.vstock-refresh .orcamento-layout,
+body.vstock-refresh .orcamento-card-dados,
+body.vstock-refresh .orcamento-card-itens,
+body.vstock-refresh .orcamento-card-dados .card-body,
+body.vstock-refresh .orcamento-card-itens .card-body {
+  min-width: 0;
+}
+
+body.vstock-refresh .orcamento-card-dados,
+body.vstock-refresh .orcamento-card-itens {
+  background: var(--vs-page-surface);
+}
+
+body.vstock-refresh .orcamento-card-dados .card-header,
+body.vstock-refresh .orcamento-card-itens .card-header {
+  color: var(--vs-page-ink);
+}
+
+body.vstock-refresh .orcamento-resumo,
+body.vstock-refresh #valorSubtotal,
+body.vstock-refresh #valorTotal,
+body.vstock-refresh #tabelaItens td.text-end,
+body.vstock-refresh #tabelaItens th.text-end {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+body.vstock-refresh #valorTotal {
+  color: var(--vs-page-petroleum);
+}
+
+body.vstock-refresh .orcamento-itens-scroll {
+  max-width: 100%;
+}
+
+body.vstock-refresh #tabelaItens {
+  width: 100%;
+}
+
+body.vstock-refresh #tabelaItens td,
+body.vstock-refresh #tabelaItens th {
+  vertical-align: middle;
+}
+
+body.vstock-refresh #resultadosItens .list-group-item {
+  gap: 0.75rem;
+}
+
+@media (max-width: 900px) {
+  body.vstock-refresh .page-header {
+    align-items: stretch;
+  }
+
+  body.vstock-refresh .page-header .vs-actions,
+  body.vstock-refresh .page-header .vs-actions .btn {
+    width: 100%;
+  }
+
+  body.vstock-refresh .orcamento-resumo .d-flex {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body.vstock-refresh .orcamento-card-dados .card-body,
+  body.vstock-refresh .orcamento-card-itens .card-body {
+    padding: 0.875rem;
+  }
+
+  body.vstock-refresh #tabelaItens th,
+  body.vstock-refresh #tabelaItens td {
+    white-space: normal;
+  }
+
+  body.vstock-refresh #resultadosItens .list-group-item {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  body.vstock-refresh #resultadosItens .list-group-item > strong.text-nowrap {
+    margin-left: auto;
+  }
+}

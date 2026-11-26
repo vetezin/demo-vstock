@@ -13,9 +13,11 @@
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/entrada-compra.css" rel="stylesheet"/>
   <link href="css/estoque-paginas.css?v=20260803-desktop" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/entrada-compra-visual.css" rel="stylesheet"/>
 </head>
 
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -30,6 +32,13 @@
         <div class="navbar-user">
           <i class="bi bi-person-badge"></i>
           <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -120,13 +129,13 @@
             <i class="bi bi-box-seam"></i>
           </div>
           <div>
-            <h2 class="h4 mb-1">Entrada de Estoque</h2>
+            <h1 class="h4 mb-1 vs-heading">Entrada de Estoque</h1>
             <p class="text-muted mb-0">Registre os itens recebidos no estoque de forma simples e rápida.</p>
           </div>
         </section>
 
         <div class="entrada-layout-grid mb-4">
-          <div class="card card-entrada-unificada saida-card mb-0">
+          <div class="card card-entrada-unificada saida-card vs-panel mb-0">
             <div class="card-body">
             <div class="entrada-section saida-section-card">
               <div class="entrada-section-header">
@@ -242,7 +251,7 @@
                 <span>Itens da Entrada</span>
               </div>
 
-            <div class="table-responsive mt-1">
+            <div class="table-responsive mt-1 vs-data-region">
               <table class="table table-sm align-middle" id="tabelaItens">
                 <thead>
                   <tr>
@@ -261,7 +270,7 @@
           </div>
           </div>
 
-          <aside class="card entrada-resumo-card mb-0">
+          <aside class="card entrada-resumo-card vs-panel mb-0">
             <div class="card-body">
               <div class="entrada-resumo-header">
                 <i class="bi bi-clipboard-data"></i>
@@ -299,10 +308,11 @@
           </aside>
         </div>
 
-        <div class="card mb-4 shadow-sm">
-          <div class="card-header bg-light card-header-flex">
+        <section class="card vs-panel mb-4 entrada-historico-card" aria-labelledby="entradaHistoricoTitulo">
+          <div class="card-header card-header-flex">
             <i class="bi bi-journal-check text-danger"></i>
-            <span>Entradas Registradas</span>
+            <h2 class="h6 mb-0 vs-heading" id="entradaHistoricoTitulo">Entradas Registradas</h2>
+            <span class="vs-tag entrada-historico-tag">Histórico</span>
           </div>
 
           <div class="card-body">
@@ -344,7 +354,7 @@
               </div>
             </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive vs-data-region">
               <table id="tabelaCompras" class="table table-hover table-striped">
                 <thead>
                     <tr>
@@ -362,7 +372,7 @@
 
             <div id="paginacaoCompras" class="paginacao-listagem"></div>
           </div>
-        </div>
+        </section>
 
         <div class="actions-bar d-flex flex-wrap justify-content-end gap-2 mb-4">
           <a href="index.html" class="btn btn-outline-secondary">

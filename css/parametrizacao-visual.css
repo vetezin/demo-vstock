@@ -1,0 +1,143 @@
+body.vstock-refresh .form-page {
+  background: var(--vs-bg);
+}
+
+.vstock-refresh .page-title h1 {
+  font-size: 1.42rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--vs-ink);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: -0.02em;
+}
+
+.vstock-refresh .page-title small {
+  color: var(--vs-muted);
+}
+
+.vstock-refresh .param-tabs-nav {
+  background: var(--vs-surface);
+  border: 1px solid var(--vs-line);
+  box-shadow: none;
+}
+
+.vstock-refresh .param-tab-button {
+  color: var(--vs-ink);
+  border: 1px solid transparent;
+  position: relative;
+  min-width: 0;
+}
+
+.vstock-refresh .param-tab-button .param-tab-state {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--vs-line);
+  flex: 0 0 8px;
+}
+
+.vstock-refresh .param-tab-button.is-active {
+  background: color-mix(in srgb, var(--vs-petroleum) 10%, white);
+  border-color: color-mix(in srgb, var(--vs-petroleum) 28%, var(--vs-line));
+  color: var(--vs-ink);
+  box-shadow: none;
+}
+
+.vstock-refresh .param-tab-button.is-active .param-tab-state {
+  background: var(--vs-petroleum);
+}
+
+.vstock-refresh .param-tab-button:focus-visible {
+  outline: 2px solid var(--vs-petroleum);
+  outline-offset: 2px;
+}
+
+.vstock-refresh .section-card {
+  background: var(--vs-surface);
+  border: 1px solid var(--vs-line);
+  box-shadow: none;
+}
+
+.vstock-refresh .section-header {
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .section-header i,
+.vstock-refresh .page-title h1 i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .module-option-card {
+  background: var(--vs-surface);
+  border: 1px solid var(--vs-line);
+  min-width: 0;
+}
+
+.vstock-refresh .module-option-card .form-text,
+.vstock-refresh .form-text,
+.vstock-refresh .page-title small,
+.vstock-refresh .text-muted {
+  color: var(--vs-muted);
+}
+
+.vstock-refresh .module-option-title,
+.vstock-refresh .form-page .form-label {
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .param-tab-panels,
+.vstock-refresh .param-tab-panel,
+.vstock-refresh .section-card,
+.vstock-refresh .module-option-card,
+.vstock-refresh .actions-row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.vstock-refresh .module-option-card > div:first-child {
+  min-width: 0;
+}
+
+.vstock-refresh .module-option-card .form-text {
+  overflow-wrap: anywhere;
+}
+
+.vstock-refresh .actions-row .btn {
+  max-width: 100%;
+}
+
+.vstock-refresh #horas_limite_cancelamento_venda,
+.vstock-refresh input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .param-tabs-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .vstock-refresh .param-tab-button {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .vstock-refresh .form-page {
+    padding: 1rem;
+  }
+
+  .vstock-refresh .section-card,
+  .vstock-refresh .module-option-card {
+    padding: 1rem;
+  }
+
+  .vstock-refresh .actions-row {
+    align-items: stretch;
+  }
+
+  .vstock-refresh .actions-row .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

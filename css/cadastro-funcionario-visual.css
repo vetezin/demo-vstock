@@ -1,0 +1,94 @@
+/* Refinamentos visuais exclusivos de cadastro-funcionario.html */
+
+.vstock-refresh .page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh #funcionarioForm .form-label.required::after {
+  content: " *";
+  color: #b42332;
+  font-weight: bold;
+}
+
+.vstock-refresh #funcionarioForm .form-section-header {
+  border-bottom: 1px solid var(--vs-line, #e2ded5);
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.vstock-refresh #funcionarioForm .badge {
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+}
+
+.vstock-refresh #tabelaFuncionarios {
+  margin-bottom: 0;
+}
+
+.vstock-refresh #tabelaFuncionarios th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh #tabelaFuncionarios td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh #tabelaFuncionarios .badge {
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+.vstock-refresh .cadastro-filtro-acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .vstock-refresh .page-header-title-center {
+    text-align: left;
+  }
+
+  .vstock-refresh .cadastro-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .vstock-refresh .cadastro-filtro {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .vstock-refresh .cadastro-filtro-acoes {
+    width: 100%;
+  }
+
+  .vstock-refresh .cadastro-filtro-acoes .btn {
+    width: 100%;
+  }
+
+  .vstock-refresh .vs-actions .btn {
+    width: 100%;
+  }
+
+  .vstock-refresh .table-responsive {
+    border: 1px solid var(--vs-line, #e2ded5);
+    border-radius: var(--vs-radius-md, 8px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

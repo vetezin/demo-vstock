@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-funcionario-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -23,6 +25,17 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -111,51 +124,76 @@
     <main class="content page-content">
       <div id="mensagens" class="mb-3"></div>
 
-      <div class="page-header">
+      <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-person-gear text-danger"></i> Cadastro de Funcionários</h2>
+          <span class="vs-kicker text-uppercase">Cadastros</span>
+          <h1 class="h4 mb-1 vs-heading">
+            <i class="bi bi-person-gear text-danger"></i> Cadastro de Funcionários
+          </h1>
           <p class="text-muted mb-0">Tela administrativa para criar, editar e inativar acessos do sistema.</p>
+        </div>
+        <div class="vs-actions">
+          <a href="index.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Dashboard
+          </a>
         </div>
       </div>
 
-      <div class="card simple-card mb-4">
-        <div class="card-header">
-          <span id="tituloFormularioFuncionario"><i class="bi bi-person-plus"></i> Novo Funcionário</span>
+      <!-- Formulário de Funcionário: Identidade antes de Acesso e Senha -->
+      <section class="card simple-card vs-panel mb-4" aria-label="Formulário de funcionário">
+        <div class="card-header bg-transparent border-bottom">
+          <span id="tituloFormularioFuncionario" class="fw-semibold"><i class="bi bi-person-plus"></i> Novo Funcionário</span>
         </div>
         <div class="card-body">
           <form id="funcionarioForm" class="row g-3">
+            <!-- 1. Identidade e Contato -->
+            <div class="col-12 form-section-header">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill bg-light text-dark border"><i class="bi bi-person-vcard text-primary"></i> 1</span>
+                <span class="fw-semibold text-secondary small text-uppercase">Identificação e Contato</span>
+              </div>
+            </div>
+
             <div class="col-md-4">
-              <label class="form-label required">CPF</label>
+              <label class="form-label required" for="funcCpf">CPF</label>
               <input type="text" id="funcCpf" class="form-control" placeholder="000.000.000-00" required />
             </div>
 
-            <div class="col-md-8">
-              <label class="form-label required">Nome</label>
+            <div class="col-md-5">
+              <label class="form-label required" for="funcNome">Nome</label>
               <input type="text" id="funcNome" class="form-control" placeholder="Nome do funcionário" required />
             </div>
 
-            <div class="col-md-4">
-              <label class="form-label required">Telefone</label>
+            <div class="col-md-3">
+              <label class="form-label required" for="funcCargo">Cargo</label>
+              <input type="text" id="funcCargo" class="form-control" placeholder="Cargo do funcionário" required />
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label required" for="funcTelefone">Telefone</label>
               <input type="text" id="funcTelefone" class="form-control" placeholder="(18)99999-9999" required />
             </div>
 
-            <div class="col-md-4">
-              <label class="form-label required">Email</label>
+            <div class="col-md-6">
+              <label class="form-label required" for="funcEmail">Email</label>
               <input type="email" id="funcEmail" class="form-control" placeholder="funcionario@empresa.com" required />
             </div>
 
+            <!-- 2. Credenciais e Acesso ao Sistema -->
+            <div class="col-12 form-section-header mt-3">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge rounded-pill bg-light text-dark border"><i class="bi bi-shield-lock text-primary"></i> 2</span>
+                <span class="fw-semibold text-secondary small text-uppercase">Credenciais e Acesso ao Sistema</span>
+              </div>
+            </div>
+
             <div class="col-md-4">
-              <label class="form-label required">Usuário</label>
+              <label class="form-label required" for="funcUsername">Usuário</label>
               <input type="text" id="funcUsername" class="form-control" placeholder="usuário de acesso" required />
             </div>
 
             <div class="col-md-4">
-              <label class="form-label required">Cargo</label>
-              <input type="text" id="funcCargo" class="form-control" placeholder="Cargo do funcionário" required />
-            </div>
-
-            <div class="col-md-4">
-              <label class="form-label required">Perfil</label>
+              <label class="form-label required" for="funcTipoAcesso">Perfil</label>
               <select id="funcTipoAcesso" class="form-select" required>
                 <option value="1">Operador</option>
                 <option value="99">Administrador</option>
@@ -163,12 +201,12 @@
             </div>
 
             <div class="col-md-4">
-              <label class="form-label required" id="labelSenhaFuncionario">Senha</label>
+              <label class="form-label required" id="labelSenhaFuncionario" for="funcSenha">Senha</label>
               <input type="password" id="funcSenha" class="form-control" placeholder="Senha de acesso" />
-              <small class="text-muted" id="senhaHelperFuncionario">Obrigatória no cadastro. Em edição, deixe vazio para manter.</small>
+              <small class="text-muted d-block mt-1" id="senhaHelperFuncionario">Obrigatória no cadastro. Em edição, deixe vazio para manter.</small>
             </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2">
+            <div class="col-12 d-flex justify-content-end gap-2 flex-wrap vs-actions mt-3">
               <button type="button" id="btnCancelarEdicaoFuncionario" class="btn btn-outline-secondary d-none">
                 <i class="bi bi-x-circle"></i> Cancelar edição
               </button>
@@ -181,17 +219,23 @@
             </div>
           </form>
         </div>
-      </div>
+      </section>
 
-      <div class="card simple-card">
-        <div class="card-header">
-          <i class="bi bi-list-ul"></i> Funcionários Cadastrados
+      <!-- Lista e Filtro de Funcionários -->
+      <section class="card simple-card vs-panel vs-data-region" aria-label="Funcionários cadastrados">
+        <div class="card-header bg-transparent border-bottom">
+          <span class="fw-semibold"><i class="bi bi-list-ul"></i> Funcionários Cadastrados</span>
         </div>
         <div class="card-body">
-          <div class="cadastro-toolbar mb-3">
-            <div class="cadastro-filtro">
+          <div class="cadastro-toolbar mb-3 d-flex flex-wrap align-items-end gap-2">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroNomeFuncionario">Filtrar por nome</label>
               <input type="text" id="filtroNomeFuncionario" class="form-control" placeholder="Buscar funcionário pelo nome" />
+            </div>
+            <div class="cadastro-filtro-acoes">
+              <button type="button" id="btnLimparFiltroFuncionario" class="btn btn-outline-secondary" onclick="const f = document.getElementById('filtroNomeFuncionario'); if(f){ f.value=''; f.dispatchEvent(new Event('input', {bubbles:true})); }">
+                <i class="bi bi-x-circle"></i> Limpar filtro
+              </button>
             </div>
           </div>
 
@@ -215,7 +259,7 @@
 
           <div id="paginacaoFuncionarios" class="paginacao-cadastro"></div>
         </div>
-      </div>
+      </section>
     </main>
   </div>
 
@@ -225,7 +269,3 @@
   <script src="js/cadastro-funcionario.js"></script>
 </body>
 </html>
-
-
-
-

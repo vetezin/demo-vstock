@@ -13,8 +13,10 @@
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/vendas.css?v=20260814-reserva-mesas-r1" rel="stylesheet"/>
   <link href="css/estoque-paginas.css" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/vendas-visual.css" rel="stylesheet"/>
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -29,6 +31,13 @@
         <div class="navbar-user">
           <i class="bi bi-person-badge"></i>
           <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -104,7 +113,7 @@
               </div>
             </section>
 
-            <aside class="pdv-panel pdv-cart-panel">
+            <aside class="pdv-panel pdv-cart-panel" id="pdvCartPanel">
               <div class="pdv-cart-header">
                 <div class="pdv-section-title">
                   <i class="bi bi-cart3"></i>
@@ -231,6 +240,19 @@
                 Finalizar Venda
               </button>
             </aside>
+
+            <a href="#pdvCartPanel" id="pdvCartShortcut" class="pdv-cart-shortcut" aria-label="Ir para o carrinho de compras">
+              <span class="pdv-cart-shortcut-info">
+                <i class="bi bi-cart3" aria-hidden="true"></i>
+                <span class="pdv-cart-shortcut-count-badge">
+                  <span id="pdvCartShortcutCount">0</span> itens
+                </span>
+              </span>
+              <span class="pdv-cart-shortcut-action">
+                <span>Ver carrinho</span>
+                <strong id="pdvCartShortcutTotal">R$ 0,00</strong>
+              </span>
+            </a>
           </div>
 
           <div class="pdv-legacy-state d-none" aria-hidden="true">
@@ -603,5 +625,41 @@
   <script src="js/principal.js?v=20260814-cliente-id-r1"></script>
   <script src="js/vendas.js?v=20260814-funcionario-sessao-r1"></script>
   <script src="js/mesas.js?v=20260814-edicao-cliente-r1"></script>
+  <script>
+    (function () {
+      function sincronizarAtalhoCarrinho() {
+        var cartCountEl = document.getElementById('pdvCartCount');
+        var totalEl = document.getElementById('pdvTotal');
+        var shortcutCountEl = document.getElementById('pdvCartShortcutCount');
+        var shortcutTotalEl = document.getElementById('pdvCartShortcutTotal');
+        if (!shortcutTotalEl || !totalEl) return;
+
+        var atualizar = function () {
+          if (shortcutCountEl && cartCountEl) {
+            shortcutCountEl.textContent = (cartCountEl.textContent || '0').trim();
+          }
+          if (shortcutTotalEl && totalEl) {
+            shortcutTotalEl.textContent = (totalEl.textContent || 'R$ 0,00').trim();
+          }
+        };
+
+        atualizar();
+
+        var observer = new MutationObserver(atualizar);
+        if (cartCountEl) {
+          observer.observe(cartCountEl, { childList: true, characterData: true, subtree: true });
+        }
+        if (totalEl) {
+          observer.observe(totalEl, { childList: true, characterData: true, subtree: true });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', sincronizarAtalhoCarrinho);
+      } else {
+        sincronizarAtalhoCarrinho();
+      }
+    })();
+  </script>
 </body>
 </html>

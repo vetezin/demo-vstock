@@ -1,0 +1,108 @@
+/* Refinamentos visuais exclusivos de cadastro-fornecedor.html */
+
+.vstock-refresh .page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh .fornecedor-grupo {
+  background-color: color-mix(in srgb, var(--vs-bg) 40%, var(--vs-surface));
+  border: 1px solid var(--vs-line);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.vstock-refresh .fornecedor-grupo-header {
+  font-weight: 600;
+  color: var(--vs-muted);
+}
+
+.vstock-refresh #fornecedorForm .form-label.required::after {
+  content: " *";
+  color: #b42332;
+  font-weight: bold;
+}
+
+.vstock-refresh .cadastro-filtro-acoes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vstock-refresh #tabelaFornecedores {
+  margin-bottom: 0;
+}
+
+.vstock-refresh #tabelaFornecedores th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh #tabelaFornecedores td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh #tabelaFornecedores td:nth-child(2),
+.vstock-refresh #tabelaFornecedores td:nth-child(3),
+.vstock-refresh #tabelaFornecedores td:nth-child(6) {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh #tabelaFornecedores .badge {
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .vstock-refresh .page-header-title-center {
+    text-align: left;
+  }
+
+  .vstock-refresh .page-header .vs-actions {
+    width: 100%;
+  }
+
+  .vstock-refresh .page-header .vs-actions .btn {
+    width: 100%;
+  }
+
+  .vstock-refresh .cadastro-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .vstock-refresh .cadastro-filtro {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .vstock-refresh .cadastro-filtro-acoes {
+    width: 100%;
+  }
+
+  .vstock-refresh .cadastro-filtro-acoes .btn {
+    width: 100%;
+  }
+
+  .vstock-refresh .vs-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vstock-refresh .vs-actions .btn {
+    width: 100%;
+  }
+}

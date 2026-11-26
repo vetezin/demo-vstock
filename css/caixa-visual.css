@@ -1,0 +1,126 @@
+/* Refinamentos visuais exclusivos de caixa.html */
+
+.vstock-refresh .cash-page-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.vstock-refresh .cash-page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.vstock-refresh .cash-page-header > div {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+.vstock-refresh .cash-page-header h1,
+.vstock-refresh .cash-page-header p {
+  max-width: 100%;
+}
+
+.vstock-refresh .cash-eyebrow {
+  color: var(--vs-muted);
+}
+
+.vstock-refresh .cash-eyebrow i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .cash-card {
+  border: 1px solid var(--vs-line);
+  background: var(--vs-surface);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.vstock-refresh .cash-card-header {
+  border-bottom: 1px solid var(--vs-line);
+}
+
+.vstock-refresh .cash-card-title span {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .cash-section-state {
+  color: var(--vs-muted);
+  border: 1px solid var(--vs-line);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.vstock-refresh .cash-section-state.is-warning {
+  color: #b56817;
+  border-color: #e8c89a;
+  background: #fff3df;
+}
+
+.vstock-refresh .cash-primary-button {
+  background: var(--vs-petroleum);
+  border-color: var(--vs-petroleum);
+  color: #ffffff;
+}
+
+.vstock-refresh .cash-danger-button {
+  background: #B42332;
+  border-color: #B42332;
+  color: #ffffff;
+}
+
+.vstock-refresh .cash-session-card,
+.vstock-refresh .cash-metric-card {
+  border: 1px solid var(--vs-line);
+  background: var(--vs-surface);
+  border-radius: 12px;
+}
+
+.vstock-refresh .cash-metric-card-highlight {
+  border-color: var(--vs-petroleum);
+  background: var(--vs-brand-wash);
+}
+
+.vstock-refresh .cash-metric-card-highlight strong {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh #cashExpectedBalance,
+.vstock-refresh #cashClosingExpected,
+.vstock-refresh #cashInitialBalance,
+.vstock-refresh #cashNetSales,
+.vstock-refresh #cashEntries,
+.vstock-refresh #cashWithdrawals,
+.vstock-refresh #cashPaymentTotal,
+.vstock-refresh .cash-table td.text-end,
+.vstock-refresh .cash-value-positive,
+.vstock-refresh .cash-value-negative {
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-refresh .cash-table th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh .cash-table td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .cash-empty-state {
+  color: var(--vs-muted);
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .cash-workspace-grid,
+  .vstock-refresh .cash-session-workspace {
+    grid-template-columns: 1fr;
+  }
+}

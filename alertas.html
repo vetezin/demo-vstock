@@ -12,8 +12,10 @@
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/estoque-geral.css" rel="stylesheet"/>
   <link href="css/alertas.css" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/alertas-visual.css" rel="stylesheet"/>
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -28,6 +30,13 @@
         <div class="navbar-user">
           <i class="bi bi-person-badge"></i>
           <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -63,24 +72,24 @@
     <main class="content page-content">
       <div class="page-topo mb-4">
         <div>
-          <h2 class="h4 mb-1"><i class="bi bi-bell text-danger"></i> Alertas</h2>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-bell text-danger"></i> Alertas</h1>
           <p class="text-muted mb-0">Produtos com baixo estoque, vencendo, vencidos ou sem estoque.</p>
         </div>
       </div>
 
-      <div class="card alerta-resumo-card mb-4">
+      <div class="card vs-panel alerta-resumo-card mb-4" data-region="ocorrencias-resumo">
         <div class="card-body">
           <small>Itens em atenção</small>
           <strong id="qtdAlertasResumo">0</strong>
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header bg-light">
-          <strong><i class="bi bi-exclamation-triangle"></i> Produtos em atenção</strong>
+      <div class="card vs-panel alerta-filtros-card mb-4" data-region="filtros-alerta">
+        <div class="card-header bg-transparent border-bottom">
+          <span class="fw-semibold"><i class="bi bi-funnel"></i> Filtros de Alertas</span>
         </div>
         <div class="card-body">
-          <div class="listagem-toolbar mb-3">
+          <div class="listagem-toolbar">
             <div class="row g-3">
               <div class="col-lg-4 col-md-6">
                 <label class="form-label" for="filtroProdutoAlerta">Produto</label>
@@ -101,7 +110,7 @@
                 </select>
               </div>
               <div class="col-12">
-                <div class="d-flex justify-content-end gap-2 flex-wrap">
+                <div class="d-flex justify-content-end gap-2 flex-wrap vs-actions">
                   <button id="btnLimparAlertas" class="btn btn-outline-warning" type="button">
                     <i class="bi bi-eraser"></i> Limpar
                   </button>
@@ -112,8 +121,15 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="table-responsive">
+      <div class="card vs-panel">
+        <div class="card-header bg-transparent border-bottom">
+          <span class="fw-semibold"><i class="bi bi-exclamation-triangle"></i> Produtos em atenção</span>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive vs-data-region">
             <table class="table table-hover align-middle" id="tabelaAlertas">
               <thead>
                 <tr>

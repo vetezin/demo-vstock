@@ -11,15 +11,25 @@
   <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
   <link href="css/cadastro-oficina-orcamento.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-oficina-orcamento-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
         <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" />
       </a>
+
       <div class="text-white text-end">
         <div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
+        </div>
       </div>
     </div>
   </nav>
@@ -32,15 +42,18 @@
 
       <div class="page-header">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-clipboard2-check text-danger"></i> Criar orçamento</h2>
+          <span class="vs-kicker text-uppercase">Oficina</span>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-clipboard2-check text-danger"></i> Criar orçamento</h1>
           <p class="text-muted mb-0">Registre o diagnóstico e monte a proposta para o cliente.</p>
         </div>
-        <a href="index.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar para Dashboard</a>
+        <div class="vs-actions">
+          <a href="index.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Voltar para Dashboard</a>
+        </div>
       </div>
 
       <form id="orcamentoForm" novalidate>
         <div class="orcamento-layout pb-4">
-          <section class="card simple-card orcamento-card-dados">
+          <section class="card simple-card vs-panel orcamento-card-dados">
             <div class="card-header"><i class="bi bi-clipboard2-data"></i> Dados do orçamento</div>
             <div class="card-body">
               <div class="row g-3">
@@ -74,7 +87,7 @@
             </div>
           </section>
 
-          <aside class="card simple-card orcamento-card-itens">
+          <aside class="card simple-card vs-panel orcamento-card-itens">
             <div class="card-header"><i class="bi bi-list-check"></i> Itens do orçamento</div>
             <div class="card-body">
               <button id="btnAbrirItens" type="button" class="btn btn-outline-success w-100 mb-3" data-bs-toggle="modal" data-bs-target="#modalAdicionarItem">
@@ -84,7 +97,7 @@
                 <i class="bi bi-basket2 d-block fs-4 mb-2"></i>
                 <span class="small">Nenhum item adicionado.</span>
               </div>
-              <div class="table-responsive d-none orcamento-itens-scroll" id="areaTabelaItens">
+              <div class="table-responsive vs-data-region d-none orcamento-itens-scroll" id="areaTabelaItens">
                 <table class="table table-hover align-middle mb-0" id="tabelaItens">
                   <thead><tr><th>Tipo</th><th>Item</th><th class="text-end">Valor</th><th class="text-center">Ação</th></tr></thead>
                   <tbody></tbody>

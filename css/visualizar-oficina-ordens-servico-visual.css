@@ -1,0 +1,221 @@
+body.vstock-refresh {
+  background: #F7F4EC;
+  color: #21353A;
+}
+
+body.vstock-refresh .page-content,
+body.vstock-refresh .main-container,
+body.vstock-refresh .os-header,
+body.vstock-refresh .os-painel-status,
+body.vstock-refresh .os-status-card,
+body.vstock-refresh .os-filtros,
+body.vstock-refresh .os-lista,
+body.vstock-refresh .os-detalhe-layout,
+body.vstock-refresh .os-execucao-layout,
+body.vstock-refresh .os-execucao-cliente,
+body.vstock-refresh .os-execucao-dados-leitura {
+  min-width: 0;
+}
+
+body.vstock-refresh .os-header,
+body.vstock-refresh .os-status-card,
+body.vstock-refresh .os-lista.card,
+body.vstock-refresh .card.simple-card,
+body.vstock-refresh .modal-content,
+body.vstock-refresh .os-detalhe-bloco,
+body.vstock-refresh .os-execucao-bloco,
+body.vstock-refresh .os-execucao-resumo,
+body.vstock-refresh .os-detalhe-resumo {
+  background: #FFFFFF;
+  border-color: #DED9CD;
+  color: #21353A;
+}
+
+body.vstock-refresh .os-eyebrow,
+body.vstock-refresh .os-modal-kicker,
+body.vstock-refresh .os-status-icon,
+body.vstock-refresh .os-previsao i,
+body.vstock-refresh .os-diagnostico-titulo .bi-arrows-angle-expand,
+body.vstock-refresh .os-editar-execucao summary,
+body.vstock-refresh .os-execucao-cliente-icone,
+body.vstock-refresh .os-bloco-icone,
+body.vstock-refresh .os-conclusao-dados small i {
+  color: #0F6A73;
+}
+
+body.vstock-refresh .os-status-card.aberta .os-status-icon,
+body.vstock-refresh .os-status.aberta,
+body.vstock-refresh .os-fluxo-os span.ativo {
+  background: rgba(116, 174, 214, 0.18);
+  color: #21353A;
+}
+
+body.vstock-refresh .os-status-card.andamento .os-status-icon,
+body.vstock-refresh .os-status.andamento {
+  background: rgba(15, 106, 115, 0.12);
+  color: #0F6A73;
+}
+
+body.vstock-refresh .os-status-card.finalizada .os-status-icon,
+body.vstock-refresh .os-status.finalizada {
+  background: rgba(15, 106, 115, 0.16);
+  color: #0F6A73;
+}
+
+body.vstock-refresh .os-status-card strong,
+body.vstock-refresh .os-numero,
+body.vstock-refresh .os-cliente,
+body.vstock-refresh .os-detalhe-dados strong,
+body.vstock-refresh .os-resumo-total strong,
+body.vstock-refresh .os-execucao-cliente-principal strong,
+body.vstock-refresh .os-detalhe-resumo .os-valor-final,
+body.vstock-refresh .os-total-final > strong,
+body.vstock-refresh #finalizarOsTotal,
+body.vstock-refresh .os-documento-impressao {
+  font-variant-numeric: tabular-nums;
+}
+
+body.vstock-refresh .os-status-card strong,
+body.vstock-refresh .os-previsao,
+body.vstock-refresh .os-numero,
+body.vstock-refresh .os-orcamento,
+body.vstock-refresh .os-resumo-linha strong,
+body.vstock-refresh .os-resumo-total strong,
+body.vstock-refresh .os-detalhe-resumo > strong,
+body.vstock-refresh .os-execucao-dados-leitura strong,
+body.vstock-refresh .os-itens-execucao-lista td:nth-child(3),
+body.vstock-refresh #detalheOsTotalItens,
+body.vstock-refresh #finalizarOsTotal,
+body.vstock-refresh .os-documento-direita,
+body.vstock-refresh .os-parcela strong {
+  font-variant-numeric: tabular-nums;
+}
+
+body.vstock-refresh .os-lista .table thead th {
+  background: rgba(247, 244, 236, 0.9);
+  color: #21353A;
+}
+
+body.vstock-refresh .btn-success,
+body.vstock-refresh .btn-outline-success:hover {
+  --bs-btn-bg: #0F6A73;
+  --bs-btn-border-color: #0F6A73;
+  --bs-btn-hover-bg: #0c5961;
+  --bs-btn-hover-border-color: #0c5961;
+  --bs-btn-active-bg: #094e55;
+  --bs-btn-active-border-color: #094e55;
+}
+
+body.vstock-refresh .btn-outline-primary,
+body.vstock-refresh .btn-outline-secondary,
+body.vstock-refresh .btn-outline-success {
+  color: #21353A;
+}
+
+body.vstock-refresh .btn-outline-primary {
+  --bs-btn-color: #0F6A73;
+  --bs-btn-border-color: #0F6A73;
+  --bs-btn-hover-bg: #0F6A73;
+  --bs-btn-hover-border-color: #0F6A73;
+  --bs-btn-active-bg: #0c5961;
+  --bs-btn-active-border-color: #0c5961;
+}
+
+body.vstock-refresh .text-muted,
+body.vstock-refresh .os-orcamento,
+body.vstock-refresh .os-veiculo,
+body.vstock-refresh .os-status-card span:not(.os-status-icon),
+body.vstock-refresh .os-detalhe-dados small,
+body.vstock-refresh .os-detalhe-resumo small,
+body.vstock-refresh .os-execucao-cliente small,
+body.vstock-refresh .os-execucao-dados-leitura small,
+body.vstock-refresh .os-execucao-resumo > small,
+body.vstock-refresh .os-resumo-linha span,
+body.vstock-refresh .os-resumo-total span {
+  color: #52666B !important;
+}
+
+body.vstock-refresh .os-execucao-cabecalho,
+body.vstock-refresh .os-execucao-bloco,
+body.vstock-refresh .os-execucao-cliente,
+body.vstock-refresh .os-detalhe-bloco,
+body.vstock-refresh .os-detalhe-resumo,
+body.vstock-refresh .os-execucao-resumo,
+body.vstock-refresh .os-status-card,
+body.vstock-refresh .os-lista.card,
+body.vstock-refresh .card.simple-card {
+  box-shadow: none;
+}
+
+body.vstock-refresh .os-filtros > *,
+body.vstock-refresh .os-detalhe-dados > *,
+body.vstock-refresh .os-execucao-cliente > *,
+body.vstock-refresh .os-execucao-dados-leitura > * {
+  min-width: 0;
+}
+
+body.vstock-refresh .os-cliente,
+body.vstock-refresh .os-veiculo,
+body.vstock-refresh .os-numero,
+body.vstock-refresh .os-orcamento,
+body.vstock-refresh .os-detalhe-dados strong,
+body.vstock-refresh .os-execucao-cliente strong,
+body.vstock-refresh .os-execucao-cliente span {
+  overflow-wrap: anywhere;
+}
+
+body.vstock-refresh .os-header-copy h1 {
+  margin: .25rem 0 .35rem;
+}
+
+@media print {
+  .os-documento-cabecalho .os-documento-titulo {
+    margin: 2mm 0 1.5mm;
+    color: #183e32;
+    font-size: 22pt;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 768px) {
+  body.vstock-refresh .os-header {
+    align-items: stretch;
+  }
+
+  body.vstock-refresh .os-header .btn {
+    margin-left: 0;
+  }
+
+  body.vstock-refresh .os-detalhe-layout,
+  body.vstock-refresh .os-execucao-layout {
+    grid-template-columns: 1fr;
+  }
+
+  body.vstock-refresh .os-execucao-titulo-linha {
+    flex-wrap: wrap;
+  }
+
+  body.vstock-refresh .os-execucao-acoes .btn,
+  body.vstock-refresh .os-finalizar-rodape .btn {
+    width: 100%;
+  }
+
+  body.vstock-refresh .os-finalizar-rodape {
+    gap: 0.5rem;
+  }
+
+  body.vstock-refresh .modal-dialog {
+    margin: 0.5rem;
+  }
+}
+
+@media (max-width: 390px) {
+  body.vstock-refresh .page-content {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  body.vstock-refresh .os-status-card {
+    padding: 0.85rem;
+  }
+}

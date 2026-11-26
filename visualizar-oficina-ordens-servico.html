@@ -11,14 +11,17 @@
   <link href="css/principal.css" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
   <link href="css/visualizar-oficina-ordens-servico.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/visual-completo.css?v=1"/>
+  <link href="css/visualizar-oficina-ordens-servico-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
         <img alt="Logo da plataforma" class="logo" src="larSantaFilomena.png" />
       </a>
       <div class="text-white text-end"><div class="navbar-date"><i class="bi bi-calendar3"></i><span id="current-date"></span></div></div>
+      <div class="app-topbar-main"><div class="app-topbar-page-intro"><span class="app-topbar-title"></span><p class="app-topbar-subtitle"></p></div></div>
     </div>
   </nav>
 
@@ -29,7 +32,7 @@
       <header class="page-header os-header simple-card">
         <div class="os-header-copy">
           <span class="os-eyebrow"><i class="bi bi-wrench-adjustable"></i> Execução da oficina</span>
-          <h2>Ordens de serviço</h2>
+          <h1>Ordens de serviço</h1>
           <p class="text-muted mb-0">Acompanhe o trabalho aprovado, inicie o atendimento e conclua a entrega.</p>
         </div>
         <a href="visualizar-oficina-orcamentos.html" class="btn btn-outline-secondary"><i class="bi bi-clipboard2-check"></i> Ver orçamentos</a>
@@ -266,7 +269,7 @@
       </div>
       <article id="osDocumentoImpressao" class="os-documento-impressao" aria-hidden="true">
         <header class="os-documento-cabecalho">
-          <div><span>VSTOCK · OFICINA</span><h1>Ordem de serviço</h1><p>OS #<strong id="documentoOsNumero">-</strong> · Orçamento #<strong id="documentoOsOrcamento">-</strong></p></div>
+          <div><span>VSTOCK · OFICINA</span><p class="os-documento-titulo">Ordem de serviço</p><p>OS #<strong id="documentoOsNumero">-</strong> · Orçamento #<strong id="documentoOsOrcamento">-</strong></p></div>
           <div class="os-documento-status"><strong>Finalizada</strong><span id="documentoOsCriacao">-</span></div>
         </header>
         <section class="os-documento-secao os-documento-atendimento"><h2>Cliente e veículo</h2><div class="os-documento-dados"><div><span>Cliente</span><strong id="documentoOsCliente">-</strong></div><div><span>Veículo</span><strong id="documentoOsVeiculo">-</strong></div><div><span>Responsável</span><strong id="documentoOsFuncionario">-</strong></div><div><span>Data de conclusão</span><strong id="documentoOsDataConclusao">-</strong></div></div></section>

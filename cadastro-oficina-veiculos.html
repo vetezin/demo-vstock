@@ -12,8 +12,9 @@
   <link href="css/principal.css?v=20260829-orcamentos-menu" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
   <link href="css/cadastro-oficina-veiculos.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -24,6 +25,13 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -39,15 +47,18 @@
 
       <div class="page-header">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-bicycle text-danger"></i> Veículos da Oficina</h2>
+          <span class="vs-kicker text-uppercase">Oficina</span>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-bicycle text-danger"></i> Veículos da Oficina</h1>
           <p class="text-muted mb-0">Cadastre as motos dos clientes para utilizá-las nos orçamentos e ordens de serviço.</p>
         </div>
-        <a href="index.html" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left"></i> Voltar para Dashboard
-        </a>
+        <div class="vs-actions">
+          <a href="index.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Dashboard
+          </a>
+        </div>
       </div>
 
-      <section class="card simple-card mb-4" aria-labelledby="tituloFormularioVeiculo">
+      <section class="card simple-card vs-panel mb-4" aria-labelledby="tituloFormularioVeiculo">
         <div class="card-header">
           <span id="tituloFormularioVeiculo"><i class="bi bi-plus-circle"></i> Novo veículo</span>
         </div>
@@ -90,7 +101,7 @@
               <textarea id="observacao" class="form-control" rows="3" maxlength="1000" placeholder="Informações úteis sobre o veículo"></textarea>
             </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2 flex-wrap">
+            <div class="col-12 d-flex justify-content-end gap-2 flex-wrap vs-actions">
               <button type="button" id="btnCancelarEdicao" class="btn btn-outline-secondary d-none">
                 <i class="bi bi-x-circle"></i> Cancelar edição
               </button>
@@ -105,7 +116,7 @@
         </div>
       </section>
 
-      <section class="card simple-card" aria-labelledby="tituloListaVeiculos">
+      <section class="card simple-card vs-panel" aria-labelledby="tituloListaVeiculos">
         <div class="card-header">
           <span id="tituloListaVeiculos"><i class="bi bi-list-ul"></i> Veículos cadastrados</span>
         </div>
@@ -129,7 +140,7 @@
             </div>
           </div>
 
-          <div class="table-responsive">
+          <div class="table-responsive vs-data-region">
             <table class="table table-hover align-middle" id="tabelaVeiculos">
               <thead>
                 <tr>
@@ -193,7 +204,59 @@
   <script src="js/principal.js"></script>
   <script src="js/cadastro-rapido.js"></script>
   <script src="js/cadastro-oficina-veiculos.js"></script>
+  <script>
+    (function () {
+      function adicionarAtalhoHistorico() {
+        var tbody = document.querySelector('#tabelaVeiculos tbody');
+        if (!tbody) return;
+        tbody.querySelectorAll('tr').forEach(function (tr) {
+          if (!tr.cells || tr.cells.length < 3) return;
+          var actions = tr.querySelector('td:last-child .d-flex, td.text-center .d-flex, td:last-child div');
+          if (!actions) return;
+          if (actions.querySelector('button[data-acao="historico"]')) return;
+
+          var placa = (tr.cells[0] ? tr.cells[0].textContent : '').trim();
+          var veiculo = (tr.cells[1] ? tr.cells[1].textContent : '').trim();
+          var cliente = (tr.cells[2] ? tr.cells[2].textContent : '').trim();
+
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn btn-sm btn-outline-secondary';
+          btn.setAttribute('data-acao', 'historico');
+          btn.setAttribute('data-bs-toggle', 'modal');
+          btn.setAttribute('data-bs-target', '#modalHistoricoVeiculo');
+          btn.setAttribute('data-placa', placa);
+          btn.setAttribute('data-veiculo', veiculo);
+          btn.setAttribute('data-cliente', cliente);
+          btn.innerHTML = '<i class="bi bi-clock-history"></i> Histórico';
+
+          btn.addEventListener('click', function () {
+            var idEl = document.getElementById('historicoVeiculoIdentificacao');
+            if (idEl) {
+              idEl.textContent = placa + ' · ' + veiculo + ' · ' + cliente;
+            }
+            var modalEl = document.getElementById('modalHistoricoVeiculo');
+            if (modalEl && window.bootstrap && typeof bootstrap.Modal === 'function') {
+              bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            }
+          });
+
+          actions.appendChild(btn);
+        });
+      }
+
+      var tbody = document.querySelector('#tabelaVeiculos tbody');
+      if (tbody) {
+        var observer = new MutationObserver(adicionarAtalhoHistorico);
+        observer.observe(tbody, { childList: true, subtree: true });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', adicionarAtalhoHistorico);
+      } else {
+        adicionarAtalhoHistorico();
+      }
+    })();
+  </script>
 </body>
 </html>
-
-

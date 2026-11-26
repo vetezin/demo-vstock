@@ -1,0 +1,48 @@
+/* Refinamentos visuais exclusivos de historico-vendas.html */
+
+.vstock-refresh .sales-summary-card strong,
+.vstock-refresh #resumoQuantidadeVendas,
+.vstock-refresh #resumoQuantidadeItensVendas,
+.vstock-refresh #resumoValorTotalVendas,
+.vstock-refresh .sales-history-table td,
+.vstock-refresh .sales-history-table th,
+.vstock-refresh #detalheVendaTotal,
+.vstock-refresh #detalheVendaSubtotal,
+.vstock-refresh #detalheVendaDesconto,
+.vstock-refresh #detalheVendaValorBruto,
+.vstock-refresh #detalheVendaValorTaxa,
+.vstock-refresh #detalheVendaValorLiquido,
+.vstock-refresh .sales-detail-summary-row strong,
+.vstock-refresh .sales-detail-table td,
+.vstock-refresh .sales-detail-table th {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .sales-filter-grid,
+.vstock-refresh .sales-summary-grid {
+  min-width: 0;
+}
+
+.vstock-refresh .sales-list-shell {
+  min-width: 0;
+}
+
+.vstock-refresh .sales-table-wrapper {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .vstock-refresh .sales-filter-grid,
+  .vstock-refresh .sales-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vstock-refresh .sales-filter-actions {
+    flex-direction: column;
+  }
+
+  .vstock-refresh .sales-filter-actions .btn {
+    width: 100%;
+  }
+}

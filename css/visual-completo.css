@@ -1,0 +1,286 @@
+body.vstock-refresh {
+  --vs-bg: #F7F4EC;
+  --vs-surface: #FFFFFF;
+  --vs-ink: #21353A;
+  --vs-muted: #52666B;
+  --vs-petroleum: #0F6A73;
+  --vs-blue: #74AED6;
+  --vs-line: #DED9CD;
+  --vs-font-heading: Bahnschrift, 'Segoe UI', system-ui, sans-serif;
+  --vs-font-body: 'Segoe UI', system-ui, sans-serif;
+  --vs-brand-wash: color-mix(in srgb, var(--brand-primary, var(--vs-petroleum)) 11%, white);
+  background: var(--vs-bg);
+  color: var(--vs-ink);
+  font-family: var(--vs-font-body);
+}
+
+.vstock-refresh :is(h1, h2, h3, h4, .vs-heading) {
+  font-family: var(--vs-font-heading);
+  letter-spacing: -0.015em;
+}
+
+.vstock-refresh :is(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--vs-petroleum);
+  outline-offset: 2px;
+}
+
+.vstock-refresh ::selection {
+  background: var(--vs-blue);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .vs-panel {
+  min-width: 0;
+  border: 1px solid var(--vs-line);
+  border-radius: 14px;
+  background: var(--vs-surface);
+  box-shadow: none;
+}
+
+.vstock-refresh .vs-kicker {
+  color: var(--vs-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.vstock-refresh .vs-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vstock-refresh .vs-data-region {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.vstock-refresh :is(.vs-data-region, .vs-tag) {
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-refresh .vs-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+  background: var(--vs-tag-bg, var(--vs-brand-wash));
+  color: var(--vs-tag-ink, var(--vs-ink));
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.vstock-refresh .btn.btn-danger {
+  --bs-btn-bg: #B42332;
+  --bs-btn-border-color: #B42332;
+  --bs-btn-hover-bg: #942033;
+  --bs-btn-hover-border-color: #942033;
+  --bs-btn-active-bg: #801B2B;
+  --bs-btn-active-border-color: #801B2B;
+  --bs-btn-disabled-bg: #B42332;
+  --bs-btn-disabled-border-color: #B42332;
+  --bs-btn-focus-shadow-rgb: 180, 35, 50;
+  background: var(--bs-btn-bg);
+}
+
+.vstock-refresh .btn.btn-danger:hover { background: var(--bs-btn-hover-bg); }
+.vstock-refresh .btn.btn-danger:active { background: var(--bs-btn-active-bg); }
+
+@media screen {
+  .vstock-refresh :is(.brand-navbar.app-topbar, .navbar.dashboard-topbar) {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--vs-surface);
+    border-bottom: 1px solid var(--vs-line);
+    box-shadow: none;
+  }
+
+  .vstock-refresh.app-shell .brand-navbar.app-topbar { position: fixed; }
+
+  .vstock-refresh :is(.brand-navbar, .navbar.dashboard-topbar) .container-fluid {
+    grid-template-columns: var(--app-sidebar-width) minmax(0, 1fr);
+    background: var(--vs-surface);
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .vstock-refresh :is(.brand-navbar .navbar-brand.navbar-brand-minimal, .topbar-brand-block) {
+    position: relative;
+    background: var(--vs-surface);
+    border-inline-end: 1px solid var(--vs-line);
+  }
+
+  .vstock-refresh :is(.navbar-brand-minimal img.logo, .topbar-brand-block .logo) {
+    filter: none;
+    opacity: 1;
+  }
+
+  .vstock-refresh :is(.app-topbar-main, .topbar-main) { background: var(--vs-surface); }
+
+  .vstock-refresh .sidebar {
+    border-inline-end: 1px solid var(--vs-line);
+    background: var(--vs-surface);
+    scrollbar-color: var(--vs-line) var(--vs-surface);
+  }
+
+  .vstock-refresh .sidebar :is(h5, .sidebar-group-toggle, .sidebar-submenu-link) {
+    color: var(--vs-muted);
+  }
+
+  .vstock-refresh .sidebar :is(.nav-btn, .sidebar-submenu > summary) {
+    border-radius: 8px;
+    color: var(--vs-ink);
+    box-shadow: none;
+  }
+
+  .vstock-refresh .sidebar :is(.nav-btn:hover, .nav-btn.active, .sidebar-submenu > summary:hover) {
+    background: var(--vs-brand-wash);
+    color: var(--vs-ink);
+  }
+
+  .vstock-refresh .sidebar .nav-btn.active {
+    border-color: var(--brand-line, var(--vs-line));
+    font-weight: 750;
+  }
+
+  .vstock-refresh .sidebar-group-toggle:hover { color: var(--vs-ink); }
+  .vstock-refresh .sidebar-group-content[hidden] { display: none; }
+  .vstock-refresh .sidebar-submenu-content { border-color: var(--vs-line); }
+  .vstock-refresh .sidebar-collapse-toggle {
+    border: 1px solid var(--vs-line);
+    background: var(--vs-surface);
+    color: var(--vs-ink);
+  }
+
+  .vstock-refresh .sidebar-collapse-toggle:hover { background: var(--vs-brand-wash); }
+
+  .vstock-refresh :is(.brand-navbar, .dashboard-topbar) .navbar-account-toggle {
+    border-radius: 10px;
+    box-shadow: none;
+  }
+
+  .vstock-refresh :is(.brand-navbar, .dashboard-topbar) .navbar-account-avatar {
+    background: var(--vs-brand-wash);
+    color: var(--vs-ink);
+  }
+
+  .vstock-refresh .navbar-account-name {
+    max-width: 16ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.vstock-nav-backdrop { display: none; }
+
+@media screen and (max-width: 768px) {
+  body.vstock-refresh { --app-topbar-height: 64px; }
+
+  .vstock-refresh.app-shell .brand-navbar.app-topbar { position: sticky; }
+
+  .vstock-refresh :is(.brand-navbar, .navbar.dashboard-topbar) .container-fluid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start !important;
+    gap: 0.5rem;
+    min-height: var(--app-topbar-height);
+    padding-inline: 0.75rem;
+  }
+
+  .vstock-refresh :is(.brand-navbar .navbar-brand.navbar-brand-minimal, .topbar-brand-block) {
+    width: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    gap: 0.5rem;
+  }
+
+  .vstock-refresh :is(.navbar-brand-minimal img.logo, .topbar-brand-block .logo) {
+    height: 36px;
+    max-width: min(104px, 27vw);
+  }
+
+  .vstock-refresh.app-shell .brand-navbar .app-topbar-main,
+  .vstock-refresh .topbar-main {
+    min-height: 0;
+    margin-inline-start: auto;
+    padding: 0;
+  }
+
+  .vstock-refresh .sidebar-collapse-toggle-topbar {
+    position: static;
+    display: inline-flex;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+    transform: none;
+  }
+
+  .vstock-refresh .sidebar-collapse-toggle-topbar:is(:hover, :focus-visible) { transform: none; }
+
+  .vstock-refresh :is(.app-topbar-page-intro, .topbar-page-intro, .navbar-date-inline, .navbar-account-summary) {
+    display: none;
+  }
+
+  .vstock-refresh :is(.brand-navbar, .dashboard-topbar) .navbar-account-toggle {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.28rem;
+    gap: 0.25rem;
+  }
+
+  .vstock-refresh .navbar-account-avatar { width: 32px; height: 32px; }
+
+  .vstock-refresh .sidebar,
+  .vstock-refresh.app-shell .sidebar {
+    position: fixed;
+    z-index: 995;
+    inset: var(--app-topbar-height) auto 0 0;
+    width: min(280px, 80vw);
+    min-width: 0;
+    height: auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform 180ms ease-out;
+  }
+
+  .vstock-refresh.vstock-nav-open .sidebar {
+    visibility: visible;
+    transform: none;
+  }
+
+  .vstock-refresh.vstock-nav-open .vstock-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 990;
+    display: block;
+    background: rgba(33, 53, 58, 0.4);
+  }
+
+  .vstock-refresh .main-container { overflow: visible; }
+  .vstock-refresh.dashboard-page .content.dashboard-content { height: auto; overflow: visible; }
+  .vstock-refresh .sidebar :is(.nav-btn, .sidebar-group-toggle, summary) { min-height: 44px; }
+}
+
+@media screen and (prefers-reduced-motion: reduce) {
+  .vstock-refresh :is(.sidebar, .sidebar *, .page-content, .brand-navbar .container-fluid) {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media print {
+  .vstock-refresh .sidebar-collapse-toggle-topbar,
+  .vstock-refresh .vstock-nav-backdrop { display: none !important; }
+}
