@@ -1,0 +1,197 @@
+body.vstock-refresh.vstock-access {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: var(--vs-bg, #F7F4EC);
+  color: var(--vs-ink, #21353A);
+  font-family: var(--vs-font-body, 'Segoe UI', system-ui, sans-serif);
+}
+
+.vstock-access-shell {
+  width: min(100%, 560px);
+  background: var(--vs-surface, #FFFFFF);
+  border: 1px solid var(--vs-line, #DED9CD);
+  border-radius: 16px;
+  padding: 32px 28px;
+  box-shadow: none;
+}
+
+.vstock-access-brand {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.vstock-access-logo {
+  display: block;
+  width: min(180px, 60vw);
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 12px;
+}
+
+.vstock-access-kicker {
+  margin: 0 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vs-muted, #52666B);
+}
+
+.vstock-access-title {
+  margin: 0;
+  font-family: var(--vs-font-heading, Bahnschrift, 'Segoe UI', system-ui, sans-serif);
+  font-size: clamp(1.6rem, 4vw, 2rem);
+  line-height: 1.15;
+  color: var(--vs-ink, #21353A);
+}
+
+.vstock-access-brand .buscar-subtitle {
+  margin: 10px 0 0;
+  color: var(--vs-muted, #52666B);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.vstock-access-form .form-label {
+  font-weight: 600;
+  color: var(--vs-ink, #21353A);
+  margin-bottom: 6px;
+}
+
+.vstock-access-form .form-control {
+  min-height: 48px;
+  border-radius: 10px;
+  border: 1px solid var(--vs-line, #DED9CD);
+  color: var(--vs-ink, #21353A);
+  background: #fff;
+  box-shadow: none;
+}
+
+.vstock-access-form .form-control:focus {
+  border-color: var(--vs-petroleum, #0F6A73);
+  box-shadow: 0 0 0 3px rgba(15, 106, 115, 0.14);
+}
+
+.vstock-field-error,
+.vstock-field-msg {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  min-height: 0;
+}
+
+.vstock-field-error:not(:empty),
+.vstock-field-msg:not(:empty) {
+  margin-top: 8px;
+}
+
+.vstock-field-error:empty,
+.vstock-field-msg:empty {
+  display: none;
+}
+
+.vstock-access-form .btn-buscar {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--vs-petroleum, #0F6A73);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: none;
+}
+
+.vstock-access-form .btn-buscar:hover,
+.vstock-access-form .btn-buscar:focus {
+  background: #0c5961;
+  color: #fff;
+}
+
+.vstock-ficha.vs-panel {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid var(--vs-line, #DED9CD);
+  border-radius: 14px;
+  background: var(--vs-surface, #FFFFFF);
+}
+
+.vstock-ficha-label {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--vs-petroleum, #0F6A73);
+  border-radius: 4px;
+  color: var(--vs-petroleum, #0F6A73);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-ficha #logoEmpresa img {
+  max-width: 140px;
+  height: auto;
+  margin-bottom: 12px;
+}
+
+.vstock-ficha #dadosEmpresa {
+  color: var(--vs-ink, #21353A);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.vstock-ficha #dadosEmpresa strong,
+.vstock-ficha #dadosEmpresa b {
+  color: var(--vs-ink, #21353A);
+}
+
+.vstock-ficha .btn-success {
+  background: var(--vs-petroleum, #0F6A73);
+  border-color: var(--vs-petroleum, #0F6A73);
+}
+
+.vstock-ficha .btn-success:hover,
+.vstock-ficha .btn-success:focus {
+  background: #0c5961;
+  border-color: #0c5961;
+}
+
+.vstock-ficha .btn-secondary {
+  background: #fff;
+  color: var(--vs-ink, #21353A);
+  border-color: var(--vs-line, #DED9CD);
+}
+
+.vstock-ficha .btn-secondary:hover,
+.vstock-ficha .btn-secondary:focus {
+  background: #f3efe6;
+  color: var(--vs-ink, #21353A);
+  border-color: #cfc8ba;
+}
+
+@media (max-width: 480px) {
+  body.vstock-refresh.vstock-access {
+    padding: 16px 12px;
+    align-items: flex-start;
+  }
+
+  .vstock-access-shell {
+    padding: 24px 16px;
+    border-radius: 14px;
+  }
+
+  .vstock-ficha .d-flex.gap-3 {
+    flex-direction: column;
+  }
+
+  .vstock-ficha .d-flex.gap-3 .btn {
+    width: 100%;
+  }
+}

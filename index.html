@@ -12,8 +12,9 @@
 <link href="css/app.css" rel="stylesheet"/>
 <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
 <link href="css/index.css" rel="stylesheet"/>
+<link href="css/visual-completo.css?v=1" rel="stylesheet"/>
 </head>
-<body class="dashboard-page">
+<body class="dashboard-page vstock-refresh">
 
 <nav class="navbar dashboard-topbar">
   <div class="container-fluid">
@@ -26,7 +27,7 @@
     <div class="topbar-main">
       <div class="topbar-page-intro">
         <span class="topbar-eyebrow">Painel principal</span>
-        <h1 class="topbar-page-title">Dashboard operacional</h1>
+        <span class="topbar-page-title">Dashboard operacional</span>
       </div>
 
       <div class="text-white topbar-account-slot"></div>
@@ -39,19 +40,94 @@
 
   <div class="content dashboard-content">
     <div class="dashboard-shell">
-      <section class="dashboard-compact-banner">
+      <section class="dashboard-compact-banner vs-panel">
         <div>
           <span class="dashboard-hero-badge">
             <i class="bi bi-stars"></i>
             Visão geral
           </span>
-          <h2>Resumo rápido do estoque, vendas e pontos de atenção.</h2>
+          <h1 class="dashboard-page-heading vs-heading">Resumo rápido do estoque, vendas e pontos de atenção.</h1>
         </div>
         <a class="dashboard-banner-link" href="historico.html">
           Ver histórico completo
           <i class="bi bi-arrow-right"></i>
         </a>
       </section>
+
+      <section class="quick-access-section vs-panel" aria-label="Acessos rápidos">
+        <div class="dashboard-card-header quick-access-header">
+          <div>
+            <h2>Acessos rápidos</h2>
+            <p>Atalhos operacionais para as ações mais usadas do dia</p>
+          </div>
+        </div>
+
+        <div class="quick-access-grid">
+          <div id="cardDashboardEntrada">
+            <a class="quick-access-card" href="entrada-compra.html">
+              <span class="quick-access-icon"><i class="bi bi-plus-square"></i></span>
+              <strong>Entrada</strong>
+              <small>Registrar compra ou reposição</small>
+            </a>
+          </div>
+
+          <div id="cardDashboardSaida">
+            <a class="quick-access-card" href="saida-estoque.html">
+              <span class="quick-access-icon"><i class="bi bi-box-arrow-up"></i></span>
+              <strong>Saída</strong>
+              <small>Baixa de itens com motivo</small>
+            </a>
+          </div>
+
+          <div id="cardDashboardProduto">
+            <a class="quick-access-card" href="cadastro-produto.html">
+              <span class="quick-access-icon"><i class="bi bi-box-seam"></i></span>
+              <strong>Produtos</strong>
+              <small>Catálogo e dados essenciais</small>
+            </a>
+          </div>
+
+          <div id="cardDashboardEstoque">
+            <a class="quick-access-card" href="estoque.html">
+              <span class="quick-access-icon"><i class="bi bi-archive"></i></span>
+              <strong>Estoque</strong>
+              <small>Consultar saldo e situação</small>
+            </a>
+          </div>
+
+          <div id="cardDashboardHistorico">
+            <a class="quick-access-card" href="historico.html">
+              <span class="quick-access-icon"><i class="bi bi-clock-history"></i></span>
+              <strong>Movimentações</strong>
+              <small>Revisar entradas e saídas</small>
+            </a>
+          </div>
+
+          <div id="cardDashboardParametrizacao">
+            <a class="quick-access-card" href="parametrizacao.html">
+              <span class="quick-access-icon"><i class="bi bi-sliders"></i></span>
+              <strong>Parametrização</strong>
+              <small>Ajustes gerais do sistema</small>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <article class="dashboard-card alerts-card d-none vs-panel" id="avisoAlertasDashboard">
+        <div class="dashboard-card-header">
+          <div>
+            <h2>Alertas</h2>
+            <p>Itens que precisam de atenção imediata</p>
+          </div>
+          <span class="dashboard-count-badge" id="badgeAlertasDashboard">0</span>
+        </div>
+
+        <p class="alerts-summary" id="textoAlertasDashboard">Existem 0 produtos em atenção no estoque.</p>
+
+        <div class="alert-list" id="dashboardAlertList"></div>
+
+        <a class="dashboard-footer-link" href="alertas.html">Ver todos os alertas</a>
+      </article>
 
       <section class="kpi-grid" aria-label="Indicadores principais">
         <article class="kpi-card">
@@ -183,23 +259,7 @@
       </section>
 
       <section class="dashboard-bottom">
-        <article class="dashboard-card alerts-card d-none" id="avisoAlertasDashboard">
-          <div class="dashboard-card-header">
-            <div>
-              <h2>Alertas</h2>
-              <p>Itens que precisam de atenção imediata</p>
-            </div>
-            <span class="dashboard-count-badge" id="badgeAlertasDashboard">0</span>
-          </div>
-
-          <p class="alerts-summary" id="textoAlertasDashboard">Existem 0 produtos em atenção no estoque.</p>
-
-          <div class="alert-list" id="dashboardAlertList"></div>
-
-          <a class="dashboard-footer-link" href="alertas.html">Ver todos os alertas</a>
-        </article>
-
-        <article class="dashboard-card movements-card">
+        <article class="dashboard-card movements-card vs-panel">
           <div class="dashboard-card-header">
             <div>
               <h2>Últimas Movimentações</h2>
@@ -212,65 +272,6 @@
             <div id="dashboardMovementsList"></div>
           </div>
         </article>
-      </section>
-
-      <section class="quick-access-section" aria-label="Acessos rápidos">
-        <div class="dashboard-card-header quick-access-header">
-          <div>
-            <h2>Acessos rápidos</h2>
-            <p>Atalhos operacionais para as ações mais usadas do dia</p>
-          </div>
-        </div>
-
-        <div class="quick-access-grid">
-          <div id="cardDashboardEntrada">
-            <a class="quick-access-card" href="entrada-compra.html">
-              <span class="quick-access-icon"><i class="bi bi-plus-square"></i></span>
-              <strong>Entrada</strong>
-              <small>Registrar compra ou reposição</small>
-            </a>
-          </div>
-
-          <div id="cardDashboardSaida">
-            <a class="quick-access-card" href="saida-estoque.html">
-              <span class="quick-access-icon"><i class="bi bi-box-arrow-up"></i></span>
-              <strong>Saída</strong>
-              <small>Baixa de itens com motivo</small>
-            </a>
-          </div>
-
-          <div id="cardDashboardProduto">
-            <a class="quick-access-card" href="cadastro-produto.html">
-              <span class="quick-access-icon"><i class="bi bi-box-seam"></i></span>
-              <strong>Produtos</strong>
-              <small>Catálogo e dados essenciais</small>
-            </a>
-          </div>
-
-          <div id="cardDashboardEstoque">
-            <a class="quick-access-card" href="estoque.html">
-              <span class="quick-access-icon"><i class="bi bi-archive"></i></span>
-              <strong>Estoque</strong>
-              <small>Consultar saldo e situação</small>
-            </a>
-          </div>
-
-          <div id="cardDashboardHistorico">
-            <a class="quick-access-card" href="historico.html">
-              <span class="quick-access-icon"><i class="bi bi-clock-history"></i></span>
-              <strong>Movimentações</strong>
-              <small>Revisar entradas e saídas</small>
-            </a>
-          </div>
-
-          <div id="cardDashboardParametrizacao">
-            <a class="quick-access-card" href="parametrizacao.html">
-              <span class="quick-access-icon"><i class="bi bi-sliders"></i></span>
-              <strong>Parametrização</strong>
-              <small>Ajustes gerais do sistema</small>
-            </a>
-          </div>
-        </div>
       </section>
     </div>
   </div>

@@ -1,0 +1,97 @@
+/* Refinamentos visuais exclusivos de cadastro-produto.html */
+
+.vstock-refresh .page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh #produtoForm .form-label.required::after {
+  content: " *";
+  color: #b42332;
+  font-weight: bold;
+}
+
+.vstock-refresh .produto-form-helper {
+  font-size: 0.8rem;
+  color: var(--vs-muted);
+}
+
+.vstock-refresh #tabelaProdutos {
+  margin-bottom: 0;
+}
+
+.vstock-refresh #tabelaProdutos th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh #tabelaProdutos td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh #tabelaProdutos .badge {
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+.vstock-refresh .campo-moeda {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vstock-refresh .campo-moeda-prefixo {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--vs-muted);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.vstock-refresh .campo-moeda input {
+  padding-left: 2.25rem;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .vstock-refresh .page-header-title-center {
+    text-align: left;
+  }
+
+  .vstock-refresh .cadastro-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .vstock-refresh .cadastro-filtro {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .vstock-refresh .vs-actions {
+    width: 100%;
+  }
+
+  .vstock-refresh .vs-actions .btn {
+    width: 100%;
+  }
+
+  .vstock-refresh .produto-form .col-12.d-flex {
+    flex-direction: column-reverse;
+  }
+
+  .vstock-refresh .produto-form .col-12.d-flex .btn {
+    width: 100%;
+  }
+}

@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet"/>
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/historico.css" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/historico-visual.css" rel="stylesheet"/>
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -23,6 +25,17 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -108,32 +121,32 @@
       <div class="page-wrapper">
       <div id="mensagens" class="mb-3"></div>
 
-      <section class="historico-header mb-4">
-        <div class="historico-header-icon">
-          <i class="bi bi-clock-history"></i>
-        </div>
-        <div>
-          <h2 class="h4 mb-1">Movimentações</h2>
+      <div class="page-topo mb-4">
+        <div class="page-topo-title-center">
+          <h1 class="h4 mb-1 vs-heading">
+            <i class="bi bi-clock-history text-danger"></i>
+            Movimentações
+          </h1>
           <p class="text-muted mb-0">Linha do tempo única com entradas, saídas e vendas.</p>
         </div>
-      </section>
+      </div>
 
-      <div class="card mb-4">
+      <section class="card vs-panel mb-4" aria-label="Filtros de movimentações">
         <div class="card-header bg-light">
           <strong><i class="bi bi-funnel"></i> Filtros</strong>
         </div>
         <div class="card-body">
           <div class="historico-filtros mb-3">
             <div>
-              <label class="form-label">Data Inicial</label>
+              <label class="form-label" for="filtroDataInicio">Data Inicial</label>
               <input type="date" id="filtroDataInicio" class="form-control" />
             </div>
             <div>
-              <label class="form-label">Data Final</label>
+              <label class="form-label" for="filtroDataFim">Data Final</label>
               <input type="date" id="filtroDataFim" class="form-control" />
             </div>
             <div>
-              <label class="form-label">Tipo</label>
+              <label class="form-label" for="filtroTipo">Tipo</label>
               <select id="filtroTipo" class="form-select">
                 <option value="">Todos</option>
                 <option value="ENTRADA">Entrada</option>
@@ -142,11 +155,11 @@
               </select>
             </div>
             <div>
-              <label class="form-label">Produto</label>
+              <label class="form-label" for="filtroProduto">Produto</label>
               <input type="text" id="filtroProduto" class="form-control" placeholder="Buscar produto..." />
             </div>
             <div>
-              <label class="form-label">Funcionário</label>
+              <label class="form-label" for="filtroFuncionario">Funcionário</label>
               <input type="text" id="filtroFuncionario" class="form-control" placeholder="Nome do funcionário" />
             </div>
           </div>
@@ -160,9 +173,13 @@
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="timeline-lista" id="timelineHistorico"></div>
+      <section class="card vs-panel vs-data-region mb-3" aria-label="Linha do tempo de movimentações">
+        <div class="card-body">
+          <div class="timeline-lista" id="timelineHistorico"></div>
+        </div>
+      </section>
       <div id="paginacaoHistorico" class="paginacao-listagem mt-3"></div>
       </div>
     </main>

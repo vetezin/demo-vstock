@@ -1,0 +1,188 @@
+body.vstock-refresh {
+  --vs-bg: #F7F4EC;
+  --vs-surface: #FFFFFF;
+  --vs-ink: #21353A;
+  --vs-teal: #0F6A73;
+  --vs-blue: #74AED6;
+  background: var(--vs-bg);
+  color: var(--vs-ink);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+body.vstock-refresh .page-content,
+body.vstock-refresh .orcamentos-header,
+body.vstock-refresh .simple-card,
+body.vstock-refresh .modal-content {
+  color: var(--vs-ink);
+}
+
+body.vstock-refresh .vs-kicker {
+  color: var(--vs-teal);
+  font-weight: 700;
+  letter-spacing: .04em;
+  font-size: .78rem;
+}
+
+body.vstock-refresh .vs-heading,
+body.vstock-refresh .orcamentos-header h1 {
+  color: var(--vs-ink);
+  font-family: Bahnschrift, 'Segoe UI', system-ui, sans-serif;
+}
+
+body.vstock-refresh .simple-card {
+  background: var(--vs-surface);
+  border: 1px solid rgba(33, 53, 58, .12);
+  box-shadow: 0 8px 24px rgba(33, 53, 58, .05);
+}
+
+body.vstock-refresh .orcamentos-lista .table thead th {
+  background: rgba(247, 244, 236, .95);
+  color: var(--vs-ink);
+}
+
+body.vstock-refresh .orcamento-numero,
+body.vstock-refresh .orcamento-cliente,
+body.vstock-refresh .orcamento-detalhe-dados strong,
+body.vstock-refresh .orcamento-detalhe-total strong {
+  color: var(--vs-ink);
+}
+
+body.vstock-refresh .orcamento-data,
+body.vstock-refresh .orcamento-veiculo,
+body.vstock-refresh .text-muted,
+body.vstock-refresh .orcamento-detalhe-dados small,
+body.vstock-refresh .orcamento-detalhe-total small {
+  color: rgba(33, 53, 58, .72) !important;
+}
+
+body.vstock-refresh .orcamento-status {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  border: 1px solid transparent;
+}
+body.vstock-refresh .orcamento-status.pendente {
+  background: rgba(116, 174, 214, .18);
+  color: #1f4f66;
+  border-color: rgba(116, 174, 214, .45);
+}
+body.vstock-refresh .orcamento-status.aprovado {
+  background: rgba(15, 106, 115, .12);
+  color: var(--vs-teal);
+  border-color: rgba(15, 106, 115, .28);
+}
+body.vstock-refresh .orcamento-status.cancelado {
+  background: rgba(180, 35, 50, .1);
+  color: #8f1d2c;
+  border-color: rgba(180, 35, 50, .22);
+}
+
+body.vstock-refresh .orcamento-detalhe-total .orcamento-detalhe-valor-final,
+body.vstock-refresh #detalheOrcamentoTotal {
+  color: var(--vs-teal);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+body.vstock-refresh .orcamento-detalhe-total,
+body.vstock-refresh .orcamento-detalhe-bloco {
+  background: var(--vs-surface);
+  border-color: rgba(33, 53, 58, .12);
+}
+
+body.vstock-refresh .btn-success {
+  background: var(--vs-teal);
+  border-color: var(--vs-teal);
+}
+body.vstock-refresh .btn-success:hover,
+body.vstock-refresh .btn-success:focus {
+  background: #0c5961;
+  border-color: #0c5961;
+}
+body.vstock-refresh .btn-outline-primary {
+  color: var(--vs-teal);
+  border-color: rgba(15, 106, 115, .45);
+}
+body.vstock-refresh .btn-outline-primary:hover,
+body.vstock-refresh .btn-outline-primary:focus {
+  background: rgba(15, 106, 115, .08);
+  color: var(--vs-teal);
+  border-color: var(--vs-teal);
+}
+
+/* Overflow / responsive guards */
+body.vstock-refresh .page-content,
+body.vstock-refresh .main-container,
+body.vstock-refresh .content {
+  min-width: 0;
+}
+body.vstock-refresh .orcamentos-header {
+  gap: .75rem;
+  flex-wrap: wrap;
+  flex-direction: row;
+  max-width: 100%;
+}
+body.vstock-refresh .orcamentos-header-titulo,
+body.vstock-refresh .orcamentos-filtro-busca,
+body.vstock-refresh .orcamentos-filtros > *,
+body.vstock-refresh .orcamentos-header .btn {
+  min-width: 0;
+  max-width: 100%;
+}
+body.vstock-refresh .orcamentos-header .btn {
+  white-space: normal;
+}
+body.vstock-refresh .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+body.vstock-refresh .orcamentos-lista .table {
+  width: 100%;
+}
+body.vstock-refresh .orcamento-numero,
+body.vstock-refresh .orcamento-cliente,
+body.vstock-refresh .orcamento-veiculo {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  body.vstock-refresh .orcamentos-filtros { grid-template-columns: 1fr; }
+  body.vstock-refresh .orcamentos-filtro-acoes { justify-content: stretch; }
+  body.vstock-refresh .orcamentos-header-titulo { flex: 1 1 100%; }
+  body.vstock-refresh .orcamentos-filtro-acoes .btn,
+  body.vstock-refresh .orcamentos-header .btn { width: 100%; flex: 1 1 100%; }
+  body.vstock-refresh .orcamentos-lista .table thead { display: none; }
+  body.vstock-refresh .orcamentos-lista .table,
+  body.vstock-refresh .orcamentos-lista .table tbody,
+  body.vstock-refresh .orcamentos-lista .table tr,
+  body.vstock-refresh .orcamentos-lista .table td {
+    display: block;
+    width: 100%;
+  }
+  body.vstock-refresh .orcamentos-lista .table tr {
+    padding: .85rem 0;
+    border-bottom: 1px solid rgba(33, 53, 58, .12);
+  }
+  body.vstock-refresh .orcamentos-lista .table td {
+    padding: .2rem 0;
+    border: 0;
+    text-align: left !important;
+  }
+  body.vstock-refresh .orcamentos-lista .table td::before {
+    display: block;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: rgba(33, 53, 58, .62);
+    margin-bottom: .1rem;
+  }
+  body.vstock-refresh .orcamentos-lista .table td:nth-child(1)::before { content: 'Orçamento'; }
+  body.vstock-refresh .orcamentos-lista .table td:nth-child(2)::before { content: 'Data de criação'; }
+  body.vstock-refresh .orcamentos-lista .table td:nth-child(3)::before { content: 'Cliente / veículo'; }
+  body.vstock-refresh .orcamentos-lista .table td:nth-child(4)::before { content: 'Status'; }
+  body.vstock-refresh .orcamentos-lista .table td:nth-child(5)::before { content: 'Ação'; }
+  body.vstock-refresh .orcamentos-lista .table td:last-child .btn { width: 100%; }
+  body.vstock-refresh .orcamento-detalhe-layout,
+  body.vstock-refresh .orcamento-detalhe-dados { grid-template-columns: 1fr; }
+}

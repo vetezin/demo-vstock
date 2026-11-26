@@ -1,0 +1,133 @@
+/* Refinamentos visuais exclusivos de vendas.html */
+
+/* Números tabulares onde aplicável */
+.vstock-refresh #pdvTotal,
+.vstock-refresh #pdvSubtotal,
+.vstock-refresh #pdvDiscountSummary,
+.vstock-refresh .pdv-product-price,
+.vstock-refresh .pdv-cart-total,
+.vstock-refresh #pdvCartShortcutTotal,
+.vstock-refresh #modalMesaTotal,
+.vstock-refresh .modal-resumo-venda-tabela td.text-end,
+.vstock-refresh .pdv-stock-inline,
+.vstock-refresh #pdvCartCount,
+.vstock-refresh #pdvProductCount {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Superfícies e paleta na tela de Vendas */
+.vstock-refresh .pdv-page {
+  color: var(--vs-ink, #21353A);
+}
+
+.vstock-refresh .pdv-panel {
+  background: var(--vs-surface, #FFFFFF);
+  border: 1px solid var(--vs-line, #DED9CD);
+  border-radius: 14px;
+}
+
+.vstock-refresh .pdv-product-card {
+  background: var(--vs-surface, #FFFFFF);
+  border: 1px solid var(--vs-line, #DED9CD);
+  border-radius: 10px;
+  color: var(--vs-ink, #21353A);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.vstock-refresh .pdv-product-card:hover {
+  border-color: var(--vs-petroleum, #0F6A73);
+  box-shadow: 0 4px 12px rgba(15, 106, 115, 0.08);
+}
+
+.vstock-refresh .pdv-product-price {
+  color: var(--vs-petroleum, #0F6A73);
+  font-weight: 700;
+}
+
+.vstock-refresh .pdv-view-switcher-btn {
+  color: var(--vs-ink, #21353A);
+}
+
+.vstock-refresh .pdv-view-switcher-btn.is-active {
+  background: var(--vs-petroleum, #0F6A73);
+  color: #FFFFFF;
+}
+
+/* Atalho móvel para o carrinho na Venda Rápida */
+#pdvCartShortcut {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  #pdvCartShortcut {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 920;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.15rem;
+    min-height: 52px;
+    background: #0F6A73;
+    color: #FFFFFF;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(15, 106, 115, 0.28);
+    transition: background-color 0.15s ease, transform 0.15s ease;
+  }
+
+  #pdvCartShortcut:hover,
+  #pdvCartShortcut:focus-visible {
+    background: #0b5057;
+    color: #FFFFFF;
+    outline: 2px solid #74AED6;
+    outline-offset: 2px;
+  }
+
+  .pdv-cart-shortcut-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .pdv-cart-shortcut-info i {
+    font-size: 1.15rem;
+  }
+
+  .pdv-cart-shortcut-count-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .pdv-cart-shortcut-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.88rem;
+  }
+
+  .pdv-cart-shortcut-action strong {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  /* Espaço inferior para o atalho flutuante não sobrepor os últimos cards */
+  .vstock-refresh .pdv-products-panel {
+    padding-bottom: 5rem;
+  }
+}
+
+@media print {
+  #pdvCartShortcut {
+    display: none !important;
+  }
+}

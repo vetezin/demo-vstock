@@ -13,9 +13,11 @@
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet"/>
   <link href="css/entrada-compra.css" rel="stylesheet"/>
   <link href="css/estoque-paginas.css?v=20260803-desktop" rel="stylesheet"/>
+  <link href="css/visual-completo.css?v=1" rel="stylesheet"/>
+  <link href="css/saida-estoque-visual.css" rel="stylesheet"/>
 </head>
 
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -32,11 +34,18 @@
           <span id="usuario-logado">Operador</span>
         </div>
       </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
+        </div>
+      </div>
     </div>
   </nav>
 
   <div class="main-container app-layout">
-    <div class="sidebar">
+    <aside class="sidebar">
       <h5><i class="bi bi-grid-3x3-gap"></i> Módulos do Sistema</h5>
 
       <a class="nav-btn" href="index.html">
@@ -109,7 +118,7 @@
           <i class="bi bi-clock"></i> Atualizado hoje
         </small>
       </div>
-    </div>
+    </aside>
 
     <div class="content page-content">
       <main class="page-wrapper">
@@ -120,12 +129,12 @@
             <i class="bi bi-box-arrow-up"></i>
           </div>
           <div>
-            <h2 class="h4 mb-1">Saída De Estoque</h2>
+            <h1 class="h4 mb-1 vs-heading">Saída De Estoque</h1>
             <p class="text-muted mb-0">Registre os itens que estão saindo do estoque.</p>
           </div>
         </section>
 
-        <div class="card mb-4 card-entrada-unificada saida-card">
+        <div class="card mb-4 card-entrada-unificada saida-card vs-panel">
 
           <div class="card-body">
             <div class="entrada-section saida-section-card">
@@ -180,17 +189,17 @@
                 </select>
               </div>
 
-              <div class="col-xl-2 col-lg-2 col-md-4">
-                <label class="form-label">Saldo em Estoque</label>
+              <div class="col-6 col-md-4 col-saida-saldo">
+                <label class="form-label">Saldo disponível</label>
                 <input type="text" id="saldoProduto" class="form-control text-end" disabled placeholder="0"/>
               </div>
 
-              <div class="col-xl-2 col-lg-2 col-md-3">
+              <div class="col-6 col-md-4 col-saida-qtd">
                 <label class="form-label required">Quantidade</label>
                 <input type="number" id="quantidade" min="1" step="1" class="form-control text-end"/>
               </div>
 
-              <div class="col-xl-2 col-lg-3 col-md-3">
+              <div class="col-12 col-md-4">
                 <label class="form-label required">Motivo</label>
                 <select id="motivo" class="form-select">
                   <option value="USO_INTERNO" selected>Uso interno</option>
@@ -230,7 +239,7 @@
                 <span>Itens da Saída</span>
               </div>
 
-            <div class="table-responsive mt-1 itens-saida-box">
+            <div class="table-responsive mt-1 itens-saida-box vs-data-region">
               <table class="table table-sm align-middle" id="tabelaItens">
                 <thead>
                   <tr>
@@ -260,7 +269,7 @@
           </div>
         </div>
 
-        <div class="card mb-4 shadow-sm">
+        <div class="card mb-4 shadow-sm vs-panel">
           <div class="card-header bg-light card-header-flex">
             <i class="bi bi-journal-minus text-danger"></i>
             <span>Saídas Registradas</span>
@@ -298,7 +307,7 @@
               </div>
             </div>
 
-            <div class="table-responsive">
+            <div class="table-responsive vs-data-region">
               <table id="tabelaSaidas" class="table table-hover table-striped">
                 <thead>
                     <tr>
@@ -317,7 +326,7 @@
           </div>
         </div>
 
-        <div class="actions-bar d-flex flex-wrap justify-content-end gap-2 mb-4">
+        <div class="actions-bar d-flex flex-wrap justify-content-end gap-2 mb-4 vs-actions">
           <a href="index.html" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Voltar
           </a>

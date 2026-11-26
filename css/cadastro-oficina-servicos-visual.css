@@ -1,0 +1,57 @@
+/* Refinamentos visuais exclusivos de cadastro-oficina-servicos.html */
+
+.vstock-refresh .page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh #servicoForm .form-label.required::after {
+  content: " *";
+  color: #b42332;
+  font-weight: bold;
+}
+
+.vstock-refresh #tabelaServicos {
+  margin-bottom: 0;
+}
+
+.vstock-refresh #tabelaServicos th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  font-weight: 600;
+  border-bottom: 1px solid var(--vs-line);
+}
+
+.vstock-refresh #tabelaServicos td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh #tabelaServicos .badge {
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .vstock-refresh .page-header-title-center {
+    text-align: left;
+  }
+
+  .vstock-refresh .cadastro-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .vstock-refresh .cadastro-filtro {
+    max-width: 100%;
+    width: 100%;
+  }
+}

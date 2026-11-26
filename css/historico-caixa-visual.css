@@ -1,0 +1,98 @@
+/* Refinamentos visuais exclusivos de historico-caixa.html */
+
+.vstock-refresh #cashHistoryNetSales,
+.vstock-refresh #cashHistoryBalanced,
+.vstock-refresh #cashHistoryDivergent,
+.vstock-refresh #cashHistoryCount,
+.vstock-refresh #cashDetailInitialBalance,
+.vstock-refresh #cashDetailNetSales,
+.vstock-refresh #cashDetailExpectedBalance,
+.vstock-refresh #cashDetailCountedAmount,
+.vstock-refresh #cashDetailDifference,
+.vstock-refresh .cash-history-table td.text-end,
+.vstock-refresh .cash-value-positive,
+.vstock-refresh .cash-value-negative {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .cash-page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.vstock-refresh .cash-page-header p {
+  max-width: 100%;
+}
+
+.vstock-refresh .cash-eyebrow {
+  color: var(--vs-muted);
+}
+
+.vstock-refresh .cash-eyebrow i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .cash-card {
+  border: 1px solid var(--vs-line);
+  background: var(--vs-surface);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.vstock-refresh .cash-card-header {
+  border-bottom: 1px solid var(--vs-line);
+}
+
+.vstock-refresh .cash-card-title span {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .cash-primary-button {
+  background: var(--vs-petroleum);
+  border-color: var(--vs-petroleum);
+  color: #ffffff;
+}
+
+.vstock-refresh .cash-secondary-button {
+  border-color: var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .cash-history-status {
+  border: 1px solid var(--vs-line);
+}
+
+.vstock-refresh .cash-table th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh .cash-table td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .cash-icon-button {
+  border-color: var(--vs-line);
+  color: var(--vs-petroleum);
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .cash-history-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media print {
+  .vstock-refresh .app-topbar,
+  .vstock-refresh .sidebar,
+  .vstock-refresh .cash-page-header,
+  .vstock-refresh .cash-card,
+  .vstock-refresh .cash-history-summary {
+    display: none !important;
+  }
+}

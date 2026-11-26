@@ -1,0 +1,128 @@
+/* Refinamentos visuais exclusivos de entrada-compra.html */
+
+.vstock-refresh .saida-page-header {
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 1rem;
+}
+
+.vstock-refresh .saida-page-header-icon {
+  background: var(--vs-brand-wash);
+  color: var(--vs-petroleum);
+  border: 1px solid color-mix(in srgb, var(--vs-petroleum) 25%, transparent);
+}
+
+.vstock-refresh .entrada-section.saida-section-card {
+  border: 1px solid var(--vs-line);
+  background: var(--vs-surface);
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 1rem;
+}
+
+.vstock-refresh .entrada-section-header {
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .entrada-step-badge {
+  background: var(--vs-petroleum);
+  color: #ffffff;
+}
+
+.vstock-refresh .saida-info-banner {
+  background: var(--vs-brand-wash);
+  border: 1px solid color-mix(in srgb, var(--vs-petroleum) 25%, transparent);
+  color: var(--vs-ink);
+  border-radius: 8px;
+}
+
+.vstock-refresh .saida-info-banner i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .entrada-resumo-card {
+  border-color: var(--vs-line);
+  background: var(--vs-surface);
+  box-shadow: none;
+}
+
+.vstock-refresh .entrada-resumo-header {
+  color: var(--vs-ink);
+  border-bottom: 1px solid var(--vs-line);
+  padding-bottom: 0.75rem;
+}
+
+.vstock-refresh .entrada-resumo-header i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .entrada-resumo-total {
+  border: 1px solid var(--vs-line);
+  border-radius: 10px;
+  background: var(--vs-brand-wash);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .entrada-resumo-total strong,
+.vstock-refresh .entrada-resumo-linha strong,
+.vstock-refresh #resumoEntradaItens,
+.vstock-refresh #resumoEntradaQuantidade,
+.vstock-refresh #resumoEntradaValor,
+.vstock-refresh #totalGeralCompra,
+.vstock-refresh #quantidade,
+.vstock-refresh #tabelaItens td.text-end,
+.vstock-refresh #tabelaCompras td {
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-refresh .entrada-tip-box {
+  border: 1px solid var(--vs-line);
+  border-radius: 8px;
+  background: var(--vs-surface);
+}
+
+.vstock-refresh .entrada-tip-box i {
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh #tabelaItens th,
+.vstock-refresh #tabelaCompras th {
+  background-color: var(--vs-brand-wash);
+  color: var(--vs-ink);
+  border-bottom: 1px solid var(--vs-line);
+  white-space: nowrap;
+}
+
+.vstock-refresh #tabelaItens td,
+.vstock-refresh #tabelaCompras td {
+  border-bottom: 1px solid var(--vs-line);
+  color: var(--vs-ink);
+}
+
+.vstock-refresh .entrada-historico-card .card-header {
+  flex-wrap: wrap;
+}
+
+.vstock-refresh .entrada-historico-tag {
+  margin-left: auto;
+  color: var(--vs-petroleum);
+}
+
+.vstock-refresh .actions-bar {
+  border-top: 1px solid var(--vs-line);
+  padding-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .vstock-refresh .saida-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vstock-refresh .actions-bar {
+    flex-direction: column-reverse;
+  }
+
+  .vstock-refresh .actions-bar .btn {
+    width: 100%;
+  }
+}

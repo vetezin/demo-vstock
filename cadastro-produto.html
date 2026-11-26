@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-produto-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -23,6 +25,13 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -107,29 +116,31 @@
     <main class="content page-content">
       <div id="mensagens" class="mb-3"></div>
 
-      <div class="page-header">
+      <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-box-seam text-danger"></i> Cadastro de Produtos</h2>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-box-seam text-danger"></i> Cadastro de Produtos</h1>
           <p class="text-muted mb-0">Cadastre os itens usados nas entradas e saídas de estoque.</p>
         </div>
-        <a href="entrada-compra.html" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left"></i> Voltar para Entrada
-        </a>
+        <div class="vs-actions">
+          <a href="entrada-compra.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Entrada
+          </a>
+        </div>
       </div>
 
-      <div class="card simple-card mb-4">
-        <div class="card-header">
-          <span id="tituloFormularioProduto"><i class="bi bi-plus-square"></i> Novo Produto</span>
+      <div class="card vs-panel mb-4">
+        <div class="card-header bg-transparent border-bottom">
+          <span id="tituloFormularioProduto" class="fw-semibold"><i class="bi bi-plus-square"></i> Novo Produto</span>
         </div>
         <div class="card-body">
           <form id="produtoForm" class="row g-3 produto-form">
             <div class="col-xl-6 col-lg-7 col-md-7">
-              <label class="form-label required">Nome do Produto</label>
+              <label class="form-label required" for="produtoDescricao">Nome do Produto</label>
               <input type="text" id="produtoDescricao" class="form-control" required />
             </div>
 
             <div class="col-xl-4 col-lg-5 col-md-5">
-              <label class="form-label required">Categoria</label>
+              <label class="form-label required" for="categoriaProduto">Categoria</label>
               <select id="categoriaProduto" class="form-select" required>
                 <option value="" selected disabled>Carregando...</option>
               </select>
@@ -141,12 +152,12 @@
             </div>
 
             <div class="col-xl-3 col-lg-4 col-md-4">
-              <label class="form-label required">Qtd. Mínima</label>
+              <label class="form-label required" for="produtoQtdMin">Qtd. Mínima</label>
               <input type="number" id="produtoQtdMin" class="form-control" min="0" placeholder="Quantidade mínima em estoque" required />
             </div>
 
             <div class="col-xl-3 col-lg-4 col-md-4">
-              <label class="form-label required">Valor Unitário</label>
+              <label class="form-label required" for="produtoValorUnitario">Valor Unitário</label>
               <div class="campo-moeda">
                 <span class="campo-moeda-prefixo">R$</span>
                 <input type="text" id="produtoValorUnitario" class="form-control" placeholder="0,00" required />
@@ -155,12 +166,12 @@
             </div>
 
             <div class="col-xl-4 col-lg-4 col-md-4">
-              <label class="form-label">Código de Barras</label>
+              <label class="form-label" for="produtoCodigoBarras">Código de Barras</label>
               <input type="text" id="produtoCodigoBarras" class="form-control" maxlength="80" placeholder="Opcional" />
               <small class="text-muted produto-form-helper">Use o código lido pelo scanner quando existir.</small>
             </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2">
+            <div class="col-12 d-flex justify-content-end gap-2 vs-actions">
               <button type="button" id="btnCancelarEdicao" class="btn btn-outline-secondary d-none">
                 <i class="bi bi-x-circle"></i> Cancelar edição
               </button>
@@ -175,17 +186,17 @@
         </div>
       </div>
 
-      <div class="card simple-card">
-        <div class="card-header">
-          <i class="bi bi-list-ul"></i> Produtos Cadastrados
+      <div class="card vs-panel">
+        <div class="card-header bg-transparent border-bottom">
+          <span class="fw-semibold"><i class="bi bi-list-ul"></i> Produtos Cadastrados</span>
         </div>
         <div class="card-body">
-          <div class="cadastro-toolbar mb-3">
-            <div class="cadastro-filtro">
+          <div class="cadastro-toolbar mb-3 d-flex flex-wrap align-items-end gap-2">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroNomeProduto">Filtrar por nome</label>
               <input type="text" id="filtroNomeProduto" class="form-control" placeholder="Buscar produto pelo nome" />
             </div>
-            <div class="cadastro-filtro">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroCategoriaProduto">Filtrar por categoria</label>
               <input type="text" id="filtroCategoriaProduto" class="form-control" placeholder="Selecione ou digite uma categoria" autocomplete="off" />
             </div>
@@ -199,7 +210,7 @@
             </div>
           </div>
 
-          <div class="table-responsive">
+          <div class="table-responsive vs-data-region">
             <table class="table table-hover align-middle" id="tabelaProdutos">
               <thead>
                 <tr>
@@ -217,7 +228,7 @@
             </table>
           </div>
 
-          <div id="paginacaoProdutos" class="paginacao-cadastro"></div>
+          <div id="paginacaoProdutos" class="paginacao-cadastro mt-3"></div>
         </div>
       </div>
     </main>

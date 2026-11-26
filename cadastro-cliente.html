@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-cliente-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -23,6 +25,17 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -36,43 +49,48 @@
     <main class="content page-content">
       <div id="mensagens" class="mb-3"></div>
 
-      <div class="page-header">
+      <div class="page-header mb-4">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-people text-danger"></i> Cadastro de Clientes</h2>
+          <span class="vs-kicker text-uppercase">Cadastros</span>
+          <h1 class="h4 mb-1 vs-heading">
+            <i class="bi bi-people text-danger"></i> Cadastro de Clientes
+          </h1>
           <p class="text-muted mb-0">Mantenha os clientes que poderão ser vinculados às vendas.</p>
         </div>
-        <a href="index.html" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left"></i> Voltar para Dashboard
-        </a>
+        <div class="vs-actions">
+          <a href="index.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Dashboard
+          </a>
+        </div>
       </div>
 
-      <div class="card simple-card mb-4">
+      <section class="card simple-card vs-panel mb-4" aria-label="Formulário de cliente">
         <div class="card-header">
           <span id="tituloFormularioCliente"><i class="bi bi-person-plus"></i> Novo Cliente</span>
         </div>
         <div class="card-body">
           <form id="clienteForm" class="row g-3">
             <div class="col-md-6">
-              <label class="form-label required">Nome</label>
+              <label class="form-label required" for="nome">Nome</label>
               <input type="text" id="nome" class="form-control" placeholder="Nome do cliente" required maxlength="120" />
             </div>
 
             <div class="col-md-3">
-              <label class="form-label">CPF/CNPJ</label>
+              <label class="form-label" for="cpfCnpj">CPF/CNPJ</label>
               <input type="text" id="cpfCnpj" class="form-control" placeholder="Opcional" maxlength="18" />
             </div>
 
             <div class="col-md-3">
-              <label class="form-label">Telefone</label>
+              <label class="form-label" for="telefone">Telefone</label>
               <input type="text" id="telefone" class="form-control" placeholder="Opcional" maxlength="20" />
             </div>
 
             <div class="col-12">
-              <label class="form-label">Observação</label>
+              <label class="form-label" for="observacao">Observação</label>
               <textarea id="observacao" class="form-control" rows="3" maxlength="500" placeholder="Informações adicionais do cliente"></textarea>
             </div>
 
-            <div class="col-12 d-flex justify-content-end gap-2">
+            <div class="col-12 d-flex justify-content-end gap-2 flex-wrap vs-actions">
               <button type="button" id="btnCancelarEdicao" class="btn btn-outline-secondary d-none">
                 <i class="bi bi-x-circle"></i> Cancelar edição
               </button>
@@ -85,14 +103,12 @@
             </div>
           </form>
         </div>
-      </div>
+      </section>
 
-      <div class="card simple-card">
-        <div class="card-header">
-          <i class="bi bi-list-ul"></i> Clientes Cadastrados
-        </div>
+      <!-- Faixa própria de busca por nome ou documento -->
+      <section class="card simple-card vs-panel mb-4 cliente-busca-faixa" aria-label="Busca de clientes">
         <div class="card-body">
-          <div class="cadastro-toolbar mb-3">
+          <div class="cadastro-toolbar mb-0">
             <div class="cadastro-filtro">
               <label class="form-label" for="filtroNomeCliente">Filtrar por nome</label>
               <input type="text" id="filtroNomeCliente" class="form-control" placeholder="Buscar cliente pelo nome" />
@@ -102,7 +118,14 @@
               <input type="text" id="filtroCpfCliente" class="form-control" placeholder="Buscar cliente pelo CPF/CNPJ" />
             </div>
           </div>
+        </div>
+      </section>
 
+      <section class="card simple-card vs-panel vs-data-region" aria-label="Clientes cadastrados">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span><i class="bi bi-list-ul"></i> Clientes Cadastrados</span>
+        </div>
+        <div class="card-body">
           <div class="table-responsive">
             <table class="table table-hover align-middle" id="tabelaClientes">
               <thead>
@@ -122,7 +145,7 @@
 
           <div id="paginacaoClientes" class="paginacao-cadastro"></div>
         </div>
-      </div>
+      </section>
     </main>
   </div>
 
@@ -132,4 +155,3 @@
   <script src="js/cadastro-cliente.js"></script>
 </body>
 </html>
-

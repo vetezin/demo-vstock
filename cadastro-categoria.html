@@ -11,8 +11,10 @@
   <link href="css/app.css" rel="stylesheet" />
   <link href="css/principal.css?v=20260803-desktop" rel="stylesheet" />
   <link href="css/cadastro-base.css" rel="stylesheet" />
+  <link href="css/visual-completo.css?v=1" rel="stylesheet" />
+  <link href="css/cadastro-categoria-visual.css" rel="stylesheet" />
 </head>
-<body class="app-shell">
+<body class="app-shell vstock-refresh">
   <nav class="navbar brand-navbar app-topbar">
     <div class="container-fluid justify-content-between">
       <a class="navbar-brand text-white d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -24,6 +26,17 @@
         <div class="navbar-date">
           <i class="bi bi-calendar3"></i>
           <span id="current-date"></span>
+        </div>
+        <div class="navbar-user">
+          <i class="bi bi-person-badge"></i>
+          <span id="usuario-logado">Operador</span>
+        </div>
+      </div>
+
+      <div class="app-topbar-main">
+        <div class="app-topbar-page-intro">
+          <span class="app-topbar-title"></span>
+          <p class="app-topbar-subtitle"></p>
         </div>
       </div>
     </div>
@@ -108,24 +121,26 @@
     <main class="content page-content">
       <div id="mensagens" class="mb-3"></div>
 
-      <div class="page-header">
+      <div class="page-header d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
         <div class="page-header-title-center">
-          <h2><i class="bi bi-tags text-danger"></i> Cadastro de Categorias</h2>
+          <h1 class="h4 mb-1 vs-heading"><i class="bi bi-tags text-danger"></i> Cadastro de Categorias</h1>
           <p class="text-muted mb-0">Organize os produtos por categoria seguindo a estrutura do banco.</p>
         </div>
-        <a href="cadastro-produto.html" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left"></i> Voltar para Produtos
-        </a>
+        <div class="vs-actions">
+          <a href="cadastro-produto.html" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar para Produtos
+          </a>
+        </div>
       </div>
 
-      <div class="card simple-card mb-4">
-        <div class="card-header">
-          <span id="tituloFormularioCategoria"><i class="bi bi-tag"></i> Nova Categoria</span>
+      <div class="card vs-panel mb-4">
+        <div class="card-header bg-transparent border-bottom">
+          <span id="tituloFormularioCategoria" class="fw-semibold"><i class="bi bi-tag"></i> Nova Categoria</span>
         </div>
         <div class="card-body">
           <form id="categoriaForm" class="row g-3">
             <div class="col-md-8">
-              <label class="form-label required">Descrição da Categoria</label>
+              <label class="form-label required" for="categoriaDescricao">Descrição da Categoria</label>
               <input type="text" id="categoriaDescricao" class="form-control" required />
             </div>
 
@@ -144,19 +159,24 @@
         </div>
       </div>
 
-      <div class="card simple-card">
-        <div class="card-header">
-          <i class="bi bi-list-ul"></i> Categorias Cadastradas
+      <div class="card vs-panel">
+        <div class="card-header bg-transparent border-bottom">
+          <span class="fw-semibold"><i class="bi bi-list-ul"></i> Categorias Cadastradas</span>
         </div>
         <div class="card-body">
-          <div class="cadastro-toolbar mb-3">
-            <div class="cadastro-filtro">
+          <div class="cadastro-toolbar mb-3 d-flex flex-wrap align-items-end gap-2">
+            <div class="cadastro-filtro flex-grow-1">
               <label class="form-label" for="filtroNomeCategoria">Filtrar por nome</label>
               <input type="text" id="filtroNomeCategoria" class="form-control" placeholder="Buscar categoria pelo nome" />
             </div>
+            <div class="cadastro-filtro-acoes">
+              <button type="button" id="btnLimparFiltroCategoria" class="btn btn-outline-secondary" onclick="const f = document.getElementById('filtroNomeCategoria'); if(f){ f.value=''; f.dispatchEvent(new Event('input', {bubbles:true})); }">
+                <i class="bi bi-x-circle"></i> Limpar filtro
+              </button>
+            </div>
           </div>
 
-          <div class="table-responsive">
+          <div class="table-responsive vs-data-region">
             <table class="table table-hover align-middle" id="tabelaCategorias">
               <thead>
                 <tr>

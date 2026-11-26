@@ -206,11 +206,13 @@
   box-shadow: 0 12px 28px rgba(38, 50, 56, 0.05);
 }
 
-.dashboard-compact-banner h2 {
+.dashboard-compact-banner h2,
+.dashboard-compact-banner h1 {
   margin: 0.55rem 0 0;
   color: #263238;
   font-size: 1.32rem;
   font-weight: 800;
+  font-family: inherit;
 }
 
 .dashboard-banner-link {

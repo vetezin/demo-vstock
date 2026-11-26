@@ -1,0 +1,266 @@
+/* login.html - visual exclusivo da pagina de acesso */
+body.vstock-refresh.vstock-access {
+  margin: 0;
+  min-height: 100vh;
+  padding: 0;
+  background: #F7F4EC;
+  color: #21353A;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.vstock-access .login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(circle at top left, rgba(15, 106, 115, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(116, 174, 214, 0.18), transparent 24%),
+    #F7F4EC;
+}
+
+.vstock-access .login-panel,
+.vstock-access .login-panel-single {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.vstock-access .login-panel-single::before,
+.vstock-access .login-panel-single::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.vstock-access .login-panel-single::before {
+  width: 18rem;
+  height: 18rem;
+  top: -2rem;
+  left: max(0rem, calc(50% - 23rem));
+  background: radial-gradient(circle, rgba(15, 106, 115, 0.12) 0%, rgba(15, 106, 115, 0) 72%);
+}
+
+.vstock-access .login-panel-single::after {
+  width: 14rem;
+  height: 14rem;
+  right: max(0rem, calc(50% - 21rem));
+  bottom: -1rem;
+  background: radial-gradient(circle, rgba(116, 174, 214, 0.2) 0%, rgba(116, 174, 214, 0) 72%);
+}
+
+.vstock-access .login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 30rem;
+  padding: 2.25rem;
+  border-radius: 1.25rem;
+  border: 1px solid #DED9CD;
+  background: #FFFFFF;
+  box-shadow: 0 20px 48px rgba(33, 53, 58, 0.08);
+  text-align: center;
+}
+
+.vstock-access .login-badge {
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto 1rem;
+  border-radius: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 106, 115, 0.1);
+  color: #0F6A73;
+  font-size: 1.5rem;
+  border: 1px solid rgba(15, 106, 115, 0.16);
+}
+
+.vstock-access .login-overline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  margin-bottom: 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #0F6A73;
+  background: rgba(15, 106, 115, 0.08);
+  border: 1px solid rgba(15, 106, 115, 0.14);
+}
+
+.vstock-access .login-container h1 {
+  margin: 0 0 0.5rem;
+  color: #21353A;
+  font-family: Bahnschrift, 'Segoe UI', system-ui, sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.vstock-access .login-subtitle {
+  margin: 0 0 1.75rem;
+  color: #52666B;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.vstock-access .field-group {
+  margin-bottom: 1rem;
+}
+
+.vstock-access .form-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  color: #21353A;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.vstock-access .input-shell {
+  position: relative;
+}
+
+.vstock-access .input-icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: #52666B;
+  pointer-events: none;
+  font-size: 1rem;
+}
+
+.vstock-access .form-control {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.8rem 1rem 0.8rem 2.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #DED9CD;
+  background: #FFFFFF;
+  color: #21353A;
+  font-size: 1rem;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 2px rgba(33, 53, 58, 0.03);
+}
+
+.vstock-access .form-control::placeholder {
+  color: #7A8A8F;
+}
+
+.vstock-access .form-control:focus {
+  border-color: #0F6A73;
+  box-shadow: 0 0 0 0.2rem rgba(15, 106, 115, 0.14);
+  outline: none;
+}
+
+.vstock-access #licencaFieldWrapper {
+  margin-top: 0.25rem;
+  padding: 1rem;
+  border-radius: 0.9rem;
+  background: #FBFAF7;
+  border: 1px dashed #CFC8B8;
+}
+
+.vstock-access #licencaHelper {
+  margin-top: 0.55rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #52666B;
+}
+
+.vstock-access .btn-login {
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #0F6A73;
+  border-radius: 0.9rem;
+  background: #0F6A73;
+  color: #FFFFFF;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 12px 24px rgba(15, 106, 115, 0.2);
+}
+
+.vstock-access .btn-login:hover,
+.vstock-access .btn-login:focus {
+  background: #0C5961;
+  border-color: #0C5961;
+  color: #FFFFFF;
+}
+
+.vstock-access .btn-login:active {
+  background: #0A4B52;
+  border-color: #0A4B52;
+  color: #FFFFFF;
+}
+
+.vstock-access .feedback-stack {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.vstock-access .status-feedback {
+  min-height: 0;
+  margin: 0;
+  text-align: left;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.vstock-access .status-feedback:empty {
+  display: none;
+}
+
+.vstock-access .status-feedback:not(:empty) {
+  padding: 0.8rem 0.95rem;
+  border-radius: 0.85rem;
+  border: 1px solid transparent;
+}
+
+.vstock-access .status-success:not(:empty) {
+  color: #1F5C3B;
+  background: rgba(31, 92, 59, 0.08);
+  border-color: rgba(31, 92, 59, 0.2);
+}
+
+.vstock-access .status-error:not(:empty) {
+  color: #8F2432;
+  background: rgba(180, 35, 50, 0.08);
+  border-color: rgba(180, 35, 50, 0.2);
+}
+
+@media (max-width: 768px) {
+  .vstock-access .login-shell {
+    padding: 1rem;
+  }
+
+  .vstock-access .login-container {
+    max-width: 100%;
+    padding: 1.6rem 1.25rem;
+    border-radius: 1.1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .vstock-access .login-container h1 {
+    font-size: 1.75rem;
+  }
+
+  .vstock-access .form-control,
+  .vstock-access .btn-login {
+    min-height: 3.15rem;
+  }
+}

@@ -1574,13 +1574,82 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   function registrarToggleSidebarRecolhida() {
     var botoes = document.querySelectorAll('[data-sidebar-collapse-toggle]');
-    for (var i = 0; i < botoes.length; i++) {
-      botoes[i].addEventListener('click', function () {
+    var sidebar = obterSidebarPrincipal();
+    var telaMovel = sidebar && botoes.length && document.body.classList.contains('vstock-refresh')
+      ? window.matchMedia('(max-width: 768px)') : null;
+    var gatilhoAtivo;
+    var aberto = false;
+
+    function aplicarEstadoMenuMovel(abrir) {
+      aberto = abrir;
+      document.body.classList.toggle('vstock-nav-open', abrir);
+      botoes.forEach(function (botao) {
+        var rotulo = abrir ? 'Fechar menu lateral' : 'Abrir menu lateral';
+        botao.setAttribute('aria-label', rotulo);
+        botao.setAttribute('title', rotulo);
+        botao.setAttribute('aria-expanded', String(abrir));
+        var icone = botao.querySelector('i');
+        if (icone) icone.className = abrir ? 'bi bi-x-lg' : 'bi bi-list';
+      });
+    }
+
+    if (telaMovel) {
+      if (!sidebar.id) sidebar.id = 'vstockSidebar';
+      botoes.forEach(function (botao) { botao.setAttribute('aria-controls', sidebar.id); });
+      sidebar.querySelectorAll('.nav-btn.active[href]').forEach(function (item) {
+        item.setAttribute('aria-current', 'page');
+      });
+
+      function sincronizarTela() {
+        if (telaMovel.matches) {
+          var focoNoMenu = sidebar.contains(document.activeElement);
+          aplicarEstadoMenuMovel(false);
+          if (focoNoMenu) (gatilhoAtivo || botoes[0]).focus();
+        } else {
+          aberto = false;
+          document.body.classList.remove('vstock-nav-open');
+          aplicarEstadoSidebarRecolhida(sidebarEstaRecolhida());
+        }
+      }
+
+      var backdrop = document.createElement('div');
+      backdrop.className = 'vstock-nav-backdrop';
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(backdrop);
+      backdrop.addEventListener('click', function () {
+        aplicarEstadoMenuMovel(false);
+        gatilhoAtivo.focus();
+      });
+      document.addEventListener('keydown', function (event) {
+        if (!aberto || event.key !== 'Escape') return;
+        aplicarEstadoMenuMovel(false);
+        gatilhoAtivo.focus();
+      });
+      document.addEventListener('focusin', function (event) {
+        if (aberto && !sidebar.contains(event.target) && !event.target.closest('[data-sidebar-collapse-toggle]')) {
+          aplicarEstadoMenuMovel(false);
+        }
+      });
+      telaMovel.addEventListener('change', sincronizarTela);
+      sincronizarTela();
+    }
+
+    botoes.forEach(function (botao) {
+      botao.addEventListener('click', function () {
+        if (telaMovel && telaMovel.matches) {
+          gatilhoAtivo = botao;
+          aplicarEstadoMenuMovel(!aberto);
+          if (aberto) {
+            var primeiroItem = sidebar.querySelector('.nav-btn[href], button:not([disabled])');
+            if (primeiroItem) primeiroItem.focus();
+          }
+          return;
+        }
         var recolhida = !document.body.classList.contains('sidebar-collapsed');
         salvarEstadoSidebarRecolhida(recolhida);
         aplicarEstadoSidebarRecolhida(recolhida);
       });
-    }
+    });
   }
 
   function prepararTitulosSidebar() {

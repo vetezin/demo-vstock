@@ -1,0 +1,48 @@
+/* Refinamentos visuais exclusivos de historico.html */
+
+.vstock-refresh .timeline-meta-bloco strong,
+.vstock-refresh .timeline-topo-meta span,
+.vstock-refresh .timeline-produto-coluna-qtd,
+.vstock-refresh .timeline-produto-coluna-valor,
+.vstock-refresh .timeline-produto-coluna-total,
+.vstock-refresh .timeline-produto-item-grid strong,
+.vstock-refresh .timeline-produto-tabela-total strong {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.vstock-refresh .historico-filtros {
+  min-width: 0;
+}
+
+.vstock-refresh .timeline-lista {
+  min-width: 0;
+}
+
+.vstock-refresh .timeline-item {
+  min-width: 0;
+}
+
+.vstock-refresh .timeline-card {
+  min-width: 0;
+}
+
+.vstock-refresh .timeline-produto-tabela {
+  min-width: 0;
+  overflow-x: auto;
+}
+
+@media (max-width: 767px) {
+  .vstock-refresh .historico-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .vstock-refresh .timeline-produto-tabela-cabecalho,
+  .vstock-refresh .timeline-produto-tabela-linha,
+  .vstock-refresh .timeline-produto-tabela-total {
+    grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(60px, 1fr));
+    gap: 0.4rem;
+    padding: 0.6rem 0.7rem;
+    font-size: 0.82rem;
+  }
+}
